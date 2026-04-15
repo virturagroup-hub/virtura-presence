@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    ".appdata/**",
+    ".npm-cache/**",
+    "_public-source/**",
+    "virtura-presence-app/**",
   ]),
 ]);
 
