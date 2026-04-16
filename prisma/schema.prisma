@@ -25,9 +25,11 @@ enum SubmissionStatus {
 }
 
 enum ScoreTier {
-  STRONG_FOOTING
-  PROMISING_UPSIDE
-  FOCUSED_ATTENTION
+  LIMITED_FOUNDATION
+  EARLY_STAGE_PRESENCE
+  BASIC_FOUNDATION_CLEAR_GAPS
+  SOLID_FOUNDATION_IMPROVEMENTS
+  STRONG_ONLINE_PRESENCE
 }
 
 enum AuditStatus {
@@ -61,16 +63,47 @@ enum FollowUpStatus {
   CLOSED
 }
 
+enum WebsiteStatus {
+  NONE
+  IN_PROGRESS
+  BASIC
+  MOSTLY_COMPLETE
+  POLISHED
+}
+
+enum GoogleBusinessProfileStatus {
+  NONE
+  NOT_SURE
+  CLAIMED_INCOMPLETE
+  CLAIMED_MOSTLY_COMPLETE
+  ACTIVE
+}
+
+enum ReviewStrength {
+  NONE
+  FEW
+  SOME
+  STRONG
+}
+
+enum ReviewRequestCadence {
+  NEVER
+  RARELY
+  SOMETIMES
+  REGULARLY
+}
+
+enum SocialPresenceLevel {
+  NONE
+  ONE_OCCASIONAL
+  ONE_ACTIVE
+  MULTIPLE_ACTIVE
+}
+
 enum AdvertisingCadence {
   YES
   OCCASIONALLY
   NO
-}
-
-enum ReviewCollectionLevel {
-  YES
-  SOMEWHAT
-  NOT_YET
 }
 
 enum NotificationEventType {
@@ -83,6 +116,7 @@ enum NotificationEventType {
   FOLLOW_UP_QUEUED
   FOLLOW_UP_SENT
   SERVICE_RECOMMENDED
+  COMPREHENSIVE_REPORT_REQUESTED
 }
 
 enum NotificationStatus {
@@ -95,6 +129,14 @@ enum NotificationStatus {
 enum UserActionTokenType {
   CLAIM_SUBMISSION
   VERIFY_EMAIL
+}
+
+enum ComprehensiveReportRequestStatus {
+  REQUESTED
+  ACKNOWLEDGED
+  IN_PROGRESS
+  COMPLETED
+  DECLINED
 }
 
 model User {
@@ -119,6 +161,7 @@ model User {
   authoredAudits          ManualAudit[]       @relation("ManualAuditAuthor")
   publishedAudits         ManualAudit[]       @relation("ManualAuditPublisher")
   authoredInternalNotes   InternalNote[]      @relation("InternalNoteAuthor")
+  comprehensiveRequests   ComprehensiveReportRequest[] @relation("ComprehensiveReportRequester")
   actionTokens            UserActionToken[]   @relation("UserActionTokenUser")
   notificationEvents      NotificationEvent[] @relation("NotificationEventUser")
 }
@@ -137,8 +180,18 @@ model Business {
   websiteUrl               String?
   googleBusinessProfileUrl String?
   socialProfiles           Json?
+  socialLinks              Json?
   discoveryChannels        Json?
   goals                    Json?
+  description              String?
+  websiteStatus            WebsiteStatus?
+  googleBusinessProfileStatus GoogleBusinessProfileStatus?
+  reviewStrength           ReviewStrength?
+  reviewRequestCadence     ReviewRequestCadence?
+  socialPresenceLevel      SocialPresenceLevel?
+  runsAdvertising          AdvertisingCadence?
+  reviewCount              Int?
+  averageRating            Float?
   notes                    String?
   leadSource               String               @default("presence-check")
   status                   SubmissionStatus     @default(SUBMITTED)
@@ -159,6 +212,7 @@ model Business {
   planRecommendations      PlanRecommendation[]
   internalNotes            InternalNote[]
   followUps                FollowUp[]
+  comprehensiveRequests    ComprehensiveReportRequest[]
   notificationEvents       NotificationEvent[]
 }
 
@@ -176,16 +230,22 @@ model PresenceCheck {
   city                     String
   state                    String
   serviceArea              String
-  hasWebsite               Boolean?
+  websiteStatus            WebsiteStatus         @default(NONE)
   websiteUrl               String?
-  usesGoogleBusinessProfile Boolean?
+  googleBusinessProfileStatus GoogleBusinessProfileStatus @default(NONE)
   googleBusinessProfileUrl String?
   socialPlatforms          Json?
+  socialPresenceLevel      SocialPresenceLevel   @default(NONE)
   runsAdvertising          AdvertisingCadence    @default(NO)
   discoveryChannels        Json?
-  collectsReviews          ReviewCollectionLevel @default(SOMEWHAT)
+  reviewStrength           ReviewStrength        @default(NONE)
+  reviewRequestCadence     ReviewRequestCadence  @default(NEVER)
+  reviewCount              Int?
+  averageRating            Float?
   desiredOutcomes          Json?
   rawNotes                 String?
+  reportEmail              String?
+  reportSentAt             DateTime?
   score                    Int?
   scoreTier                ScoreTier?
   summary                  String?
@@ -202,6 +262,7 @@ model PresenceCheck {
   planRecommendations      PlanRecommendation[]
   internalNotes            InternalNote[]
   followUps                FollowUp[]
+  comprehensiveRequests    ComprehensiveReportRequest[]
   actionTokens             UserActionToken[]
   notificationEvents       NotificationEvent[]
 
@@ -334,6 +395,24 @@ model FollowUp {
   updatedAt      DateTime       @updatedAt
   business       Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
   submission     PresenceCheck? @relation(fields: [presenceCheckId], references: [id], onDelete: Cascade)
+}
+
+model ComprehensiveReportRequest {
+  id             String                           @id @default(cuid())
+  businessId     String
+  presenceCheckId String?
+  requestedById  String?
+  status         ComprehensiveReportRequestStatus @default(REQUESTED)
+  note           String?
+  createdAt      DateTime                         @default(now())
+  updatedAt      DateTime                         @updatedAt
+  resolvedAt     DateTime?
+  business       Business                         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  submission     PresenceCheck?                   @relation(fields: [presenceCheckId], references: [id], onDelete: Cascade)
+  requestedBy    User?                            @relation("ComprehensiveReportRequester", fields: [requestedById], references: [id], onDelete: SetNull)
+
+  @@index([businessId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model NotificationEvent {

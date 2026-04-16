@@ -14,9 +14,11 @@ export const auditCategoryLabels: Record<AuditCategory, string> = {
 };
 
 export const scoreTierLabels: Record<ScoreTier, string> = {
-  STRONG_FOOTING: "Strong footing",
-  PROMISING_UPSIDE: "Promising with clear upside",
-  FOCUSED_ATTENTION: "Needs focused attention",
+  LIMITED_FOUNDATION: "Limited online foundation",
+  EARLY_STAGE_PRESENCE: "Early-stage presence",
+  BASIC_FOUNDATION_CLEAR_GAPS: "Basic foundation with clear gaps",
+  SOLID_FOUNDATION_IMPROVEMENTS: "Solid foundation with improvement opportunities",
+  STRONG_ONLINE_PRESENCE: "Strong online presence",
 };
 
 export const submissionStatusLabels: Record<SubmissionStatus, string> = {

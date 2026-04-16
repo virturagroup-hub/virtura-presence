@@ -18,9 +18,14 @@ import { cn } from "@/lib/utils";
 import {
   discoveryChannelOptions,
   goalOptions,
+  googleBusinessProfileStatusOptions,
   presenceCheckDefaultValues,
   presenceCheckSchema,
+  reviewRequestCadenceOptions,
+  reviewStrengthOptions,
   socialPlatformOptions,
+  socialPresenceLevelOptions,
+  websiteStatusOptions,
   type PresenceCheckInput,
 } from "@/lib/validations/presence-check";
 
@@ -29,42 +34,83 @@ const storageKey = "virtura-presence-preview";
 const steps = [
   {
     title: "Business basics",
-    description: "Start with who you are and who should receive the report preview.",
+    description: "Start with who you are and where the free report should go once you choose to send it.",
     fields: ["businessName", "ownerName", "email", "phone"] as const,
   },
   {
     title: "Business context",
-    description: "Give enough context for the review to stay grounded in your real market.",
+    description: "Give enough market context for the score to stay grounded in your real service area and goals.",
     fields: ["businessCategory", "city", "state", "serviceArea", "goals"] as const,
   },
   {
     title: "Website and local presence",
-    description: "Tell us about the channels customers are most likely to check first.",
+    description: "Be specific about how complete the public-facing foundation actually is today.",
     fields: [
-      "hasWebsite",
+      "websiteStatus",
       "websiteUrl",
-      "usesGoogleBusinessProfile",
+      "googleBusinessProfileStatus",
       "googleBusinessProfileUrl",
     ] as const,
   },
   {
-    title: "Discovery and trust signals",
-    description: "Show how customers currently find you and what proof they see.",
+    title: "Trust and activity",
+    description: "Describe reviews, social activity, and how customers usually discover the business.",
     fields: [
+      "reviewStrength",
+      "reviewRequestCadence",
+      "reviewCount",
+      "averageRating",
+      "socialPresenceLevel",
       "socialPlatforms",
       "runsAdvertising",
       "discoveryChannels",
-      "collectsReviews",
     ] as const,
   },
   {
     title: "Final notes",
-    description: "Add anything a consultant should know before reviewing the quick score.",
+    description: "Review the basics and add any nuance a consultant should know before a deeper audit.",
     fields: ["notes"] as const,
   },
-];
+] as const;
 
 type ToggleField = "socialPlatforms" | "discoveryChannels" | "goals";
+
+const websiteLabels: Record<PresenceCheckInput["websiteStatus"], string> = {
+  none: "No website",
+  "in-progress": "In progress, not live yet",
+  basic: "Live but basic",
+  "mostly-complete": "Live and mostly complete",
+  polished: "Live and polished / updated",
+};
+
+const googleLabels: Record<PresenceCheckInput["googleBusinessProfileStatus"], string> = {
+  none: "No profile",
+  "not-sure": "Not sure",
+  "claimed-incomplete": "Claimed but incomplete",
+  "claimed-mostly-complete": "Claimed and mostly complete",
+  active: "Claimed and actively maintained",
+};
+
+const reviewStrengthLabels: Record<PresenceCheckInput["reviewStrength"], string> = {
+  none: "No reviews",
+  few: "A few reviews",
+  some: "Some reviews",
+  strong: "Strong review base",
+};
+
+const reviewCadenceLabels: Record<PresenceCheckInput["reviewRequestCadence"], string> = {
+  never: "Never ask",
+  rarely: "Rarely ask",
+  sometimes: "Sometimes ask",
+  regularly: "Regularly ask",
+};
+
+const socialPresenceLabels: Record<PresenceCheckInput["socialPresenceLevel"], string> = {
+  none: "None",
+  "one-occasional": "One channel, occasional use",
+  "one-active": "One channel, active use",
+  "multiple-active": "Multiple active channels",
+};
 
 export function PresenceCheckFlow() {
   const router = useRouter();
@@ -83,6 +129,10 @@ export function PresenceCheckFlow() {
   }) as PresenceCheckInput;
   const activeStep = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
+  const showWebsiteUrl = ["basic", "mostly-complete", "polished"].includes(values.websiteStatus);
+  const showGoogleUrl = ["claimed-incomplete", "claimed-mostly-complete", "active"].includes(
+    values.googleBusinessProfileStatus,
+  );
 
   function renderError(field: keyof PresenceCheckInput) {
     const message = form.formState.errors[field]?.message;
@@ -92,6 +142,33 @@ export function PresenceCheckFlow() {
     }
 
     return <p className="text-sm text-rose-600">{message}</p>;
+  }
+
+  function renderChoiceGroup<Value extends string>(
+    options: readonly Value[],
+    activeValue: Value,
+    onSelect: (value: Value) => void,
+    labels: Record<Value, string>,
+  ) {
+    return (
+      <div className="flex flex-wrap gap-3">
+        {options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onSelect(option)}
+            className={cn(
+              "rounded-[22px] border px-4 py-3 text-left text-sm transition-all duration-200",
+              activeValue === option
+                ? "border-brand-300 bg-brand-50 text-brand-700 shadow-[0_16px_35px_-28px_rgba(47,111,228,0.75)]"
+                : "border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-slate-900",
+            )}
+          >
+            {labels[option]}
+          </button>
+        ))}
+      </div>
+    );
   }
 
   function toggleOption(field: ToggleField, value: string) {
@@ -131,6 +208,8 @@ export function PresenceCheckFlow() {
         JSON.stringify({
           submittedAt: new Date().toISOString(),
           input: valuesToSubmit,
+          reportEmail: valuesToSubmit.email,
+          deliverySent: false,
           result: {
             score: response.result.score,
             tier: response.result.tierLabel,
@@ -147,29 +226,29 @@ export function PresenceCheckFlow() {
         }),
       );
 
-      toast.success("Presence check saved. Your quick review is ready.");
+      toast.success("Presence check saved. Review your quick score and choose where to send the free report.");
       router.push("/presence-check/results");
     });
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-      <div className="space-y-6">
+    <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
+      <div className="space-y-5">
         <div className="surface-card p-6 sm:p-8">
           <span className="section-kicker">Guided onboarding</span>
           <h2 className="mt-4 font-heading text-3xl font-semibold text-slate-950">
-            A polished first-pass review, built to stay grounded.
+            Honest inputs make the score more believable.
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            This is not a fake report card. The goal is to understand how your
-            business currently shows up online and where the clearest next wins
-            are likely to be.
+            This check works best when the answers reflect the real state of the
+            business today. Missing fundamentals should read like missing
+            fundamentals, not polite middle-of-the-road placeholders.
           </p>
-          <div className="mt-8 space-y-4">
+          <div className="mt-6 space-y-3">
             {[
-              "Takes just a few minutes to complete",
-              "Focuses on what customers can actually see",
-              "Feeds into a deeper consultant review when needed",
+              "Specific answer states instead of fuzzy yes or no inputs",
+              "Constructive scoring that does not flatter weak foundations",
+              "A cleaner handoff into the deeper consultant review when you request it",
             ].map((item) => (
               <div
                 key={item}
@@ -188,9 +267,9 @@ export function PresenceCheckFlow() {
           <div className="mt-4 rounded-3xl border border-brand-100 bg-brand-50/70 p-4 text-sm leading-7 text-brand-800">
             <Sparkles className="size-4" />
             <p className="mt-3">
-              Once you submit, Virtura Presence will generate an encouraging quick
-              summary and preserve the answers so the deeper manual audit can stay
-              aligned with what matters to your business.
+              Your quick score is generated immediately after submission, then you
+              can choose where to send the free report and whether you want portal
+              access or a deeper consultant-led review.
             </p>
           </div>
         </div>
@@ -235,7 +314,7 @@ export function PresenceCheckFlow() {
                   {renderError("businessName")}
                 </div>
                 <div className="space-y-3">
-                  <Label htmlFor="ownerName">Owner name</Label>
+                  <Label htmlFor="ownerName">Owner / contact name</Label>
                   <Input id="ownerName" className="h-12 rounded-2xl" {...form.register("ownerName")} />
                   {renderError("ownerName")}
                 </div>
@@ -275,7 +354,7 @@ export function PresenceCheckFlow() {
                   {renderError("state")}
                 </div>
                 <div className="space-y-3 sm:col-span-2">
-                  <Label htmlFor="serviceArea">Service area</Label>
+                  <Label htmlFor="serviceArea">City / service area</Label>
                   <Input
                     id="serviceArea"
                     className="h-12 rounded-2xl"
@@ -315,37 +394,21 @@ export function PresenceCheckFlow() {
             {stepIndex === 2 ? (
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <Label>Do you have a website?</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { label: "Yes", value: "yes" },
-                      { label: "No", value: "no" },
-                      { label: "In progress", value: "in-progress" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() =>
-                          form.setValue("hasWebsite", option.value as PresenceCheckInput["hasWebsite"], {
-                            shouldDirty: true,
-                            shouldTouch: true,
+                  <Label>Website status</Label>
+                  {renderChoiceGroup(
+                    websiteStatusOptions,
+                    values.websiteStatus,
+                    (value) =>
+                      form.setValue("websiteStatus", value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
                             shouldValidate: true,
-                          })
-                        }
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-sm transition-all duration-200",
-                          values.hasWebsite === option.value
-                            ? "border-brand-300 bg-brand-50 text-brand-700"
-                            : "border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-slate-900",
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
+                          }),
+                        websiteLabels,
+                  )}
                 </div>
 
-                {values.hasWebsite === "yes" ? (
+                {showWebsiteUrl ? (
                   <div className="space-y-3">
                     <Label htmlFor="websiteUrl">Website URL</Label>
                     <Input
@@ -359,41 +422,21 @@ export function PresenceCheckFlow() {
                 ) : null}
 
                 <div className="space-y-3">
-                  <Label>Do you use Google Business Profile?</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { label: "Yes", value: "yes" },
-                      { label: "No", value: "no" },
-                      { label: "Not sure", value: "not-sure" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() =>
-                          form.setValue(
-                            "usesGoogleBusinessProfile",
-                            option.value as PresenceCheckInput["usesGoogleBusinessProfile"],
-                            {
-                              shouldDirty: true,
-                              shouldTouch: true,
-                              shouldValidate: true,
-                            },
-                          )
-                        }
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-sm transition-all duration-200",
-                          values.usesGoogleBusinessProfile === option.value
-                            ? "border-brand-300 bg-brand-50 text-brand-700"
-                            : "border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-slate-900",
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
+                  <Label>Google Business Profile status</Label>
+                  {renderChoiceGroup(
+                    googleBusinessProfileStatusOptions,
+                    values.googleBusinessProfileStatus,
+                    (value) =>
+                      form.setValue("googleBusinessProfileStatus", value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                            shouldValidate: true,
+                          }),
+                        googleLabels,
+                  )}
                 </div>
 
-                {values.usesGoogleBusinessProfile === "yes" ? (
+                {showGoogleUrl ? (
                   <div className="space-y-3">
                     <Label htmlFor="googleBusinessProfileUrl">Google Business Profile link</Label>
                     <Input
@@ -411,7 +454,86 @@ export function PresenceCheckFlow() {
             {stepIndex === 3 ? (
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <Label>Which social platforms do you use?</Label>
+                  <Label>Review strength</Label>
+                  {renderChoiceGroup(
+                    reviewStrengthOptions,
+                    values.reviewStrength,
+                    (value) =>
+                      form.setValue("reviewStrength", value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                            shouldValidate: true,
+                          }),
+                        reviewStrengthLabels,
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <Label>Review request process</Label>
+                  {renderChoiceGroup(
+                    reviewRequestCadenceOptions,
+                    values.reviewRequestCadence,
+                    (value) =>
+                      form.setValue("reviewRequestCadence", value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                            shouldValidate: true,
+                          }),
+                        reviewCadenceLabels,
+                  )}
+                </div>
+
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-3">
+                    <Label htmlFor="reviewCount">Current review count</Label>
+                    <Input
+                      id="reviewCount"
+                      type="number"
+                      min={0}
+                      className="h-12 rounded-2xl"
+                      {...form.register("reviewCount", {
+                        setValueAs: (value) =>
+                          value === "" || value === undefined ? undefined : Number(value),
+                      })}
+                    />
+                    {renderError("reviewCount")}
+                  </div>
+                  <div className="space-y-3">
+                    <Label htmlFor="averageRating">Average rating</Label>
+                    <Input
+                      id="averageRating"
+                      type="number"
+                      step="0.1"
+                      min={0}
+                      max={5}
+                      className="h-12 rounded-2xl"
+                      {...form.register("averageRating", {
+                        setValueAs: (value) =>
+                          value === "" || value === undefined ? undefined : Number(value),
+                      })}
+                    />
+                    {renderError("averageRating")}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Label>Social presence</Label>
+                  {renderChoiceGroup(
+                    socialPresenceLevelOptions,
+                    values.socialPresenceLevel,
+                    (value) =>
+                      form.setValue("socialPresenceLevel", value, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                            shouldValidate: true,
+                          }),
+                        socialPresenceLabels,
+                  )}
+                  {renderError("socialPresenceLevel")}
+                </div>
+
+                <div className="space-y-3">
+                  <Label>Which platforms are active enough to mention?</Label>
                   <div className="flex flex-wrap gap-3">
                     {socialPlatformOptions.map((option) => {
                       const active = values.socialPlatforms.includes(option);
@@ -433,29 +555,26 @@ export function PresenceCheckFlow() {
                       );
                     })}
                   </div>
+                  {renderError("socialPlatforms")}
                 </div>
 
                 <div className="space-y-3">
                   <Label>Do you run advertising?</Label>
                   <div className="flex flex-wrap gap-3">
                     {[
-                      { label: "Yes", value: "yes" },
-                      { label: "Occasionally", value: "occasionally" },
-                      { label: "No", value: "no" },
+                      { label: "Yes", value: "yes" as const },
+                      { label: "Occasionally", value: "occasionally" as const },
+                      { label: "No", value: "no" as const },
                     ].map((option) => (
                       <button
                         key={option.value}
                         type="button"
                         onClick={() =>
-                          form.setValue(
-                            "runsAdvertising",
-                            option.value as PresenceCheckInput["runsAdvertising"],
-                            {
-                              shouldDirty: true,
-                              shouldTouch: true,
-                              shouldValidate: true,
-                            },
-                          )
+                          form.setValue("runsAdvertising", option.value, {
+                            shouldDirty: true,
+                            shouldTouch: true,
+                            shouldValidate: true,
+                          })
                         }
                         className={cn(
                           "rounded-full border px-4 py-2 text-sm transition-all duration-200",
@@ -495,41 +614,6 @@ export function PresenceCheckFlow() {
                   </div>
                   {renderError("discoveryChannels")}
                 </div>
-
-                <div className="space-y-3">
-                  <Label>Do you actively collect reviews?</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      { label: "Yes", value: "yes" },
-                      { label: "Somewhat", value: "somewhat" },
-                      { label: "Not yet", value: "not-yet" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() =>
-                          form.setValue(
-                            "collectsReviews",
-                            option.value as PresenceCheckInput["collectsReviews"],
-                            {
-                              shouldDirty: true,
-                              shouldTouch: true,
-                              shouldValidate: true,
-                            },
-                          )
-                        }
-                        className={cn(
-                          "rounded-full border px-4 py-2 text-sm transition-all duration-200",
-                          values.collectsReviews === option.value
-                            ? "border-brand-300 bg-brand-50 text-brand-700"
-                            : "border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-slate-900",
-                        )}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
             ) : null}
 
@@ -545,19 +629,17 @@ export function PresenceCheckFlow() {
                       <p className="mt-1 font-medium text-slate-900">{values.businessName}</p>
                     </div>
                     <div className="rounded-2xl border border-white/80 bg-white/90 px-4 py-3">
-                      <p className="text-xs text-slate-500">Report destination</p>
+                      <p className="text-xs text-slate-500">Free report destination</p>
                       <p className="mt-1 font-medium text-slate-900">{values.email}</p>
                     </div>
                     <div className="rounded-2xl border border-white/80 bg-white/90 px-4 py-3">
-                      <p className="text-xs text-slate-500">Location</p>
-                      <p className="mt-1 font-medium text-slate-900">
-                        {values.city}, {values.state}
-                      </p>
+                      <p className="text-xs text-slate-500">Website</p>
+                      <p className="mt-1 font-medium text-slate-900">{websiteLabels[values.websiteStatus]}</p>
                     </div>
                     <div className="rounded-2xl border border-white/80 bg-white/90 px-4 py-3">
-                      <p className="text-xs text-slate-500">Goals</p>
+                      <p className="text-xs text-slate-500">Google / local</p>
                       <p className="mt-1 font-medium text-slate-900">
-                        {values.goals.join(", ")}
+                        {googleLabels[values.googleBusinessProfileStatus]}
                       </p>
                     </div>
                   </div>
@@ -567,9 +649,9 @@ export function PresenceCheckFlow() {
                   <Label htmlFor="notes">Anything else we should know?</Label>
                   <Textarea
                     id="notes"
-                    rows={6}
+                    rows={5}
                     className="rounded-3xl"
-                    placeholder="Optional context about your market, customers, current frustrations, or what you want the audit to focus on."
+                    placeholder="Optional context about your market, recent changes, current frustrations, or what you want a consultant to pay attention to."
                     {...form.register("notes")}
                   />
                   {renderError("notes")}

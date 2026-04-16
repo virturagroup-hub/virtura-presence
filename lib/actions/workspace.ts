@@ -8,6 +8,7 @@ import {
   updateSubmissionWorkflowStatus,
   upsertSubmissionAudit,
 } from "@/lib/data/workspace";
+import { updateComprehensiveReportRequestStatus } from "@/lib/data/portal";
 import { toUserFacingDatabaseError } from "@/lib/prisma-errors";
 import {
   auditEditorSchema,
@@ -17,6 +18,10 @@ import {
   type InternalNoteInput,
   type SubmissionStatusUpdateInput,
 } from "@/lib/validations/audit";
+import {
+  comprehensiveReportRequestStatusSchema,
+  type ComprehensiveReportRequestStatusInput,
+} from "@/lib/validations/portal";
 
 async function requireWorkspaceActor() {
   const user = await getCurrentUser();
@@ -128,6 +133,38 @@ export async function addSubmissionInternalNoteAction(values: InternalNoteInput)
       error: toUserFacingDatabaseError(
         error,
         "The internal note could not be saved.",
+      ),
+    };
+  }
+}
+
+export async function updateComprehensiveRequestStatusAction(
+  values: ComprehensiveReportRequestStatusInput,
+) {
+  const parsed = comprehensiveReportRequestStatusSchema.safeParse(values);
+
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: "Comprehensive report request status is invalid.",
+    };
+  }
+
+  try {
+    await requireWorkspaceActor();
+    await updateComprehensiveReportRequestStatus(parsed.data);
+
+    revalidatePath("/workspace");
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: toUserFacingDatabaseError(
+        error,
+        "The comprehensive report request could not be updated.",
       ),
     };
   }

@@ -6,8 +6,8 @@ export default function PresenceCheckResultsPage() {
     <section className="section-shell">
       <SectionHeading
         eyebrow="Quick score preview"
-        title="A constructive read on what your current online presence is doing well."
-        description="This preview is a helpful first pass, not a manipulative grade. The deeper audit remains manual, consultant-reviewed, and fully editable before publication."
+        title="An honest first-pass read on where your online foundation stands."
+        description="This preview is meant to be constructive and believable. Missing fundamentals should read clearly as missing fundamentals, and the deeper audit remains manual, consultant-reviewed, and fully editable before publication."
       />
       <div className="mt-10">
         <PresenceCheckResults />

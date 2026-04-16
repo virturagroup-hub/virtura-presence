@@ -1,16 +1,33 @@
 import "@/scripts/load-env";
 import { hash } from "bcryptjs";
 import {
+  AdvertisingCadence,
   AuditCategory,
   AuditStatus,
+  GoogleBusinessProfileStatus,
   PrismaClient,
   RecommendationStatus,
-  ReviewCollectionLevel,
+  ReviewRequestCadence,
+  ReviewStrength,
   ScoreTier,
+  SocialPresenceLevel,
   SubmissionStatus,
+  WebsiteStatus,
 } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+function getRequiredSeedEnv(key: string) {
+  const value = process.env[key]?.trim();
+
+  if (!value) {
+    throw new Error(
+      `Seed configuration is missing ${key}. Add it to your environment before running npm run db:seed so the real admin account can be created safely.`,
+    );
+  }
+
+  return value;
+}
 
 async function main() {
   const shouldSeedDemoData = process.env.SEED_DEMO_DATA === "true";
@@ -111,20 +128,37 @@ async function main() {
     });
   }
 
+  const adminEmail = process.env.ADMIN_EMAIL?.trim() || "admin@virturagroup.com";
+  const adminName = process.env.ADMIN_NAME?.trim() || "Virtura Admin";
+  const adminPasswordHash = await hash(getRequiredSeedEnv("ADMIN_PASSWORD"), 10);
+
+  const admin = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      name: adminName,
+      role: "ADMIN",
+      passwordHash: adminPasswordHash,
+      emailVerified: new Date(),
+    },
+    create: {
+      email: adminEmail,
+      name: adminName,
+      role: "ADMIN",
+      passwordHash: adminPasswordHash,
+      emailVerified: new Date(),
+    },
+  });
+
   if (!shouldSeedDemoData) {
     console.log("Virtura Presence base seed complete", {
       servicePlans: plans.length,
+      admin: admin.email,
       demoData: false,
-      nextStep:
-        'Set SEED_DEMO_DATA=true and rerun `npm run db:seed` if you want demo users and the sample submission dataset.',
+      note: "Admin is always seeded from ADMIN_EMAIL / ADMIN_PASSWORD. Demo client and consultant data stay optional under SEED_DEMO_DATA=true.",
     });
     return;
   }
 
-  const adminPassword = await hash(
-    process.env.DEMO_ADMIN_PASSWORD ?? "VirturaAdmin!2026",
-    10,
-  );
   const consultantPassword = await hash(
     process.env.DEMO_CONSULTANT_PASSWORD ?? "VirturaConsultant!2026",
     10,
@@ -134,17 +168,7 @@ async function main() {
     10,
   );
 
-  const [admin, consultant, client] = await Promise.all([
-    prisma.user.upsert({
-      where: { email: process.env.DEMO_ADMIN_EMAIL ?? "admin@virturagroup.com" },
-      update: { name: "Virtura Admin", role: "ADMIN", passwordHash: adminPassword },
-      create: {
-        email: process.env.DEMO_ADMIN_EMAIL ?? "admin@virturagroup.com",
-        name: "Virtura Admin",
-        role: "ADMIN",
-        passwordHash: adminPassword,
-      },
-    }),
+  const [consultant, client] = await Promise.all([
     prisma.user.upsert({
       where: {
         email: process.env.DEMO_CONSULTANT_EMAIL ?? "consultant@virturagroup.com",
@@ -153,12 +177,14 @@ async function main() {
         name: "Virtura Consultant",
         role: "CONSULTANT",
         passwordHash: consultantPassword,
+        emailVerified: new Date(),
       },
       create: {
         email: process.env.DEMO_CONSULTANT_EMAIL ?? "consultant@virturagroup.com",
         name: "Virtura Consultant",
         role: "CONSULTANT",
         passwordHash: consultantPassword,
+        emailVerified: new Date(),
       },
     }),
     prisma.user.upsert({
@@ -169,12 +195,14 @@ async function main() {
         name: "Avery Collins",
         role: "CLIENT",
         passwordHash: clientPassword,
+        emailVerified: new Date(),
       },
       create: {
         email: process.env.DEMO_CLIENT_EMAIL ?? "client@virturapresence.com",
         name: "Avery Collins",
         role: "CLIENT",
         passwordHash: clientPassword,
+        emailVerified: new Date(),
       },
     }),
   ]);
@@ -193,15 +221,29 @@ async function main() {
       websiteUrl: "https://www.harborpinehvac.com",
       googleBusinessProfileUrl: "https://g.page/r/example",
       socialProfiles: ["Facebook", "Instagram"],
+      socialLinks: {
+        facebook: "https://facebook.com/harborpinehvac",
+        instagram: "https://instagram.com/harborpinehvac",
+      },
       discoveryChannels: ["Google search", "Google Business Profile", "Referrals"],
       goals: ["Calls", "Trust", "Visibility"],
+      description:
+        "Referral business is strong, but the owner wants the online presence to work harder with new customers.",
+      websiteStatus: WebsiteStatus.MOSTLY_COMPLETE,
+      googleBusinessProfileStatus: GoogleBusinessProfileStatus.CLAIMED_MOSTLY_COMPLETE,
+      reviewStrength: ReviewStrength.SOME,
+      reviewRequestCadence: ReviewRequestCadence.SOMETIMES,
+      socialPresenceLevel: SocialPresenceLevel.ONE_ACTIVE,
+      runsAdvertising: AdvertisingCadence.OCCASIONALLY,
+      reviewCount: 24,
+      averageRating: 4.6,
       notes:
         "Referral business is strong, but the owner wants the online presence to work harder with new customers.",
       status: SubmissionStatus.PUBLISHED,
-      quickScore: 74,
-      quickTier: ScoreTier.PROMISING_UPSIDE,
+      quickScore: 68,
+      quickTier: ScoreTier.SOLID_FOUNDATION_IMPROVEMENTS,
       quickSummary:
-        "A solid base exists, but trust and consistency signals still need work.",
+        "A credible base exists, but trust and consistency signals still need tightening.",
       primaryContactId: client.id,
       assignedConsultantId: consultant.id,
       latestSubmittedAt: new Date("2026-04-14T16:00:00.000Z"),
@@ -220,15 +262,29 @@ async function main() {
       websiteUrl: "https://www.harborpinehvac.com",
       googleBusinessProfileUrl: "https://g.page/r/example",
       socialProfiles: ["Facebook", "Instagram"],
+      socialLinks: {
+        facebook: "https://facebook.com/harborpinehvac",
+        instagram: "https://instagram.com/harborpinehvac",
+      },
       discoveryChannels: ["Google search", "Google Business Profile", "Referrals"],
       goals: ["Calls", "Trust", "Visibility"],
+      description:
+        "Referral business is strong, but the owner wants the online presence to work harder with new customers.",
+      websiteStatus: WebsiteStatus.MOSTLY_COMPLETE,
+      googleBusinessProfileStatus: GoogleBusinessProfileStatus.CLAIMED_MOSTLY_COMPLETE,
+      reviewStrength: ReviewStrength.SOME,
+      reviewRequestCadence: ReviewRequestCadence.SOMETIMES,
+      socialPresenceLevel: SocialPresenceLevel.ONE_ACTIVE,
+      runsAdvertising: AdvertisingCadence.OCCASIONALLY,
+      reviewCount: 24,
+      averageRating: 4.6,
       notes:
         "Referral business is strong, but the owner wants the online presence to work harder with new customers.",
       status: SubmissionStatus.PUBLISHED,
-      quickScore: 74,
-      quickTier: ScoreTier.PROMISING_UPSIDE,
+      quickScore: 68,
+      quickTier: ScoreTier.SOLID_FOUNDATION_IMPROVEMENTS,
       quickSummary:
-        "A solid base exists, but trust and consistency signals still need work.",
+        "A credible base exists, but trust and consistency signals still need tightening.",
       primaryContactId: client.id,
       assignedConsultantId: consultant.id,
       latestSubmittedAt: new Date("2026-04-14T16:00:00.000Z"),
@@ -249,6 +305,7 @@ async function main() {
   await prisma.planRecommendation.deleteMany({ where: { businessId: business.id } });
   await prisma.internalNote.deleteMany({ where: { businessId: business.id } });
   await prisma.followUp.deleteMany({ where: { businessId: business.id } });
+  await prisma.comprehensiveReportRequest.deleteMany({ where: { businessId: business.id } });
   await prisma.manualAudit.deleteMany({ where: { businessId: business.id } });
   await prisma.presenceCheck.deleteMany({ where: { businessId: business.id } });
 
@@ -266,32 +323,38 @@ async function main() {
       city: "Tulsa",
       state: "OK",
       serviceArea: "Tulsa metro and surrounding suburbs",
-      hasWebsite: true,
+      websiteStatus: WebsiteStatus.MOSTLY_COMPLETE,
       websiteUrl: "https://www.harborpinehvac.com",
-      usesGoogleBusinessProfile: true,
+      googleBusinessProfileStatus: GoogleBusinessProfileStatus.CLAIMED_MOSTLY_COMPLETE,
       googleBusinessProfileUrl: "https://g.page/r/example",
       socialPlatforms: ["Facebook", "Instagram"],
-      runsAdvertising: "OCCASIONALLY",
+      socialPresenceLevel: SocialPresenceLevel.ONE_ACTIVE,
+      runsAdvertising: AdvertisingCadence.OCCASIONALLY,
       discoveryChannels: ["Google search", "Google Business Profile", "Referrals"],
-      collectsReviews: ReviewCollectionLevel.SOMEWHAT,
+      reviewStrength: ReviewStrength.SOME,
+      reviewRequestCadence: ReviewRequestCadence.SOMETIMES,
+      reviewCount: 24,
+      averageRating: 4.6,
       desiredOutcomes: ["Calls", "Trust", "Visibility"],
       rawNotes:
         "We get good referral business, but newer customers say they found us online and I am not sure if the site is helping enough.",
-      score: 74,
-      scoreTier: ScoreTier.PROMISING_UPSIDE,
+      reportEmail: client.email,
+      reportSentAt: new Date("2026-04-14T16:05:00.000Z"),
+      score: 68,
+      scoreTier: ScoreTier.SOLID_FOUNDATION_IMPROVEMENTS,
       summary:
-        "Harbor & Pine HVAC looks legitimate and discoverable, but trust and conversion signals still feel uneven enough to cost calls.",
+        "Harbor & Pine HVAC looks credible online, but trust and consistency signals still leave room for improvement.",
       encouragement:
         "There is already enough traction here to build on. The next wins are about tightening consistency, not rebuilding everything.",
       strengths: [
-        "A real website is live and contact details are visible.",
-        "Google Business Profile is present, so local trust has a foundation.",
-        "Customers already find the business through more than one channel.",
+        "A live website gives customers a credible place to evaluate the business.",
+        "Google / local presence is established enough to support nearby discovery.",
+        "Customers have a reasonably clear path to call or take the next step.",
       ],
       improvementAreas: [
-        "Review collection is inconsistent, which weakens social proof.",
-        "Social activity exists but does not yet reinforce trust consistently.",
-        "Calls-to-action and service clarity likely need a more deliberate pass.",
+        "Review cadence and proof visibility still need to become more consistent.",
+        "Social activity exists but does not yet reinforce trust strongly enough.",
+        "Service clarity and proof near the top of the site still have room to improve.",
       ],
       submittedAt: new Date("2026-04-14T16:00:00.000Z"),
       categoryScores: {
@@ -299,31 +362,31 @@ async function main() {
           {
             category: AuditCategory.WEBSITE_PRESENCE,
             score: 15,
-            note: "The foundation is there, but the site still needs sharper clarity and confidence cues.",
+            note: "The site has a credible base, but clarity, proof, and polish still have room to improve.",
             displayOrder: 0,
           },
           {
             category: AuditCategory.GOOGLE_LOCAL_PRESENCE,
-            score: 16,
-            note: "Local signals are present, which is a strong starting point for nearby searches.",
+            score: 15,
+            note: "Local presence has a usable foundation, but it still needs steadier upkeep and completeness.",
             displayOrder: 1,
           },
           {
             category: AuditCategory.REVIEWS_TRUST,
             score: 13,
-            note: "Trust signals exist, but they are not consistent enough yet to do all the selling for you.",
+            note: "Trust signals are present and useful, though there is still room to strengthen the review engine.",
             displayOrder: 2,
           },
           {
             category: AuditCategory.SOCIAL_BRAND_ACTIVITY,
-            score: 12,
-            note: "The brand is visible, but activity feels lighter than the business quality deserves.",
+            score: 11,
+            note: "One social channel is doing a useful job, though the brand footprint is still fairly narrow.",
             displayOrder: 3,
           },
           {
             category: AuditCategory.CUSTOMER_ACTION_READINESS,
-            score: 18,
-            note: "Customers can see how to move forward, which gives the presence real conversion potential.",
+            score: 14,
+            note: "Customers have a workable next-step path, though it could be clearer and easier.",
             displayOrder: 4,
           },
         ],
@@ -340,7 +403,7 @@ async function main() {
       status: AuditStatus.PUBLISHED,
       title: "Harbor & Pine HVAC Presence Audit",
       executiveSummary:
-        "The business has real visibility traction but needs stronger trust reinforcement and clearer service framing to convert more visitors confidently.",
+        "The business has a credible online base but still needs stronger trust reinforcement and clearer service framing to convert more visitors confidently.",
       clientSummary:
         "You already have a solid presence foundation. The main opportunity is tightening the parts customers use to decide whether they trust you quickly.",
       internalSummary:
@@ -373,7 +436,7 @@ async function main() {
           },
           {
             category: AuditCategory.GOOGLE_LOCAL_PRESENCE,
-            score: 16,
+            score: 15,
             headline: "Good local footing that can be tightened",
             clientFacingNotes:
               "The profile is visible, which helps, but profile freshness and completeness still have upside.",
@@ -393,7 +456,7 @@ async function main() {
           },
           {
             category: AuditCategory.SOCIAL_BRAND_ACTIVITY,
-            score: 12,
+            score: 11,
             headline: "Visible but lighter than the business quality deserves",
             clientFacingNotes:
               "Social activity shows the business exists, but it does not yet reinforce credibility consistently.",
@@ -403,12 +466,12 @@ async function main() {
           },
           {
             category: AuditCategory.CUSTOMER_ACTION_READINESS,
-            score: 18,
-            headline: "Clear next steps are a real strength",
+            score: 14,
+            headline: "Customers can take the next step, but it can still feel easier",
             clientFacingNotes:
-              "Customers can understand how to move forward, which is one of the best parts of the current experience.",
+              "Customers can understand how to move forward, but more trust reinforcement should sit closer to the action path.",
             internalNotes:
-              "Protect this while strengthening trust cues around the action path.",
+              "Protect this strength while strengthening trust cues around the action path.",
             displayOrder: 5,
           },
         ],
@@ -474,6 +537,16 @@ async function main() {
     },
   });
 
+  await prisma.comprehensiveReportRequest.create({
+    data: {
+      businessId: business.id,
+      presenceCheckId: presenceCheck.id,
+      requestedById: client.id,
+      status: "ACKNOWLEDGED",
+      note: "Interested in a deeper consultant review if it stays practical and clearly scoped.",
+    },
+  });
+
   await prisma.notificationEvent.createMany({
     data: [
       {
@@ -510,6 +583,17 @@ async function main() {
         recipient: client.email,
         subject: "Follow-up placeholder queued",
         processedAt: new Date("2026-04-14T18:00:00.000Z"),
+      },
+      {
+        type: "COMPREHENSIVE_REPORT_REQUESTED",
+        status: "LOGGED",
+        businessId: business.id,
+        presenceCheckId: presenceCheck.id,
+        userId: client.id,
+        channel: "log",
+        recipient: client.email,
+        subject: "Comprehensive report requested",
+        processedAt: new Date("2026-04-14T18:10:00.000Z"),
       },
     ],
   });

@@ -90,7 +90,14 @@ function buildWorkspaceOrderBy(filters: WorkspaceSearchInput): Prisma.PresenceCh
 export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
   const where = buildWorkspaceWhereClause(filters);
 
-  const [submissions, totalSubmissions, inReviewCount, publishedCount, followUpDueCount] =
+  const [
+    submissions,
+    totalSubmissions,
+    inReviewCount,
+    publishedCount,
+    followUpDueCount,
+    comprehensiveRequestCount,
+  ] =
     await Promise.all([
       prisma.presenceCheck.findMany({
         where,
@@ -99,6 +106,12 @@ export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
           business: true,
           submittedBy: true,
           audit: true,
+          comprehensiveRequests: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+          },
           followUps: {
             orderBy: {
               createdAt: "desc",
@@ -122,6 +135,13 @@ export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
         where: {
           status: {
             in: ["QUEUED", "SCHEDULED"],
+          },
+        },
+      }),
+      prisma.comprehensiveReportRequest.count({
+        where: {
+          status: {
+            in: ["REQUESTED", "ACKNOWLEDGED", "IN_PROGRESS"],
           },
         },
       }),
@@ -149,6 +169,11 @@ export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
         label: "Follow-up due",
         value: String(followUpDueCount),
         change: "Queued nurture touchpoints",
+      },
+      {
+        label: "Deep audit requests",
+        value: String(comprehensiveRequestCount),
+        change: "Client-raised opportunities",
       },
     ],
     availablePlans: await prisma.servicePlan.findMany({
@@ -179,6 +204,14 @@ export async function getWorkspaceSubmissionDetail(submissionId: string) {
         },
         include: {
           author: true,
+        },
+      },
+      comprehensiveRequests: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          requestedBy: true,
         },
       },
       followUps: {

@@ -2,11 +2,15 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { AuditCategoryBlock } from "@/components/shared/audit-category-block";
+import { ComprehensiveReportRequestDialog } from "@/components/shared/comprehensive-report-request-dialog";
+import { ServicePlanCard } from "@/components/shared/service-plan-card";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
 import { formatDate } from "@/lib/dates";
 import { categoryLabelFromKey } from "@/lib/display";
 import { getPortalDashboardData } from "@/lib/data/portal";
+import { resolveServicePlanDefinition } from "@/lib/plan-catalog";
+import { asStringArray } from "@/lib/text";
 
 export default async function PortalReportPage() {
   const user = await getCurrentUser();
@@ -22,6 +26,8 @@ export default async function PortalReportPage() {
   const publishedAudit = publishedSubmission?.audit;
 
   if (!publishedSubmission || !publishedAudit) {
+    const latestSubmission = portal.latestSubmission;
+
     return (
       <div className="surface-card p-8">
         <p className="section-kicker">Published report</p>
@@ -32,12 +38,27 @@ export default async function PortalReportPage() {
           Your quick score is still available in the portal. Once the consultant review
           is published, the full client-safe audit will appear here automatically.
         </p>
-        <Button asChild className="mt-6 rounded-full px-5">
-          <Link href="/portal">
-            Back to overview
-            <ArrowRight className="size-4" />
-          </Link>
-        </Button>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Button asChild className="rounded-full px-5">
+            <Link href="/portal">
+              Back to overview
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+          {latestSubmission ? (
+            <ComprehensiveReportRequestDialog
+              submissionId={latestSubmission.id}
+              existingStatus={
+                latestSubmission.comprehensiveRequests[0]
+                  ? latestSubmission.comprehensiveRequests[0].status
+                      .replaceAll("_", " ")
+                      .toLowerCase()
+                  : null
+              }
+              className="rounded-full px-5"
+            />
+          ) : null}
+        </div>
       </div>
     );
   }
@@ -56,6 +77,22 @@ export default async function PortalReportPage() {
         <p className="mt-4 text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
           Published {formatDate(publishedAudit.publishedAt)}
         </p>
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <ComprehensiveReportRequestDialog
+            submissionId={publishedSubmission.id}
+            existingStatus={
+              publishedSubmission.comprehensiveRequests[0]
+                ? publishedSubmission.comprehensiveRequests[0].status
+                    .replaceAll("_", " ")
+                    .toLowerCase()
+                : null
+            }
+            className="rounded-full px-5"
+          />
+          <Button asChild variant="outline" className="rounded-full px-5">
+            <Link href="/portal/profile">Update company profile</Link>
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -91,6 +128,30 @@ export default async function PortalReportPage() {
               </div>
             ))}
           </div>
+        </div>
+      ) : null}
+
+      {publishedAudit.planRecommendations.length ? (
+        <div className="grid gap-5 xl:grid-cols-2">
+          {publishedAudit.planRecommendations.map((recommendation) => (
+            <ServicePlanCard
+              key={recommendation.id}
+              plan={resolveServicePlanDefinition({
+                slug: recommendation.servicePlan.slug,
+                name: recommendation.servicePlan.name,
+                tagline: recommendation.servicePlan.tagline,
+                summary: recommendation.servicePlan.summary,
+                idealFor: recommendation.servicePlan.idealFor,
+                tierLabel: recommendation.servicePlan.tierLabel,
+                accentColor:
+                  recommendation.servicePlan.accentColor ?? "from-brand-500/20 to-cyan-300/20",
+                deliverables: asStringArray(recommendation.servicePlan.deliverables),
+                outcomes: asStringArray(recommendation.servicePlan.outcomes),
+                featured: recommendation.servicePlan.featured,
+              })}
+              mode="dashboard"
+            />
+          ))}
         </div>
       ) : null}
     </div>

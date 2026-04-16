@@ -17,7 +17,7 @@ Virtura Presence is a production-minded Next.js application for honest online pr
 
 1. Clone the repository.
 2. Copy `.env.example` to `.env.local`.
-3. Set real PostgreSQL env vars and `NEXTAUTH_SECRET`.
+3. Set real PostgreSQL env vars, `NEXTAUTH_SECRET`, and the seeded admin credentials (`ADMIN_EMAIL`, `ADMIN_PASSWORD`).
 4. Install dependencies:
 
 ```bash
@@ -65,6 +65,15 @@ Copy `.env.example` to `.env.local` for local development. On Vercel, add the sa
 - `NEXTAUTH_SECRET`
   Required in production. Use a long random secret for JWT/session signing.
 
+### Required for seeded admin access
+
+- `ADMIN_EMAIL`
+  The real database-backed admin login. Defaults to `admin@virturagroup.com` if omitted.
+- `ADMIN_NAME`
+  Optional display name for the seeded admin account.
+- `ADMIN_PASSWORD`
+  Required for `npm run db:seed`. The seed intentionally refuses to create the real admin account without it.
+
 ### Operational toggles
 
 - `ENABLE_DEMO_AUTH`
@@ -78,8 +87,6 @@ Copy `.env.example` to `.env.local` for local development. On Vercel, add the sa
 
 ### Optional for local/demo access
 
-- `DEMO_ADMIN_EMAIL`
-- `DEMO_ADMIN_PASSWORD`
 - `DEMO_CONSULTANT_EMAIL`
 - `DEMO_CONSULTANT_PASSWORD`
 - `DEMO_CLIENT_EMAIL`
@@ -144,7 +151,7 @@ npm run db:migrate:status
 npm run db:seed
 ```
 
-By default the seed script only loads the reusable service-plan catalog. To intentionally seed demo accounts and the sample HVAC submission, run:
+By default the seed script loads the reusable service-plan catalog and the real admin account from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. To intentionally seed demo accounts and the sample HVAC submission, run:
 
 ```bash
 $env:SEED_DEMO_DATA="true"; npm run db:seed
@@ -235,7 +242,7 @@ Official references:
 npm run db:migrate:deploy
 ```
 
-7. Seed the baseline catalog:
+7. Seed the baseline catalog and real admin account:
 
 ```bash
 npm run db:seed
@@ -296,7 +303,7 @@ npm run notifications:process
 ## Important Notes
 
 - Demo auth is intentionally opt-in now.
-- `db:seed` only creates the service-plan catalog by default. Use `SEED_DEMO_DATA=true` if you want the demo users and sample business record too.
+- `db:seed` always creates the service-plan catalog and the real admin account from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Use `SEED_DEMO_DATA=true` if you also want the demo client, demo consultant, and sample business record.
 - The production app now fails fast with clear errors when `DATABASE_URL` or `NEXTAUTH_SECRET` is missing.
 - Follow-up submission status and `FollowUp` records are kept in sync when a follow-up is marked sent.
 - Internal consultant notes remain separate from client-visible audit content.

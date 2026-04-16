@@ -16,6 +16,11 @@ const statusStyles: Record<string, string> = {
   sent: "bg-indigo-50 text-indigo-700 ring-indigo-100",
   replied: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   booked: "bg-teal-50 text-teal-700 ring-teal-100",
+  requested: "bg-violet-50 text-violet-700 ring-violet-100",
+  acknowledged: "bg-sky-50 text-sky-700 ring-sky-100",
+  "in progress": "bg-brand-50 text-brand-700 ring-brand-100",
+  completed: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  declined: "bg-rose-50 text-rose-700 ring-rose-100",
 };
 
 type StatusBadgeProps = {

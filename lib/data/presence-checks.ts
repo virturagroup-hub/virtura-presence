@@ -1,21 +1,31 @@
 import {
   AdvertisingCadence,
+  GoogleBusinessProfileStatus,
   NotificationStatus,
-  ReviewCollectionLevel,
+  ReviewRequestCadence,
+  ReviewStrength,
   ScoreTier,
+  SocialPresenceLevel,
   SubmissionStatus,
+  WebsiteStatus,
   type Prisma,
 } from "@prisma/client";
 
 import { attachEmailOwnedRecordsToUser } from "@/lib/data/user-links";
 import { dispatchNotificationEvents } from "@/lib/notification-delivery";
 import { createUserActionToken, recordNotificationEvent } from "@/lib/notifications";
-import { buildQuickScore } from "@/lib/presence/score";
+import { buildQuickScore, type QuickScoreTier } from "@/lib/presence/score";
 import { prisma } from "@/lib/prisma";
 import { normalizeEmail, slugify } from "@/lib/text";
 import type { PresenceCheckInput } from "@/lib/validations/presence-check";
 
 type SubmissionCreateOptions = {
+  currentUserId?: string;
+};
+
+type ReportDeliveryInput = {
+  submissionId: string;
+  reportEmail: string;
   currentUserId?: string;
 };
 
@@ -35,40 +45,67 @@ export type PresenceCheckSubmissionResult = {
   nextStep: "portal" | "sign-in" | "claim";
 };
 
-function toScoreTierEnum(label: ReturnType<typeof buildQuickScore>["tier"]) {
-  if (label === "Strong footing") {
-    return ScoreTier.STRONG_FOOTING;
+function toScoreTierEnum(label: QuickScoreTier) {
+  if (label === "Strong online presence") {
+    return ScoreTier.STRONG_ONLINE_PRESENCE;
   }
 
-  if (label === "Promising with clear upside") {
-    return ScoreTier.PROMISING_UPSIDE;
+  if (label === "Solid foundation with improvement opportunities") {
+    return ScoreTier.SOLID_FOUNDATION_IMPROVEMENTS;
   }
 
-  return ScoreTier.FOCUSED_ATTENTION;
+  if (label === "Basic foundation with clear gaps") {
+    return ScoreTier.BASIC_FOUNDATION_CLEAR_GAPS;
+  }
+
+  if (label === "Early-stage presence") {
+    return ScoreTier.EARLY_STAGE_PRESENCE;
+  }
+
+  return ScoreTier.LIMITED_FOUNDATION;
 }
 
-function toWebsiteValue(value: PresenceCheckInput["hasWebsite"]) {
-  if (value === "yes") {
-    return true;
+function toWebsiteStatus(value: PresenceCheckInput["websiteStatus"]) {
+  switch (value) {
+    case "in-progress":
+      return WebsiteStatus.IN_PROGRESS;
+    case "basic":
+      return WebsiteStatus.BASIC;
+    case "mostly-complete":
+      return WebsiteStatus.MOSTLY_COMPLETE;
+    case "polished":
+      return WebsiteStatus.POLISHED;
+    default:
+      return WebsiteStatus.NONE;
   }
-
-  if (value === "no") {
-    return false;
-  }
-
-  return null;
 }
 
-function toGoogleBusinessValue(value: PresenceCheckInput["usesGoogleBusinessProfile"]) {
-  if (value === "yes") {
-    return true;
+function toGoogleBusinessStatus(value: PresenceCheckInput["googleBusinessProfileStatus"]) {
+  switch (value) {
+    case "not-sure":
+      return GoogleBusinessProfileStatus.NOT_SURE;
+    case "claimed-incomplete":
+      return GoogleBusinessProfileStatus.CLAIMED_INCOMPLETE;
+    case "claimed-mostly-complete":
+      return GoogleBusinessProfileStatus.CLAIMED_MOSTLY_COMPLETE;
+    case "active":
+      return GoogleBusinessProfileStatus.ACTIVE;
+    default:
+      return GoogleBusinessProfileStatus.NONE;
   }
+}
 
-  if (value === "no") {
-    return false;
+function toSocialPresenceLevel(value: PresenceCheckInput["socialPresenceLevel"]) {
+  switch (value) {
+    case "one-occasional":
+      return SocialPresenceLevel.ONE_OCCASIONAL;
+    case "one-active":
+      return SocialPresenceLevel.ONE_ACTIVE;
+    case "multiple-active":
+      return SocialPresenceLevel.MULTIPLE_ACTIVE;
+    default:
+      return SocialPresenceLevel.NONE;
   }
-
-  return null;
 }
 
 function toAdvertisingCadence(value: PresenceCheckInput["runsAdvertising"]) {
@@ -83,24 +120,38 @@ function toAdvertisingCadence(value: PresenceCheckInput["runsAdvertising"]) {
   return AdvertisingCadence.NO;
 }
 
-function toReviewCollectionLevel(value: PresenceCheckInput["collectsReviews"]) {
-  if (value === "yes") {
-    return ReviewCollectionLevel.YES;
+function toReviewStrength(value: PresenceCheckInput["reviewStrength"]) {
+  switch (value) {
+    case "few":
+      return ReviewStrength.FEW;
+    case "some":
+      return ReviewStrength.SOME;
+    case "strong":
+      return ReviewStrength.STRONG;
+    default:
+      return ReviewStrength.NONE;
   }
+}
 
-  if (value === "somewhat") {
-    return ReviewCollectionLevel.SOMEWHAT;
+function toReviewRequestCadence(value: PresenceCheckInput["reviewRequestCadence"]) {
+  switch (value) {
+    case "rarely":
+      return ReviewRequestCadence.RARELY;
+    case "sometimes":
+      return ReviewRequestCadence.SOMETIMES;
+    case "regularly":
+      return ReviewRequestCadence.REGULARLY;
+    default:
+      return ReviewRequestCadence.NEVER;
   }
-
-  return ReviewCollectionLevel.NOT_YET;
 }
 
 async function createUniqueBusinessSlug(
   tx: Prisma.TransactionClient,
-  input: PresenceCheckInput,
+  input: Pick<PresenceCheckInput, "businessName" | "city" | "state">,
 ) {
-  const baseSlug = slugify(`${input.businessName}-${input.city}-${input.state}`);
-  let slug = baseSlug || "virtura-business";
+  const baseSlug = slugify(`${input.businessName}-${input.city}-${input.state}`) || "virtura-business";
+  let slug = baseSlug;
   let counter = 1;
 
   while (await tx.business.findUnique({ where: { slug } })) {
@@ -109,6 +160,28 @@ async function createUniqueBusinessSlug(
   }
 
   return slug;
+}
+
+async function findLinkedUser(
+  tx: Prisma.TransactionClient,
+  email: string,
+  currentUserId?: string,
+) {
+  if (currentUserId) {
+    const currentUser = await tx.user.findUnique({
+      where: { id: currentUserId },
+    });
+
+    if (currentUser) {
+      return currentUser;
+    }
+  }
+
+  return tx.user.findUnique({
+    where: {
+      email,
+    },
+  });
 }
 
 async function findMatchingBusiness(
@@ -154,87 +227,106 @@ async function findMatchingBusiness(
   return null;
 }
 
+function getSubmissionNextStep(input: {
+  currentUserId?: string;
+  linkedUserId?: string | null;
+  linkedUserHasPassword?: boolean | null;
+}) {
+  if (input.currentUserId) {
+    return "portal" as const;
+  }
+
+  if (input.linkedUserId && input.linkedUserHasPassword) {
+    return "sign-in" as const;
+  }
+
+  return "claim" as const;
+}
+
+function buildBusinessUpdateData(
+  input: PresenceCheckInput,
+  email: string,
+  quickScore: ReturnType<typeof buildQuickScore>,
+  scoreTier: ScoreTier,
+) {
+  return {
+    name: input.businessName,
+    ownerName: input.ownerName,
+    businessCategory: input.businessCategory,
+    city: input.city,
+    state: input.state,
+    serviceArea: input.serviceArea,
+    primaryEmail: email,
+    primaryPhone: input.phone || null,
+    websiteUrl: input.websiteUrl || null,
+    googleBusinessProfileUrl: input.googleBusinessProfileUrl || null,
+    socialProfiles: input.socialPlatforms,
+    discoveryChannels: input.discoveryChannels,
+    goals: input.goals,
+    description: input.notes || null,
+    websiteStatus: toWebsiteStatus(input.websiteStatus),
+    googleBusinessProfileStatus: toGoogleBusinessStatus(input.googleBusinessProfileStatus),
+    reviewStrength: toReviewStrength(input.reviewStrength),
+    reviewRequestCadence: toReviewRequestCadence(input.reviewRequestCadence),
+    socialPresenceLevel: toSocialPresenceLevel(input.socialPresenceLevel),
+    runsAdvertising: toAdvertisingCadence(input.runsAdvertising),
+    reviewCount: input.reviewCount ?? null,
+    averageRating: input.averageRating ?? null,
+    notes: input.notes || null,
+    latestSubmittedAt: new Date(),
+    quickScore: quickScore.score,
+    quickTier: scoreTier,
+    quickSummary: quickScore.summary,
+    status: SubmissionStatus.SUBMITTED,
+  };
+}
+
 export async function createPresenceCheckSubmission(
   input: PresenceCheckInput,
   options: SubmissionCreateOptions = {},
 ): Promise<PresenceCheckSubmissionResult> {
   const normalizedEmail = normalizeEmail(input.email);
-  const quickScore = buildQuickScore({
+  const normalizedInput = {
     ...input,
     email: normalizedEmail,
-  });
+  };
+  const quickScore = buildQuickScore(normalizedInput);
   const scoreTier = toScoreTierEnum(quickScore.tier);
 
   const transactionResult = await prisma.$transaction(async (tx) => {
-    const notificationEventIds: string[] = [];
-    const linkedUser =
-      (options.currentUserId
-        ? await tx.user.findUnique({ where: { id: options.currentUserId } })
-        : null) ??
-      (await tx.user.findUnique({
-        where: { email: normalizedEmail },
-      }));
-
+    const linkedUser = await findLinkedUser(tx, normalizedEmail, options.currentUserId);
     const existingBusiness = await findMatchingBusiness(
       tx,
-      input,
+      normalizedInput,
       normalizedEmail,
       linkedUser?.id,
+    );
+
+    const businessData = buildBusinessUpdateData(
+      normalizedInput,
+      normalizedEmail,
+      quickScore,
+      scoreTier,
     );
 
     const business =
       existingBusiness ??
       (await tx.business.create({
         data: {
-          slug: await createUniqueBusinessSlug(tx, input),
-          name: input.businessName,
-          ownerName: input.ownerName,
-          businessCategory: input.businessCategory,
-          city: input.city,
-          state: input.state,
-          serviceArea: input.serviceArea,
-          primaryEmail: normalizedEmail,
-          primaryPhone: input.phone,
-          websiteUrl: input.websiteUrl || null,
-          googleBusinessProfileUrl: input.googleBusinessProfileUrl || null,
-          socialProfiles: input.socialPlatforms,
-          discoveryChannels: input.discoveryChannels,
-          goals: input.goals,
-          notes: input.notes,
-          primaryContactId: linkedUser?.id,
-          assignedConsultantId: linkedUser?.role === "CONSULTANT" ? linkedUser.id : null,
-          latestSubmittedAt: new Date(),
-          quickScore: quickScore.score,
-          quickTier: scoreTier,
-          quickSummary: quickScore.summary,
-        },
+          slug: await createUniqueBusinessSlug(tx, normalizedInput),
+          leadSource: "presence-check",
+          ...businessData,
+          primaryContactId: linkedUser?.id ?? null,
+        } as Prisma.BusinessUncheckedCreateInput,
       }));
 
     if (existingBusiness) {
       await tx.business.update({
         where: { id: existingBusiness.id },
         data: {
-          name: input.businessName,
-          ownerName: input.ownerName,
-          businessCategory: input.businessCategory,
-          city: input.city,
-          state: input.state,
-          serviceArea: input.serviceArea,
-          primaryEmail: normalizedEmail,
-          primaryPhone: input.phone,
-          websiteUrl: input.websiteUrl || null,
-          googleBusinessProfileUrl: input.googleBusinessProfileUrl || null,
-          socialProfiles: input.socialPlatforms,
-          discoveryChannels: input.discoveryChannels,
-          goals: input.goals,
-          notes: input.notes,
-          primaryContactId: existingBusiness.primaryContactId ?? linkedUser?.id,
-          latestSubmittedAt: new Date(),
-          quickScore: quickScore.score,
-          quickTier: scoreTier,
-          quickSummary: quickScore.summary,
-          status: SubmissionStatus.SUBMITTED,
-        },
+          ...businessData,
+          primaryContactId: existingBusiness.primaryContactId ?? linkedUser?.id ?? null,
+        } as Prisma.BusinessUncheckedUpdateInput,
       });
     }
 
@@ -244,26 +336,31 @@ export async function createPresenceCheckSubmission(
         submittedById: linkedUser?.id,
         assignedConsultantId: business.assignedConsultantId,
         status: SubmissionStatus.SUBMITTED,
-        businessName: input.businessName,
-        ownerName: input.ownerName,
+        businessName: normalizedInput.businessName,
+        ownerName: normalizedInput.ownerName,
         contactEmail: normalizedEmail,
-        contactPhone: input.phone || null,
-        businessCategory: input.businessCategory,
-        city: input.city,
-        state: input.state,
-        serviceArea: input.serviceArea,
-        hasWebsite: toWebsiteValue(input.hasWebsite),
-        websiteUrl: input.websiteUrl || null,
-        usesGoogleBusinessProfile: toGoogleBusinessValue(
-          input.usesGoogleBusinessProfile,
+        contactPhone: normalizedInput.phone || null,
+        businessCategory: normalizedInput.businessCategory,
+        city: normalizedInput.city,
+        state: normalizedInput.state,
+        serviceArea: normalizedInput.serviceArea,
+        websiteStatus: toWebsiteStatus(normalizedInput.websiteStatus),
+        websiteUrl: normalizedInput.websiteUrl || null,
+        googleBusinessProfileStatus: toGoogleBusinessStatus(
+          normalizedInput.googleBusinessProfileStatus,
         ),
-        googleBusinessProfileUrl: input.googleBusinessProfileUrl || null,
-        socialPlatforms: input.socialPlatforms,
-        runsAdvertising: toAdvertisingCadence(input.runsAdvertising),
-        discoveryChannels: input.discoveryChannels,
-        collectsReviews: toReviewCollectionLevel(input.collectsReviews),
-        desiredOutcomes: input.goals,
-        rawNotes: input.notes || null,
+        googleBusinessProfileUrl: normalizedInput.googleBusinessProfileUrl || null,
+        socialPlatforms: normalizedInput.socialPlatforms,
+        socialPresenceLevel: toSocialPresenceLevel(normalizedInput.socialPresenceLevel),
+        runsAdvertising: toAdvertisingCadence(normalizedInput.runsAdvertising),
+        discoveryChannels: normalizedInput.discoveryChannels,
+        reviewStrength: toReviewStrength(normalizedInput.reviewStrength),
+        reviewRequestCadence: toReviewRequestCadence(normalizedInput.reviewRequestCadence),
+        reviewCount: normalizedInput.reviewCount ?? null,
+        averageRating: normalizedInput.averageRating ?? null,
+        desiredOutcomes: normalizedInput.goals,
+        rawNotes: normalizedInput.notes || null,
+        reportEmail: normalizedEmail,
         score: quickScore.score,
         scoreTier,
         summary: quickScore.summary,
@@ -279,9 +376,6 @@ export async function createPresenceCheckSubmission(
           })),
         },
       },
-      include: {
-        categoryScores: true,
-      },
     });
 
     if (linkedUser?.id) {
@@ -289,54 +383,6 @@ export async function createPresenceCheckSubmission(
         userId: linkedUser.id,
         email: normalizedEmail,
       });
-    }
-
-    const requiresClaim = !linkedUser || !linkedUser.passwordHash;
-    const claimToken = requiresClaim
-      ? await createUserActionToken(tx, {
-          type: "CLAIM_SUBMISSION",
-          email: normalizedEmail,
-          userId: linkedUser?.id,
-          presenceCheckId: submission.id,
-          expiresInHours: 72,
-        })
-      : null;
-
-    const submissionNotification = await recordNotificationEvent(tx, {
-      type: "SUBMISSION_CREATED",
-      status: claimToken ? NotificationStatus.LOGGED : NotificationStatus.PENDING,
-      businessId: business.id,
-      presenceCheckId: submission.id,
-      userId: linkedUser?.id,
-      channel: claimToken ? "log" : "email",
-      recipient: normalizedEmail,
-      subject: `Your quick review for ${input.businessName} is ready`,
-      payload: {
-        score: quickScore.score,
-        scoreTier,
-        businessName: input.businessName,
-      },
-    });
-    if (!claimToken) {
-      notificationEventIds.push(submissionNotification.id);
-    }
-
-    if (claimToken) {
-      const claimNotification = await recordNotificationEvent(tx, {
-        type: "CLAIM_LINK_CREATED",
-        status: NotificationStatus.PENDING,
-        businessId: business.id,
-        presenceCheckId: submission.id,
-        userId: linkedUser?.id,
-        channel: "email",
-        recipient: normalizedEmail,
-        subject: `Create portal access for ${input.businessName}`,
-        payload: {
-          token: claimToken.token,
-          type: "claim_submission",
-        },
-      });
-      notificationEventIds.push(claimNotification.id);
     }
 
     return {
@@ -351,33 +397,132 @@ export async function createPresenceCheckSubmission(
       improvements: quickScore.improvements,
       categories: quickScore.categories,
       suggestedPlanSlugs: quickScore.suggestedPlanSlugs,
+      claimToken: undefined,
+      nextStep: getSubmissionNextStep({
+        currentUserId: options.currentUserId,
+        linkedUserId: linkedUser?.id,
+        linkedUserHasPassword: Boolean(linkedUser?.passwordHash),
+      }),
+    } satisfies PresenceCheckSubmissionResult;
+  });
+
+  return transactionResult;
+}
+
+export async function deliverPresenceCheckReport(
+  input: ReportDeliveryInput,
+) {
+  const normalizedEmail = normalizeEmail(input.reportEmail);
+
+  const transactionResult = await prisma.$transaction(async (tx) => {
+    const notificationEventIds: string[] = [];
+    const submission = await tx.presenceCheck.findUnique({
+      where: {
+        id: input.submissionId,
+      },
+      include: {
+        business: true,
+      },
+    });
+
+    if (!submission) {
+      throw new Error("That presence check could not be found.");
+    }
+
+    const linkedUser = await findLinkedUser(tx, normalizedEmail, input.currentUserId);
+    const nextStep = getSubmissionNextStep({
+      currentUserId: input.currentUserId,
+      linkedUserId: linkedUser?.id,
+      linkedUserHasPassword: Boolean(linkedUser?.passwordHash),
+    });
+
+    await tx.presenceCheck.update({
+      where: {
+        id: submission.id,
+      },
+      data: {
+        contactEmail: normalizedEmail,
+        reportEmail: normalizedEmail,
+        reportSentAt: new Date(),
+        submittedById: input.currentUserId
+          ? submission.submittedById ?? input.currentUserId
+          : linkedUser?.id ?? submission.submittedById,
+      },
+    });
+
+    await tx.business.update({
+      where: {
+        id: submission.businessId,
+      },
+      data: {
+        primaryEmail: normalizedEmail,
+        primaryContactId:
+          input.currentUserId
+            ? submission.business.primaryContactId
+            : submission.business.primaryContactId ?? linkedUser?.id ?? null,
+      },
+    });
+
+    if (linkedUser?.id) {
+      await attachEmailOwnedRecordsToUser(tx, {
+        userId: linkedUser.id,
+        email: normalizedEmail,
+      });
+    }
+
+    let claimToken:
+      | {
+          token: string;
+        }
+      | null = null;
+
+    if (nextStep === "claim") {
+      claimToken = await createUserActionToken(tx, {
+        type: "CLAIM_SUBMISSION",
+        email: normalizedEmail,
+        userId: linkedUser?.id,
+        presenceCheckId: submission.id,
+        expiresInHours: 72,
+      });
+    }
+
+    const event = await recordNotificationEvent(tx, {
+      type: claimToken ? "CLAIM_LINK_CREATED" : "SUBMISSION_CREATED",
+      status: NotificationStatus.PENDING,
+      businessId: submission.businessId,
+      presenceCheckId: submission.id,
+      userId: linkedUser?.id ?? input.currentUserId,
+      channel: "email",
+      recipient: normalizedEmail,
+      subject: claimToken
+        ? `Create portal access for ${submission.businessName}`
+        : `Your quick review for ${submission.businessName} is ready`,
+      payload: claimToken
+        ? {
+            token: claimToken.token,
+            type: "claim_submission",
+          }
+        : {
+            score: submission.score,
+            scoreTier: submission.scoreTier,
+            businessName: submission.businessName,
+          },
+    });
+    notificationEventIds.push(event.id);
+
+    return {
+      nextStep,
       claimToken: claimToken?.token,
-      nextStep: (
-        options.currentUserId
-          ? "portal"
-          : claimToken
-            ? "claim"
-            : "sign-in"
-      ) as PresenceCheckSubmissionResult["nextStep"],
       notificationEventIds,
+      reportEmail: normalizedEmail,
     };
   });
 
   await dispatchNotificationEvents(transactionResult.notificationEventIds);
 
   return {
-    submissionId: transactionResult.submissionId,
-    businessId: transactionResult.businessId,
-    score: transactionResult.score,
-    scoreTier: transactionResult.scoreTier,
-    tierLabel: transactionResult.tierLabel,
-    summary: transactionResult.summary,
-    encouragement: transactionResult.encouragement,
-    strengths: transactionResult.strengths,
-    improvements: transactionResult.improvements,
-    categories: transactionResult.categories,
-    suggestedPlanSlugs: transactionResult.suggestedPlanSlugs,
-    claimToken: transactionResult.claimToken,
     nextStep: transactionResult.nextStep,
+    claimToken: transactionResult.claimToken,
+    reportEmail: transactionResult.reportEmail,
   };
 }

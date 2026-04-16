@@ -26,7 +26,7 @@ export default async function WorkspacePage({ searchParams }: WorkspacePageProps
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-5 lg:grid-cols-4">
+      <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-5">
         {workspace.summaryCards.map((card) => (
           <div key={card.label} className="surface-card p-5">
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
@@ -83,6 +83,11 @@ export default async function WorkspacePage({ searchParams }: WorkspacePageProps
                     <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-sm text-slate-700">
                       {scoreTierLabel(submission.scoreTier) ?? "Score pending"}
                     </div>
+                    {submission.comprehensiveRequests[0] ? (
+                      <div className="rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-sm text-violet-700">
+                        Deep audit {submission.comprehensiveRequests[0].status.replaceAll("_", " ").toLowerCase()}
+                      </div>
+                    ) : null}
                     <Button asChild className="rounded-full px-4">
                       <Link href={`/workspace/submissions/${submission.id}`}>
                         Open submission

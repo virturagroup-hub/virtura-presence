@@ -1,52 +1,52 @@
 import { servicePlans } from "@/lib/plan-catalog";
 
 export const demoAssessment = {
-  score: 74,
-  tier: "Promising with clear upside",
+  score: 68,
+  tier: "Solid foundation with improvement opportunities",
   summary:
-    "Harbor & Pine HVAC looks legitimate and discoverable, but trust and conversion signals still feel uneven enough to cost calls.",
+    "Harbor & Pine HVAC looks credible online, but trust and consistency signals still leave room for improvement.",
   encouragement:
     "There is already enough traction here to build on. The next wins are about tightening consistency, not rebuilding everything.",
   strengths: [
-    "A real website is live and contact details are visible.",
-    "Google Business Profile is present, so local trust has a foundation.",
-    "Customers already find the business through more than one channel.",
+    "A live website gives customers a credible place to evaluate the business.",
+    "Google / local presence is established enough to support nearby discovery.",
+    "Customers have a reasonably clear path to call or take the next step.",
   ],
   improvements: [
-    "Review collection is inconsistent, which weakens social proof.",
-    "Social activity exists but does not yet reinforce trust consistently.",
-    "Calls-to-action and service clarity likely need a more deliberate pass.",
+    "Review cadence and proof visibility still need to become more consistent.",
+    "Social activity exists but does not yet reinforce trust strongly enough.",
+    "Service clarity and proof near the top of the site still have room to improve.",
   ],
   categories: [
     {
       key: "WEBSITE_PRESENCE",
       label: "Website Presence",
       score: 15,
-      note: "The foundation is there, but the site still needs sharper clarity and confidence cues.",
+      note: "The site has a credible base, but clarity, proof, and polish still have room to improve.",
     },
     {
       key: "GOOGLE_LOCAL_PRESENCE",
       label: "Google / Local Presence",
-      score: 16,
-      note: "Local signals are present, which is a strong starting point for nearby searches.",
+      score: 15,
+      note: "Local presence has a usable foundation, but it still needs steadier upkeep and completeness.",
     },
     {
       key: "REVIEWS_TRUST",
       label: "Reviews & Trust",
       score: 13,
-      note: "Trust signals exist, but they are not consistent enough yet to do all the selling for you.",
+      note: "Trust signals are present and useful, though there is still room to strengthen the review engine.",
     },
     {
       key: "SOCIAL_BRAND_ACTIVITY",
       label: "Social Presence / Brand Activity",
-      score: 12,
-      note: "The brand is visible, but activity feels lighter than the business quality deserves.",
+      score: 11,
+      note: "One social channel is doing a useful job, though the brand footprint is still fairly narrow.",
     },
     {
       key: "CUSTOMER_ACTION_READINESS",
       label: "Customer Action Readiness",
-      score: 18,
-      note: "Customers can see how to move forward, which gives the presence real conversion potential.",
+      score: 14,
+      note: "Customers have a workable next-step path, though it could be clearer and easier.",
     },
   ],
 };

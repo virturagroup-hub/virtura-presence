@@ -5,6 +5,7 @@ import {
   Compass,
   FileText,
   LayoutGrid,
+  Settings2,
   ShieldCheck,
   Sparkles,
   Users,
@@ -36,6 +37,12 @@ export const portalNavigation: NavigationItem[] = [
     href: "/portal/report",
     icon: FileText,
     description: "Client-facing audit summary and category findings.",
+  },
+  {
+    title: "Profile & Security",
+    href: "/portal/profile",
+    icon: Settings2,
+    description: "Business details, contact data, and password settings.",
   },
 ];
 

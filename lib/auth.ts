@@ -20,14 +20,6 @@ type DemoAuthUser = {
 
 export const demoAuthUsers: DemoAuthUser[] = [
   {
-    id: "demo-admin",
-    name: "Virtura Admin",
-    email: process.env.DEMO_ADMIN_EMAIL ?? "admin@virturagroup.com",
-    password: process.env.DEMO_ADMIN_PASSWORD ?? "VirturaAdmin!2026",
-    role: "ADMIN",
-    label: "Admin demo",
-  },
-  {
     id: "demo-consultant",
     name: "Virtura Consultant",
     email: process.env.DEMO_CONSULTANT_EMAIL ?? "consultant@virturagroup.com",

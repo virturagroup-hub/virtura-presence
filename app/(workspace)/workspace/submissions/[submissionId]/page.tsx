@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { AuditCategory } from "@prisma/client";
 
 import { AuditEditorForm } from "@/components/workspace/audit-editor-form";
+import { ComprehensiveRequestStatusForm } from "@/components/workspace/comprehensive-request-status-form";
 import { InternalNoteForm } from "@/components/workspace/internal-note-form";
 import { SubmissionStatusForm } from "@/components/workspace/submission-status-form";
 import { ScorePanel } from "@/components/shared/score-panel";
@@ -82,10 +83,29 @@ export default async function SubmissionDetailPage({
                 ["Email", submission.contactEmail],
                 ["Phone", submission.contactPhone ?? "Not provided"],
                 ["Service area", submission.serviceArea],
+                ["Website status", submission.websiteStatus.replaceAll("_", " ").toLowerCase()],
                 ["Website", submission.websiteUrl ?? "No site listed"],
+                [
+                  "Google status",
+                  submission.googleBusinessProfileStatus.replaceAll("_", " ").toLowerCase(),
+                ],
                 [
                   "Google profile",
                   submission.googleBusinessProfileUrl ?? "No profile listed",
+                ],
+                [
+                  "Review base",
+                  submission.reviewCount
+                    ? `${submission.reviewCount} reviews${submission.averageRating ? ` · ${submission.averageRating.toFixed(1)} avg` : ""}`
+                    : "No review data provided",
+                ],
+                [
+                  "Review requests",
+                  submission.reviewRequestCadence.replaceAll("_", " ").toLowerCase(),
+                ],
+                [
+                  "Social presence",
+                  submission.socialPresenceLevel.replaceAll("_", " ").toLowerCase(),
                 ],
                 ["Social platforms", asStringArray(submission.socialPlatforms).join(", ") || "None listed"],
                 ["Discovery", asStringArray(submission.discoveryChannels).join(", ") || "None listed"],
@@ -123,6 +143,41 @@ export default async function SubmissionDetailPage({
           </div>
 
           <InternalNoteForm submissionId={submission.id} />
+
+          {submission.comprehensiveRequests.length ? (
+            <div className="surface-card p-6">
+              <p className="section-kicker">Comprehensive report requests</p>
+              <div className="mt-5 space-y-4">
+                {submission.comprehensiveRequests.map((request) => (
+                  <div
+                    key={request.id}
+                    className="rounded-[28px] border border-slate-200/70 bg-white/88 p-5"
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold text-slate-950">
+                          Requested {formatDateTime(request.createdAt)}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {request.requestedBy?.name ?? "Client"} · {request.status.replaceAll("_", " ")}
+                        </p>
+                      </div>
+                      <StatusBadge value={request.status.replaceAll("_", " ")} />
+                    </div>
+                    {request.note ? (
+                      <p className="mt-4 text-sm leading-7 text-slate-700">{request.note}</p>
+                    ) : null}
+                    <div className="mt-4">
+                      <ComprehensiveRequestStatusForm
+                        requestId={request.id}
+                        currentStatus={request.status}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           {submission.internalNotes.length ? (
             <div className="surface-card p-6">

@@ -104,10 +104,13 @@ export function SignInForm({
 
         {!showDemoCredentials ? (
           <div className="mt-8 rounded-3xl border border-amber-200/70 bg-amber-50/80 p-4 text-sm leading-7 text-amber-900">
-            Demo access is currently off in this environment. The provided demo
-            emails and passwords only work when <code>ENABLE_DEMO_AUTH=true</code>,
-            or after database setup if you intentionally seed demo users with{" "}
-            <code>$env:SEED_DEMO_DATA=&quot;true&quot;; npm run db:seed</code>.
+            Demo client and consultant access are currently off in this environment.
+            Those optional demo users only work when <code>ENABLE_DEMO_AUTH=true</code>,
+            or after database setup if you intentionally seed demo data with{" "}
+            <code>$env:SEED_DEMO_DATA=&quot;true&quot;; npm run db:seed</code>. The
+            real admin account is seeded separately through{" "}
+            <code>ADMIN_EMAIL</code> / <code>ADMIN_PASSWORD</code> when you run{" "}
+            <code>npm run db:seed</code>.
           </div>
         ) : null}
 

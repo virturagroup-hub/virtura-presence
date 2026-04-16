@@ -81,27 +81,31 @@ export function ScorePanel({
       ) : null}
 
       {(strengths.length || improvements.length) && (
-        <div className="grid gap-4 lg:grid-cols-2">
-          <div className="rounded-3xl border border-emerald-100 bg-emerald-50/80 p-5">
-            <p className="text-xs font-semibold tracking-[0.26em] text-emerald-700 uppercase">
-              Helping you already
-            </p>
-            <div className="mt-3 space-y-3 text-sm leading-6 text-emerald-900">
-              {strengths.map((item) => (
-                <p key={item}>{item}</p>
-              ))}
+        <div className={cn("grid gap-4", strengths.length && improvements.length ? "lg:grid-cols-2" : "")}>
+          {strengths.length ? (
+            <div className="rounded-3xl border border-emerald-100 bg-emerald-50/80 p-5">
+              <p className="text-xs font-semibold tracking-[0.26em] text-emerald-700 uppercase">
+                Helping you already
+              </p>
+              <div className="mt-3 space-y-3 text-sm leading-6 text-emerald-900">
+                {strengths.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="rounded-3xl border border-amber-100 bg-amber-50/80 p-5">
-            <p className="text-xs font-semibold tracking-[0.26em] text-amber-700 uppercase">
-              Likely needs attention
-            </p>
-            <div className="mt-3 space-y-3 text-sm leading-6 text-amber-900">
-              {improvements.map((item) => (
-                <p key={item}>{item}</p>
-              ))}
+          ) : null}
+          {improvements.length ? (
+            <div className="rounded-3xl border border-amber-100 bg-amber-50/80 p-5">
+              <p className="text-xs font-semibold tracking-[0.26em] text-amber-700 uppercase">
+                Likely needs attention
+              </p>
+              <div className="mt-3 space-y-3 text-sm leading-6 text-amber-900">
+                {improvements.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       )}
     </div>

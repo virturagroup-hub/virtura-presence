@@ -9,6 +9,8 @@ export type ServicePlanDefinition = {
   featured?: boolean;
   deliverables: string[];
   outcomes: string[];
+  priceFrom: string;
+  pricingLabel: string;
 };
 
 export const servicePlans: ServicePlanDefinition[] = [
@@ -21,6 +23,8 @@ export const servicePlans: ServicePlanDefinition[] = [
     idealFor: "Service providers with inconsistent local visibility or incomplete profile coverage.",
     tierLabel: "Local visibility",
     accentColor: "from-brand-500/20 via-brand-500/8 to-cyan-300/20",
+    priceFrom: "Starting at $425",
+    pricingLabel: "Focused local cleanup and optimization scope",
     deliverables: [
       "Profile review and completeness recommendations",
       "Category, services, and trust-signal optimization guidance",
@@ -37,6 +41,8 @@ export const servicePlans: ServicePlanDefinition[] = [
     idealFor: "Businesses with no site, an outdated site, or unclear contact and service messaging.",
     tierLabel: "Website readiness",
     accentColor: "from-slate-900/85 via-slate-800/70 to-brand-700/70",
+    priceFrom: "Starting at $1,250",
+    pricingLabel: "Launch scope varies with page count and content readiness",
     deliverables: [
       "Messaging and service-clarity framework",
       "Contact-path and conversion structure",
@@ -54,6 +60,8 @@ export const servicePlans: ServicePlanDefinition[] = [
     tierLabel: "Ongoing support",
     accentColor: "from-sky-400/20 via-brand-500/10 to-white/20",
     featured: true,
+    priceFrom: "Starting at $295/mo",
+    pricingLabel: "Ongoing support with custom scope available",
     deliverables: [
       "Monthly presence review and action list",
       "Review and profile consistency check-ins",
@@ -70,6 +78,8 @@ export const servicePlans: ServicePlanDefinition[] = [
     idealFor: "Owners who want a thorough consultant perspective without a bloated SEO crawl.",
     tierLabel: "Deep review",
     accentColor: "from-indigo-500/20 via-brand-600/12 to-slate-900/20",
+    priceFrom: "Starting at $350",
+    pricingLabel: "Consultation may expand pricing for multi-location or custom scope",
     deliverables: [
       "Manual website, local, review, and action-readiness audit",
       "Consultant summary with practical recommendations",
@@ -78,3 +88,30 @@ export const servicePlans: ServicePlanDefinition[] = [
     outcomes: ["Clear diagnosis", "Honest priorities", "Better decision confidence"],
   },
 ];
+
+export const servicePlanCatalogBySlug = Object.fromEntries(
+  servicePlans.map((plan) => [plan.slug, plan]),
+) as Record<string, ServicePlanDefinition>;
+
+export function resolveServicePlanDefinition(
+  plan: Pick<ServicePlanDefinition, "slug"> &
+    Partial<Omit<ServicePlanDefinition, "slug">>,
+) {
+  const fallback = servicePlanCatalogBySlug[plan.slug];
+
+  return {
+    ...(fallback ?? {
+      name: plan.slug,
+      tagline: "",
+      summary: "",
+      idealFor: "",
+      tierLabel: "Service plan",
+      accentColor: "from-brand-500/20 to-cyan-300/20",
+      deliverables: [],
+      outcomes: [],
+      priceFrom: "Consultation required",
+      pricingLabel: "Custom scope",
+    }),
+    ...plan,
+  } as ServicePlanDefinition;
+}

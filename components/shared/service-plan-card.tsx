@@ -38,6 +38,10 @@ export function ServicePlanCard({
         <p className="rounded-2xl border border-slate-200/70 bg-slate-50/90 px-4 py-3 text-sm text-slate-600">
           {plan.summary}
         </p>
+        <div className="rounded-2xl border border-brand-100 bg-brand-50/75 px-4 py-3">
+          <p className="text-sm font-semibold text-brand-700">{plan.priceFrom}</p>
+          <p className="mt-1 text-xs leading-6 text-brand-800">{plan.pricingLabel}</p>
+        </div>
       </div>
 
       <div className="mt-6 space-y-5">
