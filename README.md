@@ -150,6 +150,11 @@ By default the seed script only loads the reusable service-plan catalog. To inte
 $env:SEED_DEMO_DATA="true"; npm run db:seed
 ```
 
+The provided demo sign-in credentials only work in one of these two cases:
+
+- `ENABLE_DEMO_AUTH=true`, which enables the built-in demo-auth shortcut.
+- You already ran migrations and then seeded demo users with `SEED_DEMO_DATA=true`.
+
 7. Verify connectivity and baseline seed data:
 
 ```bash
@@ -165,6 +170,7 @@ vercel env pull .env.local
 ```
 
 That should populate the pooled and direct Postgres values Vercel provides, including `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and the `POSTGRES_*` compatibility variables.
+Prisma CLI in this repo is configured to read `.env.local` first, so migration and seed commands can use the same pulled environment file as local app runtime.
 
 ## Local Development
 
@@ -290,6 +296,7 @@ npm run notifications:process
 ## Important Notes
 
 - Demo auth is intentionally opt-in now.
+- `db:seed` only creates the service-plan catalog by default. Use `SEED_DEMO_DATA=true` if you want the demo users and sample business record too.
 - The production app now fails fast with clear errors when `DATABASE_URL` or `NEXTAUTH_SECRET` is missing.
 - Follow-up submission status and `FollowUp` records are kept in sync when a follow-up is marked sent.
 - Internal consultant notes remain separate from client-visible audit content.

@@ -1,3 +1,4 @@
+import "@/scripts/load-env";
 import { hash } from "bcryptjs";
 import {
   AuditCategory,
@@ -114,6 +115,8 @@ async function main() {
     console.log("Virtura Presence base seed complete", {
       servicePlans: plans.length,
       demoData: false,
+      nextStep:
+        'Set SEED_DEMO_DATA=true and rerun `npm run db:seed` if you want demo users and the sample submission dataset.',
     });
     return;
   }

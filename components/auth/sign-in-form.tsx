@@ -30,8 +30,12 @@ export function SignInForm({
   initialEmail,
 }: SignInFormProps) {
   const router = useRouter();
-  const [email, setEmail] = useState(initialEmail ?? demoUsers[0]?.email ?? "");
-  const [password, setPassword] = useState(demoUsers[0]?.password ?? "");
+  const [email, setEmail] = useState(
+    initialEmail ?? (showDemoCredentials ? demoUsers[0]?.email : "") ?? "",
+  );
+  const [password, setPassword] = useState(
+    showDemoCredentials ? demoUsers[0]?.password ?? "" : "",
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
 
@@ -40,8 +44,12 @@ export function SignInForm({
     setIsPending(true);
     setError(null);
 
+    const normalizedEmail = email.trim().toLowerCase();
+    const matchedKnownDemo = demoUsers.find(
+      (user) => user.email.toLowerCase() === normalizedEmail,
+    );
     const matchedDemo = demoUsers.find(
-      (user) => user.email === email && user.password === password,
+      (user) => user.email.toLowerCase() === normalizedEmail && user.password === password,
     );
     const resolvedCallbackUrl =
       callbackUrl === "/portal" && matchedDemo && matchedDemo.role !== "CLIENT"
@@ -58,7 +66,16 @@ export function SignInForm({
     setIsPending(false);
 
     if (response?.error) {
-      setError("That sign-in did not go through. Check your credentials and try again.");
+      if (!showDemoCredentials && matchedKnownDemo) {
+        setError(
+          "Demo credentials are disabled in this environment. Set ENABLE_DEMO_AUTH=true for instant demo access, or run migrations and then seed demo users with `$env:SEED_DEMO_DATA=\"true\"; npm run db:seed`.",
+        );
+        return;
+      }
+
+      setError(
+        "That sign-in did not go through. If migrations and seeded users have not been set up yet, the database may not have any login records yet.",
+      );
       return;
     }
 
@@ -84,6 +101,15 @@ export function SignInForm({
           audits, and honest next-step recommendations. The internal workspace is
           for consultants reviewing leads, drafting reports, and publishing findings.
         </p>
+
+        {!showDemoCredentials ? (
+          <div className="mt-8 rounded-3xl border border-amber-200/70 bg-amber-50/80 p-4 text-sm leading-7 text-amber-900">
+            Demo access is currently off in this environment. The provided demo
+            emails and passwords only work when <code>ENABLE_DEMO_AUTH=true</code>,
+            or after database setup if you intentionally seed demo users with{" "}
+            <code>$env:SEED_DEMO_DATA=&quot;true&quot;; npm run db:seed</code>.
+          </div>
+        ) : null}
 
         {showDemoCredentials ? (
           <div className="mt-8 space-y-4">

@@ -1,3 +1,4 @@
+import "@/scripts/load-env";
 import { processPendingNotificationEvents } from "@/lib/notification-delivery";
 
 async function main() {

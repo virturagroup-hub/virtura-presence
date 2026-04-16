@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { getCurrentUser } from "@/lib/auth";
 import { createPresenceCheckSubmission } from "@/lib/data/presence-checks";
+import { toUserFacingDatabaseError } from "@/lib/prisma-errors";
 import { presenceCheckSchema, type PresenceCheckInput } from "@/lib/validations/presence-check";
 
 export async function submitPresenceCheckAction(values: PresenceCheckInput) {
@@ -33,10 +34,10 @@ export async function submitPresenceCheckAction(values: PresenceCheckInput) {
   } catch (error) {
     return {
       success: false as const,
-      error:
-        error instanceof Error
-          ? error.message
-          : "The submission could not be saved right now.",
+      error: toUserFacingDatabaseError(
+        error,
+        "The submission could not be saved right now.",
+      ),
     };
   }
 }

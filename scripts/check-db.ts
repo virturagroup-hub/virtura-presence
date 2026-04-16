@@ -1,3 +1,4 @@
+import "@/scripts/load-env";
 import { prisma } from "@/lib/prisma";
 
 type DatabaseMetadata = {

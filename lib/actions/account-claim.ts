@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { claimSubmissionAccount } from "@/lib/data/accounts";
+import { toUserFacingDatabaseError } from "@/lib/prisma-errors";
 import {
   claimSubmissionAccountSchema,
   type ClaimSubmissionAccountInput,
@@ -34,10 +35,10 @@ export async function claimSubmissionAccountAction(
   } catch (error) {
     return {
       success: false as const,
-      error:
-        error instanceof Error
-          ? error.message
-          : "The account could not be set up right now.",
+      error: toUserFacingDatabaseError(
+        error,
+        "The account could not be set up right now.",
+      ),
     };
   }
 }

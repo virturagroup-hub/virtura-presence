@@ -8,6 +8,7 @@ import {
   updateSubmissionWorkflowStatus,
   upsertSubmissionAudit,
 } from "@/lib/data/workspace";
+import { toUserFacingDatabaseError } from "@/lib/prisma-errors";
 import {
   auditEditorSchema,
   internalNoteSchema,
@@ -54,10 +55,10 @@ export async function saveSubmissionAuditAction(values: AuditEditorInput) {
   } catch (error) {
     return {
       success: false as const,
-      error:
-        error instanceof Error
-          ? error.message
-          : "The audit could not be updated right now.",
+      error: toUserFacingDatabaseError(
+        error,
+        "The audit could not be updated right now.",
+      ),
     };
   }
 }
@@ -92,10 +93,7 @@ export async function updateSubmissionStatusAction(
   } catch (error) {
     return {
       success: false as const,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Status could not be updated.",
+      error: toUserFacingDatabaseError(error, "Status could not be updated."),
     };
   }
 }
@@ -127,10 +125,10 @@ export async function addSubmissionInternalNoteAction(values: InternalNoteInput)
   } catch (error) {
     return {
       success: false as const,
-      error:
-        error instanceof Error
-          ? error.message
-          : "The internal note could not be saved.",
+      error: toUserFacingDatabaseError(
+        error,
+        "The internal note could not be saved.",
+      ),
     };
   }
 }
