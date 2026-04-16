@@ -1,24 +1,31 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageSquareText } from "lucide-react";
 
+import { ServicePlanDetailDialog } from "@/components/shared/service-plan-detail-dialog";
 import { Button } from "@/components/ui/button";
-import type { ServicePlanDefinition } from "@/lib/plan-catalog";
+import { buildServicePlanInquiryHref, type ServicePlanDefinition } from "@/lib/plan-catalog";
 
 type ServicePlanCardProps = {
   plan: ServicePlanDefinition;
   mode?: "marketing" | "dashboard";
+  submissionId?: string;
+  requestStatusLabel?: string | null;
 };
 
 export function ServicePlanCard({
   plan,
   mode = "marketing",
+  submissionId,
+  requestStatusLabel,
 }: ServicePlanCardProps) {
+  const inquiryHref = buildServicePlanInquiryHref(plan.name);
+
   return (
     <article className="surface-card relative flex h-full flex-col overflow-hidden p-6">
       <div
         className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${plan.accentColor}`}
       />
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
@@ -38,40 +45,43 @@ export function ServicePlanCard({
         <p className="rounded-2xl border border-slate-200/70 bg-slate-50/90 px-4 py-3 text-sm text-slate-600">
           {plan.summary}
         </p>
-        <div className="rounded-2xl border border-brand-100 bg-brand-50/75 px-4 py-3">
-          <p className="text-sm font-semibold text-brand-700">{plan.priceFrom}</p>
-          <p className="mt-1 text-xs leading-6 text-brand-800">{plan.pricingLabel}</p>
-        </div>
-      </div>
-
-      <div className="mt-6 space-y-5">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.2em] text-slate-500 uppercase">
-            Ideal for
+        <div className="rounded-[26px] border border-brand-100 bg-brand-50/80 px-5 py-4">
+          <p className="text-xs font-semibold tracking-[0.22em] text-brand-700 uppercase">
+            Public pricing
           </p>
-          <p className="mt-2 text-sm leading-7 text-slate-700">{plan.idealFor}</p>
-        </div>
-
-        <div className="grid gap-3">
-          {plan.deliverables.map((deliverable) => (
-            <div
-              key={deliverable}
-              className="rounded-2xl border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700"
-            >
-              {deliverable}
-            </div>
-          ))}
+          <p className="mt-3 font-heading text-3xl font-semibold tracking-tight text-slate-950">
+            {plan.quickPrice}
+          </p>
+          <p className="mt-2 text-sm leading-7 text-brand-800">{plan.quickPriceNote}</p>
         </div>
       </div>
 
-      {mode === "marketing" ? (
-        <Button asChild className="mt-6 self-start rounded-full px-5">
-          <Link href="/presence-check">
-            Start with the free check
-            <ArrowRight className="size-4" />
-          </Link>
-        </Button>
-      ) : null}
+      <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row sm:flex-wrap">
+        {mode === "marketing" ? (
+          <Button asChild className="rounded-full px-5">
+            <Link href="/presence-check">
+              Start with the free check
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        ) : (
+          <Button asChild variant="outline" className="rounded-full px-5">
+            <a href={inquiryHref}>
+              Talk through this service
+              <MessageSquareText className="size-4" />
+            </a>
+          </Button>
+        )}
+
+        <ServicePlanDetailDialog
+          plan={plan}
+          mode={mode}
+          submissionId={submissionId}
+          requestStatusLabel={requestStatusLabel}
+          triggerClassName="rounded-full px-5"
+          triggerVariant={mode === "marketing" ? "outline" : "default"}
+        />
+      </div>
     </article>
   );
 }

@@ -223,7 +223,7 @@ export function Homepage() {
         <SectionHeading
           eyebrow="Service plans"
           title="Recommendations are available when they are actually justified."
-          description="Virtura Presence supports plan recommendations such as profile cleanup, website launch support, ongoing visibility care, and deeper manual audits. Starting prices are visible because fit should be clear, not hidden."
+          description="Virtura Presence supports plan recommendations such as profile cleanup, website launch support, ongoing visibility care, and deeper manual audits. Entry pricing is visible on each card, and the full detail view shows the fuller breakdown, included scope, and honest notes."
         />
         <div className="mt-10 grid gap-5 xl:grid-cols-2">
           {servicePlans.map((plan) => (

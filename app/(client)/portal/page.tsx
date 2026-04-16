@@ -49,6 +49,7 @@ export default async function PortalPage() {
   const latestBusiness = portal.latestBusiness;
   const latestFollowUp = latest.followUps[0] ?? null;
   const latestRequest = latest.comprehensiveRequests[0] ?? latest.business.comprehensiveRequests[0] ?? null;
+  const latestRequestLabel = latestRequest?.status.replaceAll("_", " ").toLowerCase() ?? null;
   const recommendedPlans =
     latest.audit?.planRecommendations.length
       ? latest.audit.planRecommendations
@@ -127,7 +128,7 @@ export default async function PortalPage() {
               </Button>
               <ComprehensiveReportRequestDialog
                 submissionId={latest.id}
-                existingStatus={latestRequest?.status.replaceAll("_", " ").toLowerCase() ?? null}
+                existingStatus={latestRequestLabel}
                 className="rounded-full px-5"
               />
             </div>
@@ -190,16 +191,12 @@ export default async function PortalPage() {
                 plan={resolveServicePlanDefinition({
                   slug: plan.servicePlan.slug,
                   name: plan.servicePlan.name,
-                  tagline: plan.servicePlan.tagline,
-                  summary: plan.servicePlan.summary,
-                  idealFor: plan.servicePlan.idealFor,
-                  tierLabel: plan.servicePlan.tierLabel,
                   accentColor: plan.servicePlan.accentColor ?? "from-brand-500/20 to-cyan-300/20",
-                  deliverables: asStringArray(plan.servicePlan.deliverables),
-                  outcomes: asStringArray(plan.servicePlan.outcomes),
                   featured: plan.servicePlan.featured,
                 })}
                 mode="dashboard"
+                submissionId={latest.id}
+                requestStatusLabel={latestRequestLabel}
               />
             ))}
           </div>

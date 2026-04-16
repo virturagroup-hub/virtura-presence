@@ -239,20 +239,28 @@ export function PresenceCheckResults() {
             <span className="section-kicker">Suggested next steps</span>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               These recommendations are suggestions, not automatic requests. If you
-              want the deeper consultant review, request it explicitly.
+              want the deeper consultant review, request it explicitly. Each card
+              shows the simple public price, and the full details open the fuller
+              scope and pricing notes.
             </p>
             <div className="mt-5 grid gap-5">
               {recommendedPlans.map((plan) => (
-                <ServicePlanCard key={plan.slug} plan={plan} mode="dashboard" />
+                <ServicePlanCard
+                  key={plan.slug}
+                  plan={plan}
+                  mode="dashboard"
+                  submissionId={activePreview.submissionId}
+                />
               ))}
             </div>
           </div>
 
           <div className="surface-card p-6">
-            <span className="section-kicker">Transparent starting pricing</span>
+            <span className="section-kicker">Pricing at a glance</span>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               Virtura Presence still starts with a free check, but pricing should not
-              feel hidden once you are evaluating next steps.
+              feel hidden once you are evaluating next steps. Open any service above
+              for the fuller breakdown and scope notes.
             </p>
             <div className="mt-4 grid gap-3">
               {recommendedPlans.map((plan) => (
@@ -263,9 +271,9 @@ export function PresenceCheckResults() {
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-sm font-semibold text-slate-950">{plan.name}</p>
-                      <p className="mt-1 text-xs text-slate-500">{plan.pricingLabel}</p>
+                      <p className="mt-1 text-xs text-slate-500">{plan.quickPriceNote}</p>
                     </div>
-                    <p className="text-sm font-semibold text-brand-700">{plan.priceFrom}</p>
+                    <p className="text-sm font-semibold text-brand-700">{plan.quickPrice}</p>
                   </div>
                 </div>
               ))}

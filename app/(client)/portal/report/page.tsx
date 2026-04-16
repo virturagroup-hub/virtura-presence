@@ -10,7 +10,6 @@ import { formatDate } from "@/lib/dates";
 import { categoryLabelFromKey } from "@/lib/display";
 import { getPortalDashboardData } from "@/lib/data/portal";
 import { resolveServicePlanDefinition } from "@/lib/plan-catalog";
-import { asStringArray } from "@/lib/text";
 
 export default async function PortalReportPage() {
   const user = await getCurrentUser();
@@ -24,6 +23,9 @@ export default async function PortalReportPage() {
     (submission) => submission.audit?.status === "PUBLISHED",
   );
   const publishedAudit = publishedSubmission?.audit;
+  const requestStatusLabel =
+    publishedSubmission?.comprehensiveRequests[0]?.status.replaceAll("_", " ").toLowerCase() ??
+    null;
 
   if (!publishedSubmission || !publishedAudit) {
     const latestSubmission = portal.latestSubmission;
@@ -78,17 +80,11 @@ export default async function PortalReportPage() {
           Published {formatDate(publishedAudit.publishedAt)}
         </p>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-          <ComprehensiveReportRequestDialog
-            submissionId={publishedSubmission.id}
-            existingStatus={
-              publishedSubmission.comprehensiveRequests[0]
-                ? publishedSubmission.comprehensiveRequests[0].status
-                    .replaceAll("_", " ")
-                    .toLowerCase()
-                : null
-            }
-            className="rounded-full px-5"
-          />
+            <ComprehensiveReportRequestDialog
+              submissionId={publishedSubmission.id}
+              existingStatus={requestStatusLabel}
+              className="rounded-full px-5"
+            />
           <Button asChild variant="outline" className="rounded-full px-5">
             <Link href="/portal/profile">Update company profile</Link>
           </Button>
@@ -138,18 +134,13 @@ export default async function PortalReportPage() {
               key={recommendation.id}
               plan={resolveServicePlanDefinition({
                 slug: recommendation.servicePlan.slug,
-                name: recommendation.servicePlan.name,
-                tagline: recommendation.servicePlan.tagline,
-                summary: recommendation.servicePlan.summary,
-                idealFor: recommendation.servicePlan.idealFor,
-                tierLabel: recommendation.servicePlan.tierLabel,
                 accentColor:
                   recommendation.servicePlan.accentColor ?? "from-brand-500/20 to-cyan-300/20",
-                deliverables: asStringArray(recommendation.servicePlan.deliverables),
-                outcomes: asStringArray(recommendation.servicePlan.outcomes),
                 featured: recommendation.servicePlan.featured,
               })}
               mode="dashboard"
+              submissionId={publishedSubmission.id}
+              requestStatusLabel={requestStatusLabel}
             />
           ))}
         </div>
