@@ -1,5 +1,10 @@
 import { compare, hash } from "bcryptjs";
-import { NotificationStatus, Prisma } from "@prisma/client";
+import {
+  BusinessLifecycleStage,
+  NotificationStatus,
+  Prisma,
+  SubmissionStatus,
+} from "@prisma/client";
 
 import { dispatchNotificationEvents } from "@/lib/notification-delivery";
 import { recordNotificationEvent } from "@/lib/notifications";
@@ -279,6 +284,16 @@ export async function createComprehensiveReportRequest(
       },
     });
 
+    await tx.business.update({
+      where: {
+        id: submission.businessId,
+      },
+      data: {
+        lifecycleStage: BusinessLifecycleStage.COMPREHENSIVE_AUDIT_REQUESTED,
+        lastActivityAt: new Date(),
+      },
+    });
+
     const event = await recordNotificationEvent(tx, {
       type: "COMPREHENSIVE_REPORT_REQUESTED",
       status: NotificationStatus.LOGGED,
@@ -309,16 +324,43 @@ export async function createComprehensiveReportRequest(
 export async function updateComprehensiveReportRequestStatus(
   input: ComprehensiveReportRequestStatusInput,
 ) {
-  return prisma.comprehensiveReportRequest.update({
-    where: {
-      id: input.requestId,
-    },
-    data: {
-      status: input.status,
-      resolvedAt:
-        input.status === "COMPLETED" || input.status === "DECLINED"
-          ? new Date()
-          : null,
-    },
+  return prisma.$transaction(async (tx) => {
+    const request = await tx.comprehensiveReportRequest.update({
+      where: {
+        id: input.requestId,
+      },
+      data: {
+        status: input.status,
+        resolvedAt:
+          input.status === "COMPLETED" || input.status === "DECLINED"
+            ? new Date()
+            : null,
+      },
+    });
+
+    await tx.business.update({
+      where: {
+        id: request.businessId,
+      },
+      data: {
+        lifecycleStage:
+          input.status === "REQUESTED"
+            ? BusinessLifecycleStage.COMPREHENSIVE_AUDIT_REQUESTED
+            : input.status === "ACKNOWLEDGED" || input.status === "IN_PROGRESS"
+              ? BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS
+              : input.status === "COMPLETED"
+                ? BusinessLifecycleStage.AUDIT_PUBLISHED
+                : BusinessLifecycleStage.FREE_AUDIT_REVIEWED,
+        status:
+          input.status === "COMPLETED"
+            ? SubmissionStatus.PUBLISHED
+            : input.status === "DECLINED"
+              ? SubmissionStatus.IN_REVIEW
+              : undefined,
+        lastActivityAt: new Date(),
+      },
+    });
+
+    return request;
   });
 }

@@ -1,9 +1,12 @@
 import {
+  AuditScope,
+  BusinessLifecycleStage,
+  ComprehensiveReportRequestStatus,
   FollowUpStatus,
   NotificationStatus,
   RecommendationStatus,
   SubmissionStatus,
-  type Prisma,
+  Prisma,
 } from "@prisma/client";
 
 import { dispatchNotificationEvents } from "@/lib/notification-delivery";
@@ -11,188 +14,101 @@ import { recordNotificationEvent } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
 import { servicePlans } from "@/lib/plan-catalog";
 import { parseLineItems } from "@/lib/text";
-import { workspaceAuditStateForIntent, type AuditEditorInput } from "@/lib/validations/audit";
+import { buildAuditDraftAssist } from "@/lib/workspace-audit";
+import {
+  workspaceAuditStateForIntent,
+  type AuditEditorInput,
+  type WorkspaceNotificationActionInput,
+} from "@/lib/validations/audit";
 import type { WorkspaceSearchInput } from "@/lib/validations/workspace-filters";
 
-function buildWorkspaceWhereClause(filters: WorkspaceSearchInput): Prisma.PresenceCheckWhereInput {
-  const where: Prisma.PresenceCheckWhereInput = {};
+const activeComprehensiveRequestStatuses = [
+  ComprehensiveReportRequestStatus.REQUESTED,
+  ComprehensiveReportRequestStatus.ACKNOWLEDGED,
+  ComprehensiveReportRequestStatus.IN_PROGRESS,
+];
 
-  if (filters.status) {
-    where.status = filters.status;
-  }
+const lockedFollowUpStatuses: string[] = [
+  FollowUpStatus.SENT,
+  FollowUpStatus.REPLIED,
+  FollowUpStatus.BOOKED,
+];
 
-  if (filters.scoreTier) {
-    where.scoreTier = filters.scoreTier;
-  }
-
-  if (filters.category) {
-    where.businessCategory = {
-      contains: filters.category,
-      mode: "insensitive",
-    };
-  }
-
-  if (filters.state) {
-    where.state = {
-      contains: filters.state,
-      mode: "insensitive",
-    };
-  }
-
-  if (filters.search) {
-    where.OR = [
-      {
-        businessName: {
-          contains: filters.search,
-          mode: "insensitive",
-        },
-      },
-      {
-        contactEmail: {
-          contains: filters.search,
-          mode: "insensitive",
-        },
-      },
-      {
-        serviceArea: {
-          contains: filters.search,
-          mode: "insensitive",
-        },
-      },
-      {
-        businessCategory: {
-          contains: filters.search,
-          mode: "insensitive",
-        },
-      },
-    ];
-  }
-
-  return where;
-}
-
-function buildWorkspaceOrderBy(filters: WorkspaceSearchInput): Prisma.PresenceCheckOrderByWithRelationInput {
-  if (filters.sort === "oldest") {
-    return { submittedAt: "asc" };
-  }
-
-  if (filters.sort === "highest_score") {
-    return { score: "desc" };
-  }
-
-  if (filters.sort === "lowest_score") {
-    return { score: "asc" };
-  }
-
-  return { submittedAt: "desc" };
-}
-
-export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
-  const where = buildWorkspaceWhereClause(filters);
-
-  const [
-    submissions,
-    totalSubmissions,
-    inReviewCount,
-    publishedCount,
-    followUpDueCount,
-    comprehensiveRequestCount,
-  ] =
-    await Promise.all([
-      prisma.presenceCheck.findMany({
-        where,
-        orderBy: buildWorkspaceOrderBy(filters),
-        include: {
-          business: true,
-          submittedBy: true,
-          audit: true,
-          comprehensiveRequests: {
-            orderBy: {
-              createdAt: "desc",
-            },
-            take: 1,
-          },
-          followUps: {
-            orderBy: {
-              createdAt: "desc",
-            },
-            take: 1,
-          },
-        },
-      }),
-      prisma.presenceCheck.count(),
-      prisma.presenceCheck.count({
-        where: {
-          status: SubmissionStatus.IN_REVIEW,
-        },
-      }),
-      prisma.presenceCheck.count({
-        where: {
-          status: SubmissionStatus.PUBLISHED,
-        },
-      }),
-      prisma.followUp.count({
-        where: {
-          status: {
-            in: ["QUEUED", "SCHEDULED"],
-          },
-        },
-      }),
-      prisma.comprehensiveReportRequest.count({
-        where: {
-          status: {
-            in: ["REQUESTED", "ACKNOWLEDGED", "IN_PROGRESS"],
-          },
-        },
-      }),
-    ]);
-
-  return {
-    submissions,
-    summaryCards: [
-      {
-        label: "Total submissions",
-        value: String(totalSubmissions),
-        change: "Live pipeline",
-      },
-      {
-        label: "In review",
-        value: String(inReviewCount),
-        change: "Active consultant work",
-      },
-      {
-        label: "Published audits",
-        value: String(publishedCount),
-        change: "Client-visible reports",
-      },
-      {
-        label: "Follow-up due",
-        value: String(followUpDueCount),
-        change: "Queued nurture touchpoints",
-      },
-      {
-        label: "Deep audit requests",
-        value: String(comprehensiveRequestCount),
-        change: "Client-raised opportunities",
-      },
-    ],
-    availablePlans: await prisma.servicePlan.findMany({
-      orderBy: {
-        name: "asc",
-      },
-    }),
-  };
-}
-
-export async function getWorkspaceSubmissionDetail(submissionId: string) {
-  const submission = await prisma.presenceCheck.findUnique({
-    where: {
-      id: submissionId,
+const pipelineBusinessInclude = Prisma.validator<Prisma.BusinessInclude>()({
+  primaryContact: true,
+  assignedConsultant: true,
+  presenceChecks: {
+    orderBy: {
+      submittedAt: "desc",
     },
     include: {
-      business: true,
-      submittedBy: true,
-      assignedConsultant: true,
+      audit: {
+        select: {
+          id: true,
+          status: true,
+          scope: true,
+          updatedAt: true,
+          publishedAt: true,
+          progressPercent: true,
+        },
+      },
+      comprehensiveRequests: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
+      followUps: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 1,
+      },
+    },
+  },
+  audits: {
+    orderBy: {
+      updatedAt: "desc",
+    },
+    take: 1,
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      scope: true,
+      updatedAt: true,
+      publishedAt: true,
+      progressPercent: true,
+    },
+  },
+  comprehensiveRequests: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 1,
+  },
+  followUps: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 1,
+  },
+  notificationEvents: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 3,
+  },
+});
+
+const businessDetailInclude = Prisma.validator<Prisma.BusinessInclude>()({
+  primaryContact: true,
+  assignedConsultant: true,
+  presenceChecks: {
+    orderBy: {
+      submittedAt: "desc",
+    },
+    include: {
       categoryScores: {
         orderBy: {
           displayOrder: "asc",
@@ -219,12 +135,26 @@ export async function getWorkspaceSubmissionDetail(submissionId: string) {
           createdAt: "desc",
         },
       },
+      notificationEvents: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 10,
+      },
       audit: {
         include: {
+          author: true,
+          publishedBy: true,
           sections: {
             orderBy: {
               displayOrder: "asc",
             },
+          },
+          checklistItems: {
+            orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+          },
+          evidence: {
+            orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
           },
           planRecommendations: {
             include: {
@@ -234,15 +164,680 @@ export async function getWorkspaceSubmissionDetail(submissionId: string) {
               priority: "asc",
             },
           },
+          notificationEvents: {
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 10,
+          },
         },
       },
-      notificationEvents: {
+      planRecommendations: {
+        include: {
+          servicePlan: true,
+        },
+        orderBy: {
+          priority: "asc",
+        },
+      },
+    },
+  },
+  audits: {
+    orderBy: {
+      updatedAt: "desc",
+    },
+    include: {
+      author: true,
+      publishedBy: true,
+      sections: {
+        orderBy: {
+          displayOrder: "asc",
+        },
+      },
+      checklistItems: {
+        orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+      },
+      evidence: {
+        orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+      },
+      planRecommendations: {
+        include: {
+          servicePlan: true,
+        },
+        orderBy: {
+          priority: "asc",
+        },
+      },
+    },
+  },
+  planRecommendations: {
+    include: {
+      servicePlan: true,
+      audit: {
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          scope: true,
+          updatedAt: true,
+        },
+      },
+      submission: {
+        select: {
+          id: true,
+          submittedAt: true,
+          score: true,
+          scoreTier: true,
+        },
+      },
+    },
+    orderBy: [{ priority: "asc" }, { createdAt: "desc" }],
+  },
+  internalNotes: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      author: true,
+    },
+  },
+  followUps: {
+    orderBy: {
+      createdAt: "desc",
+    },
+  },
+  comprehensiveRequests: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      requestedBy: true,
+    },
+  },
+  notificationEvents: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 25,
+  },
+});
+
+const submissionDetailInclude = Prisma.validator<Prisma.PresenceCheckInclude>()({
+  business: true,
+  submittedBy: true,
+  assignedConsultant: true,
+  categoryScores: {
+    orderBy: {
+      displayOrder: "asc",
+    },
+  },
+  internalNotes: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      author: true,
+    },
+  },
+  comprehensiveRequests: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      requestedBy: true,
+    },
+  },
+  followUps: {
+    orderBy: {
+      createdAt: "desc",
+    },
+  },
+  audit: {
+    include: {
+      author: true,
+      publishedBy: true,
+      sections: {
+        orderBy: {
+          displayOrder: "asc",
+        },
+      },
+      checklistItems: {
+        orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+      },
+      evidence: {
+        orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+      },
+      planRecommendations: {
+        include: {
+          servicePlan: true,
+        },
+        orderBy: {
+          priority: "asc",
+        },
+      },
+    },
+  },
+  notificationEvents: {
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 10,
+  },
+});
+
+type PipelineBusiness = Prisma.BusinessGetPayload<{
+  include: typeof pipelineBusinessInclude;
+}>;
+
+function buildWorkspaceWhereClause(filters: WorkspaceSearchInput): Prisma.BusinessWhereInput {
+  const where: Prisma.BusinessWhereInput = {};
+  const getAndConditions = () =>
+    Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
+
+  if (filters.status) {
+    where.OR = [{ status: filters.status }, { presenceChecks: { some: { status: filters.status } } }];
+  }
+
+  if (filters.scoreTier) {
+    where.AND = [
+      ...getAndConditions(),
+      {
+        OR: [
+          { quickTier: filters.scoreTier },
+          { presenceChecks: { some: { scoreTier: filters.scoreTier } } },
+        ],
+      },
+    ];
+  }
+
+  if (filters.category) {
+    where.businessCategory = {
+      contains: filters.category,
+      mode: "insensitive",
+    };
+  }
+
+  if (filters.state) {
+    where.state = {
+      contains: filters.state,
+      mode: "insensitive",
+    };
+  }
+
+  if (filters.search) {
+    where.AND = [
+      ...getAndConditions(),
+      {
+        OR: [
+          { name: { contains: filters.search, mode: "insensitive" } },
+          { ownerName: { contains: filters.search, mode: "insensitive" } },
+          { primaryEmail: { contains: filters.search, mode: "insensitive" } },
+          { primaryPhone: { contains: filters.search, mode: "insensitive" } },
+          { serviceArea: { contains: filters.search, mode: "insensitive" } },
+          { businessCategory: { contains: filters.search, mode: "insensitive" } },
+          { city: { contains: filters.search, mode: "insensitive" } },
+          { state: { contains: filters.search, mode: "insensitive" } },
+        ],
+      },
+    ];
+  }
+
+  return where;
+}
+
+function buildWorkspaceOrderBy(
+  filters: WorkspaceSearchInput,
+): Prisma.BusinessOrderByWithRelationInput[] {
+  if (filters.sort === "oldest") {
+    return [{ latestSubmittedAt: "asc" }, { createdAt: "asc" }];
+  }
+
+  if (filters.sort === "highest_score") {
+    return [{ quickScore: "desc" }, { latestSubmittedAt: "desc" }];
+  }
+
+  if (filters.sort === "lowest_score") {
+    return [{ quickScore: "asc" }, { latestSubmittedAt: "desc" }];
+  }
+
+  return [{ latestSubmittedAt: "desc" }, { updatedAt: "desc" }];
+}
+
+function getLatestDate(...values: Array<Date | null | undefined>) {
+  return values
+    .filter((value): value is Date => value instanceof Date)
+    .sort((left, right) => right.getTime() - left.getTime())[0] ?? null;
+}
+
+function buildCompanyPipelineCard(business: PipelineBusiness) {
+  const latestSubmission = business.presenceChecks[0] ?? null;
+  const previousSubmission = business.presenceChecks[1] ?? null;
+  const latestAudit = business.audits[0] ?? latestSubmission?.audit ?? null;
+  const latestRequest =
+    business.comprehensiveRequests[0] ?? latestSubmission?.comprehensiveRequests[0] ?? null;
+  const latestFollowUp =
+    business.followUps[0] ?? latestSubmission?.followUps[0] ?? null;
+  const latestNotification = business.notificationEvents[0] ?? null;
+  const trendDelta =
+    latestSubmission?.score != null && previousSubmission?.score != null
+      ? latestSubmission.score - previousSubmission.score
+      : null;
+
+  return {
+    id: business.id,
+    name: business.name,
+    ownerName: business.ownerName,
+    primaryEmail: business.primaryEmail,
+    primaryPhone: business.primaryPhone,
+    businessCategory: business.businessCategory,
+    city: business.city,
+    state: business.state,
+    serviceArea: business.serviceArea,
+    status: business.status,
+    lifecycleStage: business.lifecycleStage,
+    quickScore: latestSubmission?.score ?? business.quickScore,
+    quickTier: latestSubmission?.scoreTier ?? business.quickTier,
+    quickSummary: latestSubmission?.summary ?? business.quickSummary,
+    trendDelta,
+    submissionCount: business.presenceChecks.length,
+    latestSubmissionId: latestSubmission?.id ?? null,
+    latestSubmissionAt: latestSubmission?.submittedAt ?? business.latestSubmittedAt,
+    latestAuditStatus: latestAudit?.status ?? null,
+    latestAuditScope: latestAudit?.scope ?? null,
+    latestAuditProgressPercent: latestAudit?.progressPercent ?? null,
+    latestRequestStatus: latestRequest?.status ?? null,
+    latestFollowUpStatus: latestFollowUp?.status ?? null,
+    latestActivityAt: getLatestDate(
+      business.lastActivityAt,
+      business.latestSubmittedAt,
+      latestAudit?.updatedAt ?? null,
+      latestRequest?.updatedAt ?? null,
+      latestFollowUp?.updatedAt ?? null,
+      latestNotification?.createdAt ?? null,
+      business.updatedAt,
+    ),
+    submissions: business.presenceChecks.map((submission) => ({
+      id: submission.id,
+      submittedAt: submission.submittedAt,
+      status: submission.status,
+      score: submission.score,
+      scoreTier: submission.scoreTier,
+      summary: submission.summary,
+      auditStatus: submission.audit?.status ?? null,
+      auditScope: submission.audit?.scope ?? null,
+      auditProgressPercent: submission.audit?.progressPercent ?? null,
+      comprehensiveRequestStatus: submission.comprehensiveRequests[0]?.status ?? null,
+      followUpStatus: submission.followUps[0]?.status ?? null,
+      contactEmail: submission.contactEmail,
+    })),
+  };
+}
+
+function buildDraftAssistForBusiness(
+  business: Prisma.BusinessGetPayload<{ include: typeof businessDetailInclude }>,
+) {
+  const latestSubmission = business.presenceChecks[0];
+
+  if (!latestSubmission) {
+    return [];
+  }
+
+  return buildAuditDraftAssist({
+    businessName: business.name,
+    websiteStatus: latestSubmission.websiteStatus,
+    googleBusinessProfileStatus: latestSubmission.googleBusinessProfileStatus,
+    reviewStrength: latestSubmission.reviewStrength,
+    reviewRequestCadence: latestSubmission.reviewRequestCadence,
+    socialPresenceLevel: latestSubmission.socialPresenceLevel,
+    runsAdvertising: latestSubmission.runsAdvertising,
+    lowestCategories: latestSubmission.categoryScores
+      .slice()
+      .sort((left, right) => left.score - right.score)
+      .slice(0, 2)
+      .map((item) => ({
+        category: item.category,
+        score: item.score,
+      })),
+    comprehensiveRequestNote: business.comprehensiveRequests[0]?.note,
+  });
+}
+
+function lifecycleStageFromAudit(scope: AuditScope, published: boolean) {
+  if (published) {
+    return BusinessLifecycleStage.AUDIT_PUBLISHED;
+  }
+
+  return scope === AuditScope.COMPREHENSIVE
+    ? BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS
+    : BusinessLifecycleStage.FREE_AUDIT_REVIEWED;
+}
+
+function lifecycleStageFromSubmissionStatus(
+  status: SubmissionStatus,
+  currentStage: BusinessLifecycleStage,
+) {
+  if (status === SubmissionStatus.FOLLOW_UP_SENT) {
+    return BusinessLifecycleStage.FOLLOW_UP_SENT;
+  }
+
+  if (status === SubmissionStatus.CONVERTED) {
+    return BusinessLifecycleStage.CONVERTED;
+  }
+
+  if (status === SubmissionStatus.CLOSED) {
+    return BusinessLifecycleStage.CLOSED_INACTIVE;
+  }
+
+  if (status === SubmissionStatus.PUBLISHED) {
+    return BusinessLifecycleStage.AUDIT_PUBLISHED;
+  }
+
+  if (status === SubmissionStatus.IN_REVIEW) {
+    return currentStage === BusinessLifecycleStage.COMPREHENSIVE_AUDIT_REQUESTED
+      ? BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS
+      : currentStage === BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS
+        ? currentStage
+        : BusinessLifecycleStage.FREE_AUDIT_REVIEWED;
+  }
+
+  return currentStage;
+}
+
+function businessStatusForLifecycleStage(
+  lifecycleStage: BusinessLifecycleStage,
+  fallbackStatus: SubmissionStatus,
+) {
+  switch (lifecycleStage) {
+    case BusinessLifecycleStage.AUDIT_PUBLISHED:
+      return SubmissionStatus.PUBLISHED;
+    case BusinessLifecycleStage.FOLLOW_UP_SENT:
+      return SubmissionStatus.FOLLOW_UP_SENT;
+    case BusinessLifecycleStage.CONVERTED:
+      return SubmissionStatus.CONVERTED;
+    case BusinessLifecycleStage.CLOSED_INACTIVE:
+      return SubmissionStatus.CLOSED;
+    case BusinessLifecycleStage.FREE_AUDIT_REVIEWED:
+    case BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS:
+      return SubmissionStatus.IN_REVIEW;
+    default:
+      return fallbackStatus;
+  }
+}
+
+async function touchBusinessActivity(
+  tx: Prisma.TransactionClient,
+  input: {
+    businessId: string;
+    lifecycleStage?: BusinessLifecycleStage;
+    status?: SubmissionStatus;
+    publishedAt?: Date | null;
+    lastClientContactAt?: Date | null;
+  },
+) {
+  await tx.business.update({
+    where: {
+      id: input.businessId,
+    },
+    data: {
+      lifecycleStage: input.lifecycleStage,
+      status: input.status,
+      publishedAt: input.publishedAt,
+      lastClientContactAt: input.lastClientContactAt,
+      lastActivityAt: new Date(),
+    },
+  });
+}
+
+async function getSubmissionForNotification(
+  tx: Prisma.TransactionClient,
+  input: WorkspaceNotificationActionInput,
+) {
+  if (input.submissionId) {
+    return tx.presenceCheck.findUnique({
+      where: {
+        id: input.submissionId,
+      },
+      include: {
+        audit: true,
+        followUps: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+        comprehensiveRequests: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
+    });
+  }
+
+  return tx.presenceCheck.findFirst({
+    where: {
+      businessId: input.businessId,
+    },
+    orderBy: {
+      submittedAt: "desc",
+    },
+    include: {
+      audit: true,
+      followUps: {
         orderBy: {
           createdAt: "desc",
         },
-        take: 10,
+      },
+      comprehensiveRequests: {
+        orderBy: {
+          createdAt: "desc",
+        },
       },
     },
+  });
+}
+
+export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
+  const where = buildWorkspaceWhereClause(filters);
+
+  const [
+    businesses,
+    totalCompanies,
+    inReviewCount,
+    publishedCount,
+    followUpDueCount,
+    comprehensiveRequestCount,
+  ] = await Promise.all([
+    prisma.business.findMany({
+      where,
+      orderBy: buildWorkspaceOrderBy(filters),
+      include: pipelineBusinessInclude,
+    }),
+    prisma.business.count(),
+    prisma.business.count({
+      where: {
+        lifecycleStage: {
+          in: [
+            BusinessLifecycleStage.FREE_AUDIT_REVIEWED,
+            BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS,
+          ],
+        },
+      },
+    }),
+    prisma.manualAudit.count({
+      where: {
+        status: "PUBLISHED",
+      },
+    }),
+    prisma.followUp.count({
+      where: {
+        status: {
+          in: [FollowUpStatus.QUEUED, FollowUpStatus.SCHEDULED],
+        },
+      },
+    }),
+    prisma.comprehensiveReportRequest.count({
+      where: {
+        status: {
+          in: activeComprehensiveRequestStatuses,
+        },
+      },
+    }),
+  ]);
+
+  return {
+    companies: businesses.map(buildCompanyPipelineCard),
+    summaryCards: [
+      {
+        label: "Active companies",
+        value: String(totalCompanies),
+        change: "Grouped pipeline records",
+      },
+      {
+        label: "In review",
+        value: String(inReviewCount),
+        change: "Free and comprehensive work in motion",
+      },
+      {
+        label: "Published audits",
+        value: String(publishedCount),
+        change: "Client-visible reports",
+      },
+      {
+        label: "Follow-up due",
+        value: String(followUpDueCount),
+        change: "Queued client touchpoints",
+      },
+      {
+        label: "Comprehensive requests",
+        value: String(comprehensiveRequestCount),
+        change: "Client-raised opportunities",
+      },
+    ],
+  };
+}
+
+export async function getWorkspaceClientsData(filters: WorkspaceSearchInput) {
+  return getWorkspaceDashboardData(filters);
+}
+
+export async function getWorkspaceBusinessDetail(businessId: string) {
+  const business = await prisma.business.findUnique({
+    where: {
+      id: businessId,
+    },
+    include: businessDetailInclude,
+  });
+
+  if (!business) {
+    return null;
+  }
+
+  const scoreTrend = business.presenceChecks
+    .slice()
+    .reverse()
+    .map((submission) => ({
+      id: submission.id,
+      date: submission.submittedAt,
+      score: submission.score ?? 0,
+      businessName: submission.businessName,
+      tier: submission.scoreTier,
+    }));
+
+  return {
+    business,
+    latestSubmission: business.presenceChecks[0] ?? null,
+    latestAudit:
+      business.presenceChecks.find((submission) => submission.audit)?.audit ??
+      business.audits[0] ??
+      null,
+    latestPublishedAudit:
+      business.audits.find((audit) => audit.status === "PUBLISHED") ?? null,
+    scoreTrend,
+    draftAssist: buildDraftAssistForBusiness(business),
+    availablePlans: await prisma.servicePlan.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    }),
+  };
+}
+
+export async function getAuditStudioData(input: {
+  businessId?: string;
+  submissionId?: string;
+}) {
+  const queueBusinesses = await prisma.business.findMany({
+    where: {
+      OR: [
+        {
+          lifecycleStage: {
+            in: [
+              BusinessLifecycleStage.FREE_AUDIT_REQUESTED,
+              BusinessLifecycleStage.FREE_AUDIT_REVIEWED,
+              BusinessLifecycleStage.COMPREHENSIVE_AUDIT_REQUESTED,
+              BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS,
+              BusinessLifecycleStage.AUDIT_PUBLISHED,
+            ],
+          },
+        },
+        {
+          comprehensiveRequests: {
+            some: {
+              status: {
+                in: activeComprehensiveRequestStatuses,
+              },
+            },
+          },
+        },
+      ],
+    },
+    orderBy: [{ lastActivityAt: "desc" }, { latestSubmittedAt: "desc" }],
+    take: 12,
+    include: pipelineBusinessInclude,
+  });
+
+  const selectedBusinessId =
+    input.businessId ??
+    (input.submissionId
+      ? (
+          await prisma.presenceCheck.findUnique({
+            where: {
+              id: input.submissionId,
+            },
+            select: {
+              businessId: true,
+            },
+          })
+        )?.businessId
+      : undefined) ??
+    queueBusinesses[0]?.id;
+
+  const detail = selectedBusinessId
+    ? await getWorkspaceBusinessDetail(selectedBusinessId)
+    : null;
+
+  const selectedSubmission =
+    detail?.business.presenceChecks.find(
+      (submission) => submission.id === input.submissionId,
+    ) ??
+    detail?.latestSubmission ??
+    null;
+
+  return {
+    queue: queueBusinesses.map((business) =>
+      buildCompanyPipelineCard(business as PipelineBusiness),
+    ),
+    detail,
+    selectedSubmission,
+  };
+}
+
+export async function getWorkspaceSubmissionDetail(submissionId: string) {
+  const submission = await prisma.presenceCheck.findUnique({
+    where: {
+      id: submissionId,
+    },
+    include: submissionDetailInclude,
   });
 
   if (!submission) {
@@ -285,20 +880,17 @@ export async function upsertSubmissionAudit(
       throw new Error("Submission not found.");
     }
 
-    if (
-      input.intent === "unpublish" &&
-      actor.role !== "ADMIN"
-    ) {
+    if (input.intent === "unpublish" && actor.role !== "ADMIN") {
       throw new Error("Only admins can unpublish an audit.");
     }
 
     if (
       input.intent === "unpublish" &&
-      submission.followUps.some((item) =>
-        ["SENT", "REPLIED", "BOOKED"].includes(item.status),
-      )
+      submission.followUps.some((item) => lockedFollowUpStatuses.includes(item.status))
     ) {
-      throw new Error("This audit cannot be unpublished because follow-up has already progressed.");
+      throw new Error(
+        "This audit cannot be unpublished because follow-up has already progressed.",
+      );
     }
 
     const linkedPlans = await tx.servicePlan.findMany({
@@ -309,6 +901,7 @@ export async function upsertSubmissionAudit(
       },
     });
 
+    const now = new Date();
     const audit = await tx.manualAudit.upsert({
       where: {
         presenceCheckId: submission.id,
@@ -319,6 +912,7 @@ export async function upsertSubmissionAudit(
         authorId: actor.id,
         publishedById: input.intent === "publish" ? actor.id : null,
         status: nextAuditStatus,
+        scope: input.scope,
         title: input.title,
         executiveSummary: input.executiveSummary || null,
         clientSummary: input.clientSummary || null,
@@ -326,7 +920,13 @@ export async function upsertSubmissionAudit(
         strengths: parseLineItems(input.strengthsText),
         improvementOpportunities: parseLineItems(input.improvementText),
         nextSteps: parseLineItems(input.nextStepsText),
-        publishedAt: input.intent === "publish" ? new Date() : null,
+        actionPlan: parseLineItems(input.actionPlanText),
+        progressPercent: input.progressPercent,
+        implementationRecommendation: input.implementationRecommendation,
+        implementationNotes: input.implementationNotes || null,
+        startedAt: input.progressPercent > 0 ? now : null,
+        completedAt: input.progressPercent >= 100 ? now : null,
+        publishedAt: input.intent === "publish" ? now : null,
       },
       update: {
         authorId: actor.id,
@@ -337,6 +937,7 @@ export async function upsertSubmissionAudit(
               ? null
               : undefined,
         status: nextAuditStatus,
+        scope: input.scope,
         title: input.title,
         executiveSummary: input.executiveSummary || null,
         clientSummary: input.clientSummary || null,
@@ -344,9 +945,16 @@ export async function upsertSubmissionAudit(
         strengths: parseLineItems(input.strengthsText),
         improvementOpportunities: parseLineItems(input.improvementText),
         nextSteps: parseLineItems(input.nextStepsText),
+        actionPlan: parseLineItems(input.actionPlanText),
+        progressPercent: input.progressPercent,
+        implementationRecommendation: input.implementationRecommendation,
+        implementationNotes: input.implementationNotes || null,
+        startedAt:
+          input.progressPercent > 0 ? submission.audit?.startedAt ?? now : null,
+        completedAt: input.progressPercent >= 100 ? now : null,
         publishedAt:
           input.intent === "publish"
-            ? new Date()
+            ? now
             : input.intent === "unpublish"
               ? null
               : undefined,
@@ -370,6 +978,47 @@ export async function upsertSubmissionAudit(
         displayOrder: index,
       })),
     });
+
+    await tx.auditChecklistItem.deleteMany({
+      where: {
+        auditId: audit.id,
+      },
+    });
+
+    if (input.checklistItems.length) {
+      await tx.auditChecklistItem.createMany({
+        data: input.checklistItems.map((item, index) => ({
+          auditId: audit.id,
+          category: item.category,
+          title: item.title,
+          status: item.status,
+          notes: item.notes || null,
+          recommendation: item.recommendation || null,
+          displayOrder: index,
+        })),
+      });
+    }
+
+    await tx.auditEvidence.deleteMany({
+      where: {
+        auditId: audit.id,
+      },
+    });
+
+    if (input.evidence.length) {
+      await tx.auditEvidence.createMany({
+        data: input.evidence.map((item, index) => ({
+          auditId: audit.id,
+          category: item.category ?? null,
+          label: item.label,
+          assetUrl: item.assetUrl || null,
+          notes: item.notes || null,
+          stage: item.stage,
+          clientVisible: item.clientVisible,
+          displayOrder: index,
+        })),
+      });
+    }
 
     await tx.planRecommendation.deleteMany({
       where: {
@@ -410,18 +1059,24 @@ export async function upsertSubmissionAudit(
       },
       data: {
         status: nextSubmissionStatus,
-        updatedAt: new Date(),
+        updatedAt: now,
       },
     });
 
-    await tx.business.update({
-      where: {
-        id: submission.businessId,
-      },
-      data: {
-        status: nextSubmissionStatus,
-        publishedAt: input.intent === "publish" ? new Date() : null,
-      },
+    await touchBusinessActivity(tx, {
+      businessId: submission.businessId,
+      status: nextSubmissionStatus,
+      lifecycleStage: lifecycleStageFromAudit(
+        input.scope,
+        input.intent === "publish",
+      ),
+      publishedAt:
+        input.intent === "publish"
+          ? now
+          : input.intent === "unpublish"
+            ? null
+            : undefined,
+      lastClientContactAt: input.intent === "publish" ? now : undefined,
     });
 
     if (input.intent === "publish") {
@@ -429,7 +1084,7 @@ export async function upsertSubmissionAudit(
         where: {
           presenceCheckId: submission.id,
           status: {
-            in: ["QUEUED", "SCHEDULED"],
+            in: [FollowUpStatus.QUEUED, FollowUpStatus.SCHEDULED],
           },
         },
       });
@@ -439,7 +1094,7 @@ export async function upsertSubmissionAudit(
           data: {
             businessId: submission.businessId,
             presenceCheckId: submission.id,
-            status: "QUEUED",
+            status: FollowUpStatus.QUEUED,
             channel: "email",
             subject: "Published audit follow-up",
             notes:
@@ -463,13 +1118,17 @@ export async function upsertSubmissionAudit(
       recipient: input.intent === "publish" ? submission.contactEmail : undefined,
       subject:
         input.intent === "publish"
-          ? "Your consultant-reviewed audit is now published"
+          ? input.scope === AuditScope.COMPREHENSIVE
+            ? "Your comprehensive Virtura Presence audit is now published"
+            : "Your consultant-reviewed audit is now published"
           : "Audit draft updated",
       payload: {
         intent: input.intent,
         selectedPlanSlugs: input.selectedPlanSlugs,
+        scope: input.scope,
       },
     });
+
     if (input.intent === "publish") {
       notificationEventIds.push(auditNotification.id);
     }
@@ -524,12 +1183,17 @@ export async function updateSubmissionWorkflowStatus(input: {
       where: {
         id: input.submissionId,
       },
+      include: {
+        business: true,
+        audit: true,
+      },
     });
 
     if (!submission) {
       throw new Error("Submission not found.");
     }
 
+    const now = new Date();
     const updated = await tx.presenceCheck.update({
       where: {
         id: input.submissionId,
@@ -539,13 +1203,24 @@ export async function updateSubmissionWorkflowStatus(input: {
       },
     });
 
-    await tx.business.update({
-      where: {
-        id: submission.businessId,
-      },
-      data: {
-        status: input.status,
-      },
+    let nextLifecycleStage = lifecycleStageFromSubmissionStatus(
+      input.status,
+      submission.business.lifecycleStage,
+    );
+
+    if (
+      submission.audit?.scope === AuditScope.COMPREHENSIVE &&
+      input.status === SubmissionStatus.IN_REVIEW
+    ) {
+      nextLifecycleStage = BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS;
+    }
+
+    await touchBusinessActivity(tx, {
+      businessId: submission.businessId,
+      status: input.status,
+      lifecycleStage: nextLifecycleStage,
+      lastClientContactAt:
+        input.status === SubmissionStatus.FOLLOW_UP_SENT ? now : undefined,
     });
 
     if (input.status === SubmissionStatus.FOLLOW_UP_SENT) {
@@ -569,7 +1244,7 @@ export async function updateSubmissionWorkflowStatus(input: {
               },
               data: {
                 status: FollowUpStatus.SENT,
-                sentAt: new Date(),
+                sentAt: now,
               },
             })
           : await tx.followUp.create({
@@ -577,7 +1252,7 @@ export async function updateSubmissionWorkflowStatus(input: {
                 businessId: submission.businessId,
                 presenceCheckId: submission.id,
                 status: FollowUpStatus.SENT,
-                sentAt: new Date(),
+                sentAt: now,
                 channel: "email",
                 subject: "A quick follow-up from Virtura Presence",
                 notes:
@@ -628,7 +1303,7 @@ export async function createSubmissionInternalNote(input: {
     throw new Error("Submission not found.");
   }
 
-  return prisma.internalNote.create({
+  const note = await prisma.internalNote.create({
     data: {
       businessId: submission.businessId,
       presenceCheckId: submission.id,
@@ -640,6 +1315,200 @@ export async function createSubmissionInternalNote(input: {
       author: true,
     },
   });
+
+  await prisma.business.update({
+    where: {
+      id: submission.businessId,
+    },
+    data: {
+      lastActivityAt: new Date(),
+    },
+  });
+
+  return note;
+}
+
+export async function updateBusinessLifecycle(input: {
+  businessId: string;
+  lifecycleStage: BusinessLifecycleStage;
+}) {
+  const business = await prisma.business.findUnique({
+    where: {
+      id: input.businessId,
+    },
+  });
+
+  if (!business) {
+    throw new Error("Business not found.");
+  }
+
+  return prisma.business.update({
+    where: {
+      id: input.businessId,
+    },
+    data: {
+      lifecycleStage: input.lifecycleStage,
+      status: businessStatusForLifecycleStage(input.lifecycleStage, business.status),
+      lastActivityAt: new Date(),
+    },
+  });
+}
+
+export async function sendWorkspaceNotification(
+  input: WorkspaceNotificationActionInput,
+  actor: { id: string },
+) {
+  const transactionResult = await prisma.$transaction(async (tx) => {
+    const notificationEventIds: string[] = [];
+    const business = await tx.business.findUnique({
+      where: {
+        id: input.businessId,
+      },
+    });
+
+    if (!business) {
+      throw new Error("Business not found.");
+    }
+
+    const submission = await getSubmissionForNotification(tx, input);
+
+    if (!submission) {
+      throw new Error("A matching submission could not be found for this email action.");
+    }
+
+    const audit = submission.audit;
+    const recipient = submission.reportEmail || submission.contactEmail || business.primaryEmail;
+    const now = new Date();
+    let eventId: string | null = null;
+
+    if (input.kind === "quick_report") {
+      const event = await recordNotificationEvent(tx, {
+        type: "SUBMISSION_CREATED",
+        status: NotificationStatus.PENDING,
+        businessId: business.id,
+        presenceCheckId: submission.id,
+        userId: actor.id,
+        recipient,
+        channel: "email",
+        subject: `Your quick review for ${submission.businessName} is ready`,
+      });
+      eventId = event.id;
+    }
+
+    if (input.kind === "audit_available") {
+      if (!audit) {
+        throw new Error("Publish or save an audit before sending the audit-available email.");
+      }
+
+      const event = await recordNotificationEvent(tx, {
+        type: "AUDIT_PUBLISHED",
+        status: NotificationStatus.PENDING,
+        businessId: business.id,
+        presenceCheckId: submission.id,
+        auditId: audit.id,
+        userId: actor.id,
+        recipient,
+        channel: "email",
+        subject: "Your consultant-reviewed Virtura Presence audit is ready",
+      });
+      eventId = event.id;
+    }
+
+    if (input.kind === "comprehensive_ready") {
+      if (!audit) {
+        throw new Error(
+          "A comprehensive audit draft needs to exist before this notification can be sent.",
+        );
+      }
+
+      const event = await recordNotificationEvent(tx, {
+        type: "AUDIT_PUBLISHED",
+        status: NotificationStatus.PENDING,
+        businessId: business.id,
+        presenceCheckId: submission.id,
+        auditId: audit.id,
+        userId: actor.id,
+        recipient,
+        channel: "email",
+        subject: "Your comprehensive Virtura Presence audit is ready",
+        payload: {
+          scope: AuditScope.COMPREHENSIVE,
+        },
+      });
+      eventId = event.id;
+    }
+
+    if (input.kind === "follow_up") {
+      const latestFollowUp = submission.followUps[0];
+      const followUp =
+        latestFollowUp
+          ? await tx.followUp.update({
+              where: {
+                id: latestFollowUp.id,
+              },
+              data: {
+                status: FollowUpStatus.SENT,
+                sentAt: now,
+              },
+            })
+          : await tx.followUp.create({
+              data: {
+                businessId: business.id,
+                presenceCheckId: submission.id,
+                status: FollowUpStatus.SENT,
+                sentAt: now,
+                channel: "email",
+                subject: "A quick follow-up from Virtura Presence",
+                notes:
+                  "Checking in after the audit to offer practical next-step support.",
+              },
+            });
+
+      const event = await recordNotificationEvent(tx, {
+        type: "FOLLOW_UP_SENT",
+        status: NotificationStatus.PENDING,
+        businessId: business.id,
+        presenceCheckId: submission.id,
+        auditId: audit?.id,
+        userId: actor.id,
+        recipient,
+        channel: "email",
+        subject: followUp.subject ?? "A quick follow-up from Virtura Presence",
+        payload: {
+          followUpId: followUp.id,
+        },
+      });
+      eventId = event.id;
+    }
+
+    if (!eventId) {
+      throw new Error("Notification action could not be created.");
+    }
+
+    await touchBusinessActivity(tx, {
+      businessId: business.id,
+      lifecycleStage:
+        input.kind === "follow_up"
+          ? BusinessLifecycleStage.FOLLOW_UP_SENT
+          : business.lifecycleStage,
+      status:
+        input.kind === "follow_up"
+          ? SubmissionStatus.FOLLOW_UP_SENT
+          : business.status,
+      lastClientContactAt: now,
+    });
+
+    notificationEventIds.push(eventId);
+
+    return {
+      eventId,
+      notificationEventIds,
+    };
+  });
+
+  await dispatchNotificationEvents(transactionResult.notificationEventIds);
+
+  return transactionResult.eventId;
 }
 
 export async function getFallbackPlanCatalog() {

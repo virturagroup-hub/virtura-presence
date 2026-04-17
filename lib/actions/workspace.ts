@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import {
   createSubmissionInternalNote,
+  sendWorkspaceNotification,
+  updateBusinessLifecycle,
   updateSubmissionWorkflowStatus,
   upsertSubmissionAudit,
 } from "@/lib/data/workspace";
@@ -12,11 +14,15 @@ import { updateComprehensiveReportRequestStatus } from "@/lib/data/portal";
 import { toUserFacingDatabaseError } from "@/lib/prisma-errors";
 import {
   auditEditorSchema,
+  businessLifecycleUpdateSchema,
   internalNoteSchema,
   submissionStatusUpdateSchema,
+  workspaceNotificationActionSchema,
   type AuditEditorInput,
+  type BusinessLifecycleUpdateInput,
   type InternalNoteInput,
   type SubmissionStatusUpdateInput,
+  type WorkspaceNotificationActionInput,
 } from "@/lib/validations/audit";
 import {
   comprehensiveReportRequestStatusSchema,
@@ -49,6 +55,8 @@ export async function saveSubmissionAuditAction(values: AuditEditorInput) {
     const audit = await upsertSubmissionAudit(parsed.data, actor);
 
     revalidatePath("/workspace");
+    revalidatePath("/workspace/audit-studio");
+    revalidatePath("/workspace/clients");
     revalidatePath(`/workspace/submissions/${parsed.data.submissionId}`);
     revalidatePath("/portal");
     revalidatePath("/portal/report");
@@ -89,6 +97,8 @@ export async function updateSubmissionStatusAction(
     });
 
     revalidatePath("/workspace");
+    revalidatePath("/workspace/audit-studio");
+    revalidatePath("/workspace/clients");
     revalidatePath(`/workspace/submissions/${parsed.data.submissionId}`);
     revalidatePath("/portal");
 
@@ -123,6 +133,7 @@ export async function addSubmissionInternalNoteAction(values: InternalNoteInput)
     });
 
     revalidatePath(`/workspace/submissions/${parsed.data.submissionId}`);
+    revalidatePath("/workspace/audit-studio");
 
     return {
       success: true as const,
@@ -155,6 +166,8 @@ export async function updateComprehensiveRequestStatusAction(
     await updateComprehensiveReportRequestStatus(parsed.data);
 
     revalidatePath("/workspace");
+    revalidatePath("/workspace/audit-studio");
+    revalidatePath("/workspace/clients");
 
     return {
       success: true as const,
@@ -165,6 +178,78 @@ export async function updateComprehensiveRequestStatusAction(
       error: toUserFacingDatabaseError(
         error,
         "The comprehensive report request could not be updated.",
+      ),
+    };
+  }
+}
+
+export async function updateBusinessLifecycleAction(
+  values: BusinessLifecycleUpdateInput,
+) {
+  const parsed = businessLifecycleUpdateSchema.safeParse(values);
+
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: "Lifecycle update is invalid.",
+    };
+  }
+
+  try {
+    await requireWorkspaceActor();
+    await updateBusinessLifecycle(parsed.data);
+
+    revalidatePath("/workspace");
+    revalidatePath("/workspace/clients");
+    revalidatePath(`/workspace/clients/${parsed.data.businessId}`);
+    revalidatePath("/workspace/audit-studio");
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: toUserFacingDatabaseError(
+        error,
+        "The company lifecycle could not be updated.",
+      ),
+    };
+  }
+}
+
+export async function sendWorkspaceNotificationAction(
+  values: WorkspaceNotificationActionInput,
+) {
+  const parsed = workspaceNotificationActionSchema.safeParse(values);
+
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: "Notification request is invalid.",
+    };
+  }
+
+  try {
+    const actor = await requireWorkspaceActor();
+    await sendWorkspaceNotification(parsed.data, actor);
+
+    revalidatePath("/workspace");
+    revalidatePath("/workspace/audit-studio");
+    revalidatePath("/workspace/clients");
+    revalidatePath(`/workspace/clients/${parsed.data.businessId}`);
+    revalidatePath("/portal");
+    revalidatePath("/portal/report");
+
+    return {
+      success: true as const,
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: toUserFacingDatabaseError(
+        error,
+        "The email action could not be sent.",
       ),
     };
   }

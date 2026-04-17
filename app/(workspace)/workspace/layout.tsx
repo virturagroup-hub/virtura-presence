@@ -14,7 +14,7 @@ export default async function WorkspaceLayout({
   return (
     <DashboardShell
       title="Consultant Workspace"
-      description="Review lead submissions, draft manual audits, publish findings to client portals, and track next-step recommendations."
+      description="Group submissions by company, move audits through a real studio workflow, send client-ready notifications intentionally, and keep the client lifecycle visible from first check to ongoing care."
       navigation={workspaceNavigation}
       user={user}
     >

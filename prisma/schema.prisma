@@ -139,6 +139,45 @@ enum ComprehensiveReportRequestStatus {
   DECLINED
 }
 
+enum BusinessLifecycleStage {
+  LEAD
+  FREE_AUDIT_REQUESTED
+  FREE_AUDIT_REVIEWED
+  COMPREHENSIVE_AUDIT_REQUESTED
+  COMPREHENSIVE_AUDIT_IN_PROGRESS
+  AUDIT_PUBLISHED
+  FOLLOW_UP_SENT
+  CONVERTED
+  ONGOING_CARE
+  CLOSED_INACTIVE
+}
+
+enum AuditScope {
+  FREE_REVIEW
+  COMPREHENSIVE
+}
+
+enum AuditChecklistStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
+  NEEDS_ATTENTION
+}
+
+enum AuditEvidenceStage {
+  BEFORE
+  AFTER
+  PROGRESS
+  REFERENCE
+}
+
+enum ImplementationRecommendation {
+  DIY
+  DONE_FOR_YOU
+  HYBRID
+  CONSULTATION
+}
+
 model User {
   id                      String              @id @default(cuid())
   name                    String?
@@ -195,6 +234,7 @@ model Business {
   notes                    String?
   leadSource               String               @default("presence-check")
   status                   SubmissionStatus     @default(SUBMITTED)
+  lifecycleStage           BusinessLifecycleStage @default(FREE_AUDIT_REQUESTED)
   quickScore               Int?
   quickTier                ScoreTier?
   quickSummary             String?
@@ -202,6 +242,8 @@ model Business {
   assignedConsultantId     String?
   submittedAt              DateTime             @default(now())
   latestSubmittedAt        DateTime?
+  lastActivityAt           DateTime?
+  lastClientContactAt      DateTime?
   publishedAt              DateTime?
   createdAt                DateTime             @default(now())
   updatedAt                DateTime             @updatedAt
@@ -214,6 +256,10 @@ model Business {
   followUps                FollowUp[]
   comprehensiveRequests    ComprehensiveReportRequest[]
   notificationEvents       NotificationEvent[]
+
+  @@index([lifecycleStage, latestSubmittedAt(sort: Desc)])
+  @@index([status, latestSubmittedAt(sort: Desc)])
+  @@index([assignedConsultantId, latestSubmittedAt(sort: Desc)])
 }
 
 model PresenceCheck {
@@ -292,6 +338,7 @@ model ManualAudit {
   authorId                 String?
   publishedById            String?
   status                   AuditStatus          @default(DRAFT)
+  scope                    AuditScope           @default(FREE_REVIEW)
   title                    String               @default("Manual Presence Audit")
   executiveSummary         String?
   clientSummary            String?
@@ -299,6 +346,12 @@ model ManualAudit {
   strengths                String[]             @default([])
   improvementOpportunities String[]             @default([])
   nextSteps                String[]             @default([])
+  actionPlan               String[]             @default([])
+  progressPercent          Int                  @default(0)
+  implementationRecommendation ImplementationRecommendation @default(CONSULTATION)
+  implementationNotes      String?
+  startedAt                DateTime?
+  completedAt              DateTime?
   publishedAt              DateTime?
   createdAt                DateTime             @default(now())
   updatedAt                DateTime             @updatedAt
@@ -307,8 +360,13 @@ model ManualAudit {
   author                   User?                @relation("ManualAuditAuthor", fields: [authorId], references: [id], onDelete: SetNull)
   publishedBy              User?                @relation("ManualAuditPublisher", fields: [publishedById], references: [id], onDelete: SetNull)
   sections                 AuditSection[]
+  checklistItems           AuditChecklistItem[]
+  evidence                 AuditEvidence[]
   planRecommendations      PlanRecommendation[]
   notificationEvents       NotificationEvent[]
+
+  @@index([scope, status, updatedAt(sort: Desc)])
+  @@index([businessId, updatedAt(sort: Desc)])
 }
 
 model AuditSection {
@@ -325,6 +383,39 @@ model AuditSection {
   audit             ManualAudit   @relation(fields: [auditId], references: [id], onDelete: Cascade)
 
   @@unique([auditId, category])
+}
+
+model AuditChecklistItem {
+  id             String               @id @default(cuid())
+  auditId        String
+  category       AuditCategory
+  title          String
+  status         AuditChecklistStatus @default(NOT_STARTED)
+  notes          String?
+  recommendation String?
+  displayOrder   Int                  @default(0)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  audit          ManualAudit          @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId, category, displayOrder])
+}
+
+model AuditEvidence {
+  id           String             @id @default(cuid())
+  auditId      String
+  category     AuditCategory?
+  label        String
+  assetUrl     String?
+  notes        String?
+  stage        AuditEvidenceStage @default(REFERENCE)
+  clientVisible Boolean           @default(false)
+  displayOrder Int                @default(0)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  audit        ManualAudit        @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId, category, displayOrder])
 }
 
 model ServicePlan {

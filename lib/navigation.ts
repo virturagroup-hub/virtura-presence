@@ -8,7 +8,7 @@ import {
   Settings2,
   ShieldCheck,
   Sparkles,
-  Users,
+  UserRoundSearch,
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -51,19 +51,19 @@ export const workspaceNavigation: NavigationItem[] = [
     title: "Pipeline",
     href: "/workspace",
     icon: BarChart3,
-    description: "Lead volume, audit status, and consultant priorities.",
-  },
-  {
-    title: "Review Queue",
-    href: "/workspace#submission-list",
-    icon: Users,
-    description: "Search, filter, and open real submissions for review.",
+    description: "Company pipeline, grouped submissions, lifecycle, and next actions.",
   },
   {
     title: "Audit Studio",
-    href: "/workspace#submission-list",
+    href: "/workspace/audit-studio",
     icon: ClipboardCheck,
-    description: "Draft, refine, and publish consultant-reviewed audits.",
+    description: "Draft, refine, publish, and resend consultant-reviewed audits.",
+  },
+  {
+    title: "Clients",
+    href: "/workspace/clients",
+    icon: UserRoundSearch,
+    description: "Open company records, history, notes, and ongoing care context.",
   },
 ];
 

@@ -25,7 +25,7 @@ export function ServicePlanCard({
       <div
         className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${plan.accentColor}`}
       />
-      <div className="space-y-5">
+      <div className="flex flex-1 flex-col">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold tracking-[0.24em] text-slate-500 uppercase">
@@ -41,11 +41,11 @@ export function ServicePlanCard({
             </span>
           ) : null}
         </div>
-        <p className="text-sm leading-7 text-slate-600">{plan.tagline}</p>
-        <p className="rounded-2xl border border-slate-200/70 bg-slate-50/90 px-4 py-3 text-sm text-slate-600">
+        <p className="mt-5 min-h-[84px] text-sm leading-7 text-slate-600">{plan.tagline}</p>
+        <p className="mt-5 min-h-[92px] rounded-2xl border border-slate-200/70 bg-slate-50/90 px-4 py-3 text-sm text-slate-600">
           {plan.summary}
         </p>
-        <div className="rounded-[26px] border border-brand-100 bg-brand-50/80 px-5 py-4">
+        <div className="mt-5 flex min-h-[136px] flex-col justify-between rounded-[26px] border border-brand-100 bg-brand-50/80 px-5 py-4">
           <p className="text-xs font-semibold tracking-[0.22em] text-brand-700 uppercase">
             Public pricing
           </p>
@@ -56,7 +56,7 @@ export function ServicePlanCard({
         </div>
       </div>
 
-      <div className="mt-auto flex flex-col gap-3 pt-6 sm:flex-row sm:flex-wrap">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {mode === "marketing" ? (
           <Button asChild className="rounded-full px-5">
             <Link href="/presence-check">

@@ -21,6 +21,23 @@ const statusStyles: Record<string, string> = {
   "in progress": "bg-brand-50 text-brand-700 ring-brand-100",
   completed: "bg-emerald-50 text-emerald-700 ring-emerald-100",
   declined: "bg-rose-50 text-rose-700 ring-rose-100",
+  lead: "bg-slate-100 text-slate-700 ring-slate-200",
+  "free audit requested": "bg-brand-50 text-brand-700 ring-brand-100",
+  "free audit reviewed": "bg-sky-50 text-sky-700 ring-sky-100",
+  "comprehensive audit requested": "bg-violet-50 text-violet-700 ring-violet-100",
+  "comprehensive audit in progress": "bg-brand-50 text-brand-700 ring-brand-100",
+  "audit published": "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  "ongoing care": "bg-cyan-50 text-cyan-700 ring-cyan-100",
+  "closed / inactive": "bg-slate-100 text-slate-600 ring-slate-200",
+  complete: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  "not started": "bg-slate-100 text-slate-700 ring-slate-200",
+  "needs attention": "bg-amber-50 text-amber-700 ring-amber-100",
+  processed: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  pending: "bg-brand-50 text-brand-700 ring-brand-100",
+  failed: "bg-rose-50 text-rose-700 ring-rose-100",
+  logged: "bg-slate-100 text-slate-700 ring-slate-200",
+  "free review": "bg-slate-100 text-slate-700 ring-slate-200",
+  comprehensive: "bg-violet-50 text-violet-700 ring-violet-100",
 };
 
 type StatusBadgeProps = {

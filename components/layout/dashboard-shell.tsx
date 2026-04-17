@@ -4,6 +4,7 @@ import { Menu } from "lucide-react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { VirturaLogo } from "@/components/brand/virtura-logo";
+import { DashboardNav } from "@/components/layout/dashboard-nav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { NavigationItem } from "@/lib/navigation";
-import { cn } from "@/lib/utils";
 
 type DashboardShellProps = {
   title: string;
@@ -40,36 +40,6 @@ function getInitials(name?: string | null) {
     .map((part) => part[0])
     .join("")
     .toUpperCase();
-}
-
-function DashboardNav({
-  navigation,
-}: {
-  navigation: NavigationItem[];
-}) {
-  return (
-    <nav className="space-y-2">
-      {navigation.map((item) => {
-        const Icon = item.icon;
-
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "flex rounded-3xl border border-white/5 bg-white/5 px-4 py-4 transition-all duration-300 hover:border-brand-400/30 hover:bg-white/10",
-            )}
-          >
-            <Icon className="mt-1 size-5 text-brand-300" />
-            <div className="ml-3">
-              <p className="text-sm font-semibold text-white">{item.title}</p>
-              <p className="mt-1 text-xs leading-5 text-slate-300">{item.description}</p>
-            </div>
-          </Link>
-        );
-      })}
-    </nav>
-  );
 }
 
 export function DashboardShell({

@@ -1,5 +1,16 @@
-import { AuditCategory, AuditStatus, SubmissionStatus } from "@prisma/client";
+import {
+  AuditCategory,
+  AuditChecklistStatus,
+  AuditEvidenceStage,
+  AuditScope,
+  AuditStatus,
+  BusinessLifecycleStage,
+  ImplementationRecommendation,
+  SubmissionStatus,
+} from "@prisma/client";
 import { z } from "zod";
+
+const optionalTextSchema = z.string().optional().default("");
 
 export const auditEditorSectionSchema = z.object({
   category: z.nativeEnum(AuditCategory),
@@ -8,24 +19,48 @@ export const auditEditorSectionSchema = z.object({
   clientFacingNotes: z
     .string()
     .min(12, "Client-facing notes should be clear enough to be useful."),
-  internalNotes: z.string().optional(),
+  internalNotes: optionalTextSchema,
+});
+
+export const auditChecklistItemSchema = z.object({
+  category: z.nativeEnum(AuditCategory),
+  title: z.string().min(3, "Add a checklist item."),
+  status: z.nativeEnum(AuditChecklistStatus),
+  notes: optionalTextSchema,
+  recommendation: optionalTextSchema,
+});
+
+export const auditEvidenceSchema = z.object({
+  category: z.nativeEnum(AuditCategory).nullable().optional(),
+  label: z.string().min(2, "Add a short evidence label."),
+  assetUrl: optionalTextSchema,
+  notes: optionalTextSchema,
+  stage: z.nativeEnum(AuditEvidenceStage),
+  clientVisible: z.boolean().default(false),
 });
 
 export const auditEditorSchema = z.object({
   submissionId: z.string().min(1),
   intent: z.enum(["save", "ready", "publish", "unpublish"]),
+  scope: z.nativeEnum(AuditScope),
+  progressPercent: z.coerce.number().min(0).max(100),
+  implementationRecommendation: z.nativeEnum(ImplementationRecommendation),
+  implementationNotes: optionalTextSchema,
   title: z.string().min(3, "Add an audit title."),
-  executiveSummary: z.string().optional(),
-  clientSummary: z.string().optional(),
-  internalSummary: z.string().optional(),
-  strengthsText: z.string().optional(),
-  improvementText: z.string().optional(),
-  nextStepsText: z.string().optional(),
+  executiveSummary: optionalTextSchema,
+  clientSummary: optionalTextSchema,
+  internalSummary: optionalTextSchema,
+  strengthsText: optionalTextSchema,
+  improvementText: optionalTextSchema,
+  nextStepsText: optionalTextSchema,
+  actionPlanText: optionalTextSchema,
   sections: z
     .array(auditEditorSectionSchema)
     .min(5, "All audit categories should be present."),
+  checklistItems: z.array(auditChecklistItemSchema).default([]),
+  evidence: z.array(auditEvidenceSchema).default([]),
   selectedPlanSlugs: z.array(z.string()).default([]),
-  serviceRecommendationRationale: z.string().optional(),
+  serviceRecommendationRationale: optionalTextSchema,
 });
 
 export type AuditEditorInput = z.infer<typeof auditEditorSchema>;
@@ -46,6 +81,30 @@ export const internalNoteSchema = z.object({
 });
 
 export type InternalNoteInput = z.infer<typeof internalNoteSchema>;
+
+export const businessLifecycleUpdateSchema = z.object({
+  businessId: z.string().min(1),
+  lifecycleStage: z.nativeEnum(BusinessLifecycleStage),
+});
+
+export type BusinessLifecycleUpdateInput = z.infer<
+  typeof businessLifecycleUpdateSchema
+>;
+
+export const workspaceNotificationActionSchema = z.object({
+  businessId: z.string().min(1),
+  submissionId: z.string().optional(),
+  kind: z.enum([
+    "quick_report",
+    "audit_available",
+    "follow_up",
+    "comprehensive_ready",
+  ]),
+});
+
+export type WorkspaceNotificationActionInput = z.infer<
+  typeof workspaceNotificationActionSchema
+>;
 
 export const workspaceAuditStateForIntent: Record<
   AuditEditorInput["intent"],

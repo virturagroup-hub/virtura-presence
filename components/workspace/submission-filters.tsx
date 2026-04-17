@@ -3,6 +3,7 @@ import { ScoreTier, SubmissionStatus } from "@prisma/client";
 import { scoreTierLabels, submissionStatusLabels } from "@/lib/display";
 
 type SubmissionFiltersProps = {
+  basePath?: string;
   current: {
     search?: string;
     status?: SubmissionStatus;
@@ -13,15 +14,18 @@ type SubmissionFiltersProps = {
   };
 };
 
-export function SubmissionFilters({ current }: SubmissionFiltersProps) {
+export function SubmissionFilters({
+  basePath = "/workspace",
+  current,
+}: SubmissionFiltersProps) {
   return (
-    <form className="surface-card grid gap-4 p-5 xl:grid-cols-[1.2fr_repeat(5,minmax(0,1fr))]">
+    <form className="surface-card grid gap-3 p-4 sm:p-5 xl:grid-cols-[minmax(0,1.35fr)_repeat(4,minmax(0,0.82fr))_minmax(0,0.9fr)_auto]">
       <input
         type="text"
         name="search"
         defaultValue={current.search}
         placeholder="Search business, email, service area, or category"
-        className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
+        className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2 xl:min-w-[240px]"
       />
 
       <select
@@ -66,20 +70,27 @@ export function SubmissionFilters({ current }: SubmissionFiltersProps) {
         className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
       />
 
-      <div className="flex gap-3">
-        <select
-          name="sort"
-          defaultValue={current.sort ?? "newest"}
-          className="h-12 flex-1 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
+      <select
+        name="sort"
+        defaultValue={current.sort ?? "newest"}
+        className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
+      >
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="highest_score">Highest score</option>
+        <option value="lowest_score">Lowest score</option>
+      </select>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-[auto_auto] xl:justify-self-end">
+        <a
+          href={basePath}
+          className="inline-flex h-12 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:border-brand-200 hover:text-slate-950"
         >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-          <option value="highest_score">Highest score</option>
-          <option value="lowest_score">Lowest score</option>
-        </select>
+          Clear
+        </a>
         <button
           type="submit"
-          className="inline-flex h-12 items-center justify-center rounded-full bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600"
+          className="inline-flex h-12 items-center justify-center rounded-full bg-brand-500 px-6 text-sm font-semibold text-white shadow-[0_20px_40px_-25px_rgba(47,111,228,0.8)] transition hover:bg-brand-600"
         >
           Apply
         </button>
