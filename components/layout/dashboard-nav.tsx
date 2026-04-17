@@ -2,9 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  BarChart3,
+  ClipboardCheck,
+  FileText,
+  LayoutGrid,
+  Settings2,
+  UserRoundSearch,
+} from "lucide-react";
 
-import type { NavigationItem } from "@/lib/navigation";
+import type { NavigationIcon, NavigationItem } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+
+const navigationIcons: Record<NavigationIcon, typeof LayoutGrid> = {
+  layoutGrid: LayoutGrid,
+  fileText: FileText,
+  settings2: Settings2,
+  barChart3: BarChart3,
+  clipboardCheck: ClipboardCheck,
+  userRoundSearch: UserRoundSearch,
+};
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/workspace") {
@@ -24,7 +41,7 @@ export function DashboardNav({
   return (
     <nav className="space-y-2">
       {navigation.map((item) => {
-        const Icon = item.icon;
+        const Icon = navigationIcons[item.icon];
         const active = isActivePath(pathname, item.href);
 
         return (

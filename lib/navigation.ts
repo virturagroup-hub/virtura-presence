@@ -1,20 +1,21 @@
-import type { LucideIcon } from "lucide-react";
 import {
-  BarChart3,
-  ClipboardCheck,
   Compass,
-  FileText,
-  LayoutGrid,
-  Settings2,
   ShieldCheck,
   Sparkles,
-  UserRoundSearch,
 } from "lucide-react";
+
+export type NavigationIcon =
+  | "layoutGrid"
+  | "fileText"
+  | "settings2"
+  | "barChart3"
+  | "clipboardCheck"
+  | "userRoundSearch";
 
 export type NavigationItem = {
   title: string;
   href: string;
-  icon: LucideIcon;
+  icon: NavigationIcon;
   description: string;
 };
 
@@ -29,19 +30,19 @@ export const portalNavigation: NavigationItem[] = [
   {
     title: "Overview",
     href: "/portal",
-    icon: LayoutGrid,
+    icon: "layoutGrid",
     description: "Quick assessment, status, and next steps.",
   },
   {
     title: "Published Report",
     href: "/portal/report",
-    icon: FileText,
+    icon: "fileText",
     description: "Client-facing audit summary and category findings.",
   },
   {
     title: "Profile & Security",
     href: "/portal/profile",
-    icon: Settings2,
+    icon: "settings2",
     description: "Business details, contact data, and password settings.",
   },
 ];
@@ -50,19 +51,19 @@ export const workspaceNavigation: NavigationItem[] = [
   {
     title: "Pipeline",
     href: "/workspace",
-    icon: BarChart3,
+    icon: "barChart3",
     description: "Company pipeline, grouped submissions, lifecycle, and next actions.",
   },
   {
     title: "Audit Studio",
     href: "/workspace/audit-studio",
-    icon: ClipboardCheck,
+    icon: "clipboardCheck",
     description: "Draft, refine, publish, and resend consultant-reviewed audits.",
   },
   {
     title: "Clients",
     href: "/workspace/clients",
-    icon: UserRoundSearch,
+    icon: "userRoundSearch",
     description: "Open company records, history, notes, and ongoing care context.",
   },
 ];
