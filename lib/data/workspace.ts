@@ -31,11 +31,38 @@ const activeComprehensiveRequestStatuses = [
   ComprehensiveReportRequestStatus.IN_PROGRESS,
 ];
 
+const lifecycleReportStageOrder = [
+  BusinessLifecycleStage.LEAD,
+  BusinessLifecycleStage.FREE_AUDIT_REQUESTED,
+  BusinessLifecycleStage.FREE_AUDIT_REVIEWED,
+  BusinessLifecycleStage.COMPREHENSIVE_AUDIT_REQUESTED,
+  BusinessLifecycleStage.COMPREHENSIVE_AUDIT_IN_PROGRESS,
+  BusinessLifecycleStage.AUDIT_PUBLISHED,
+  BusinessLifecycleStage.FOLLOW_UP_SENT,
+  BusinessLifecycleStage.CONVERTED,
+  BusinessLifecycleStage.ONGOING_CARE,
+  BusinessLifecycleStage.CLOSED_INACTIVE,
+];
+
 const lockedFollowUpStatuses: string[] = [
   FollowUpStatus.SENT,
   FollowUpStatus.REPLIED,
   FollowUpStatus.BOOKED,
 ];
+
+function startOfCurrentMonth(date = new Date()) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function isSenderAuthorizationError(message?: string | null) {
+  return Boolean(
+    message?.toLowerCase().includes("not authorized to send emails from"),
+  );
+}
+
+function isInsecureUrl(value?: string | null) {
+  return Boolean(value?.trim().toLowerCase().startsWith("http://"));
+}
 
 const pipelineBusinessInclude = Prisma.validator<Prisma.BusinessInclude>()({
   primaryContact: true,
@@ -820,6 +847,280 @@ export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
 
 export async function getWorkspaceClientsData(filters: WorkspaceSearchInput) {
   return getWorkspaceDashboardData(filters);
+}
+
+export async function getWorkspaceReportsData() {
+  const monthStart = startOfCurrentMonth();
+  const acceptedRecommendationWhere = {
+    status: RecommendationStatus.ACCEPTED,
+  } satisfies Prisma.PlanRecommendationWhereInput;
+
+  const [
+    totalFreeAudits,
+    freeAuditsThisMonth,
+    acceptedServicesTotal,
+    acceptedServicesThisMonth,
+    customerBusinesses,
+    newCustomerBusinesses,
+    totalComprehensiveAudits,
+    comprehensiveAuditsThisMonth,
+    openComprehensiveRequests,
+    failedEmailsTotal,
+    failedEmailsThisMonth,
+    senderAuthorizationFailures,
+    lifecycleBreakdown,
+    planBreakdown,
+    failedEmailEvents,
+    insecureBusinesses,
+  ] = await Promise.all([
+    prisma.presenceCheck.count(),
+    prisma.presenceCheck.count({
+      where: {
+        submittedAt: {
+          gte: monthStart,
+        },
+      },
+    }),
+    prisma.planRecommendation.count({
+      where: acceptedRecommendationWhere,
+    }),
+    prisma.planRecommendation.count({
+      where: {
+        ...acceptedRecommendationWhere,
+        createdAt: {
+          gte: monthStart,
+        },
+      },
+    }),
+    prisma.planRecommendation.findMany({
+      where: acceptedRecommendationWhere,
+      distinct: ["businessId"],
+      select: {
+        businessId: true,
+      },
+    }),
+    prisma.planRecommendation.findMany({
+      where: {
+        ...acceptedRecommendationWhere,
+        createdAt: {
+          gte: monthStart,
+        },
+      },
+      distinct: ["businessId"],
+      select: {
+        businessId: true,
+      },
+    }),
+    prisma.manualAudit.count({
+      where: {
+        scope: AuditScope.COMPREHENSIVE,
+      },
+    }),
+    prisma.manualAudit.count({
+      where: {
+        scope: AuditScope.COMPREHENSIVE,
+        createdAt: {
+          gte: monthStart,
+        },
+      },
+    }),
+    prisma.comprehensiveReportRequest.count({
+      where: {
+        status: {
+          in: activeComprehensiveRequestStatuses,
+        },
+      },
+    }),
+    prisma.notificationEvent.count({
+      where: {
+        channel: "email",
+        status: NotificationStatus.FAILED,
+      },
+    }),
+    prisma.notificationEvent.count({
+      where: {
+        channel: "email",
+        status: NotificationStatus.FAILED,
+        createdAt: {
+          gte: monthStart,
+        },
+      },
+    }),
+    prisma.notificationEvent.count({
+      where: {
+        channel: "email",
+        status: NotificationStatus.FAILED,
+        errorMessage: {
+          contains: "not authorized to send emails from",
+          mode: "insensitive",
+        },
+      },
+    }),
+    prisma.business.groupBy({
+      by: ["lifecycleStage"],
+      _count: {
+        _all: true,
+      },
+    }),
+    prisma.servicePlan.findMany({
+      orderBy: {
+        name: "asc",
+      },
+      include: {
+        planRecommendations: {
+          select: {
+            status: true,
+            createdAt: true,
+          },
+        },
+      },
+    }),
+    prisma.notificationEvent.findMany({
+      where: {
+        channel: "email",
+        status: NotificationStatus.FAILED,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 8,
+      select: {
+        id: true,
+        type: true,
+        subject: true,
+        recipient: true,
+        errorMessage: true,
+        createdAt: true,
+        processedAt: true,
+        business: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    }),
+    prisma.business.findMany({
+      where: {
+        OR: [
+          {
+            websiteUrl: {
+              startsWith: "http://",
+            },
+          },
+          {
+            googleBusinessProfileUrl: {
+              startsWith: "http://",
+            },
+          },
+        ],
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      take: 6,
+      select: {
+        id: true,
+        name: true,
+        websiteUrl: true,
+        googleBusinessProfileUrl: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  return {
+    monthStart,
+    summaryCards: [
+      {
+        label: "Free audits",
+        value: String(freeAuditsThisMonth),
+        change: `${totalFreeAudits} total presence checks recorded`,
+      },
+      {
+        label: "New customers",
+        value: String(newCustomerBusinesses.length),
+        change: `${customerBusinesses.length} companies with accepted services`,
+      },
+      {
+        label: "Services purchased",
+        value: String(acceptedServicesThisMonth),
+        change: `${acceptedServicesTotal} accepted recommendations total`,
+      },
+      {
+        label: "Comprehensive audits",
+        value: String(comprehensiveAuditsThisMonth),
+        change: `${totalComprehensiveAudits} total · ${openComprehensiveRequests} active requests`,
+      },
+      {
+        label: "Failed email alerts",
+        value: String(failedEmailsThisMonth),
+        change: `${failedEmailsTotal} total delivery failures tracked`,
+      },
+    ],
+    lifecycleBreakdown: lifecycleReportStageOrder
+      .map((stage) => ({
+        stage,
+        count:
+          lifecycleBreakdown.find((item) => item.lifecycleStage === stage)?._count._all ?? 0,
+      }))
+      .filter((item) => item.count > 0),
+    serviceBreakdown: planBreakdown
+      .map((plan) => {
+        const acceptedCount = plan.planRecommendations.filter(
+          (recommendation) => recommendation.status === RecommendationStatus.ACCEPTED,
+        ).length;
+        const presentedCount = plan.planRecommendations.filter(
+          (recommendation) => recommendation.status === RecommendationStatus.PRESENTED,
+        ).length;
+        const proposedCount = plan.planRecommendations.filter(
+          (recommendation) => recommendation.status === RecommendationStatus.PROPOSED,
+        ).length;
+
+        return {
+          slug: plan.slug,
+          name: plan.name,
+          acceptedCount,
+          presentedCount,
+          proposedCount,
+        };
+      })
+      .sort(
+        (left, right) =>
+          right.acceptedCount - left.acceptedCount ||
+          right.presentedCount - left.presentedCount ||
+          left.name.localeCompare(right.name),
+      ),
+    failedEmailAlerts: failedEmailEvents.map((event) => ({
+      id: event.id,
+      title: event.subject ?? "Email delivery failed",
+      businessId: event.business?.id ?? null,
+      businessName: event.business?.name ?? "Unlinked business",
+      recipient: event.recipient ?? null,
+      errorMessage: event.errorMessage ?? "Delivery failed without a stored provider message.",
+      createdAt: event.createdAt,
+      processedAt: event.processedAt,
+      severity: (
+        isSenderAuthorizationError(event.errorMessage) ? "critical" : "warning"
+      ) as "critical" | "warning",
+    })),
+    insecureLinkAlerts: insecureBusinesses.map((business) => ({
+      id: business.id,
+      businessId: business.id,
+      businessName: business.name,
+      websiteUrl: isInsecureUrl(business.websiteUrl) ? business.websiteUrl : null,
+      googleBusinessProfileUrl: isInsecureUrl(business.googleBusinessProfileUrl)
+        ? business.googleBusinessProfileUrl
+        : null,
+      updatedAt: business.updatedAt,
+    })),
+    alertSummary: {
+      failedEmailsTotal,
+      senderAuthorizationFailures,
+      insecureLinkCount: insecureBusinesses.length,
+      activeComprehensiveRequests: openComprehensiveRequests,
+    },
+  };
 }
 
 export async function getWorkspaceBusinessDetail(businessId: string) {

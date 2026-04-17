@@ -92,6 +92,11 @@ const evidenceStageLabels: Record<AuditEvidenceStage, string> = {
   REFERENCE: "Reference",
 };
 
+const insetPanelClass =
+  "rounded-[24px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_22px_45px_-38px_rgba(15,23,42,0.22)]";
+
+const mutedInsetPanelClass = "rounded-[24px] border border-slate-200/70 bg-slate-50/80 p-4";
+
 export function AuditEditorForm(props: AuditEditorFormProps) {
   const {
     submissionId,
@@ -344,68 +349,76 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
         title="Align scope, progress, and implementation direction"
         tone="muted"
       >
-        <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-[0.95fr_0.8fr_1fr_1.25fr]">
-          <WorkspaceField label="Audit scope">
-            <WorkspaceSelect
-              value={draft.scope}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  scope: event.target.value as AuditScope,
-                }))
-              }
-            >
-              {Object.entries(auditScopeLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </WorkspaceSelect>
-          </WorkspaceField>
-          <WorkspaceField label="Progress percent">
-            <WorkspaceInput
-              type="number"
-              min={0}
-              max={100}
-              value={draft.progressPercent}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  progressPercent: Number(event.target.value || 0),
-                }))
-              }
-            />
-          </WorkspaceField>
-          <WorkspaceField label="Implementation path">
-            <WorkspaceSelect
-              value={draft.implementationRecommendation}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  implementationRecommendation:
-                    event.target.value as ImplementationRecommendation,
-                }))
-              }
-            >
-              {Object.entries(implementationRecommendationLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </WorkspaceSelect>
-          </WorkspaceField>
-          <WorkspaceField label="Implementation notes">
-            <WorkspaceInput
-              value={draft.implementationNotes}
-              onChange={(event) =>
-                setDraft((current) => ({
-                  ...current,
-                  implementationNotes: event.target.value,
-                }))
-              }
-              placeholder="DIY, hybrid, or done-for-you context"
-            />
-          </WorkspaceField>
+        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+          <div className={insetPanelClass}>
+            <WorkspaceField label="Audit scope" helper="Choose whether this is a free review or a deeper comprehensive audit.">
+              <WorkspaceSelect
+                value={draft.scope}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    scope: event.target.value as AuditScope,
+                  }))
+                }
+              >
+                {Object.entries(auditScopeLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </WorkspaceSelect>
+            </WorkspaceField>
+          </div>
+          <div className={insetPanelClass}>
+            <WorkspaceField label="Progress percent" helper="Keep the studio honest about how complete the review is right now.">
+              <WorkspaceInput
+                type="number"
+                min={0}
+                max={100}
+                value={draft.progressPercent}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    progressPercent: Number(event.target.value || 0),
+                  }))
+                }
+              />
+            </WorkspaceField>
+          </div>
+          <div className={insetPanelClass}>
+            <WorkspaceField label="Implementation path" helper="Clarify whether Virtura recommends DIY, hybrid support, or done-for-you delivery.">
+              <WorkspaceSelect
+                value={draft.implementationRecommendation}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    implementationRecommendation:
+                      event.target.value as ImplementationRecommendation,
+                  }))
+                }
+              >
+                {Object.entries(implementationRecommendationLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </WorkspaceSelect>
+            </WorkspaceField>
+          </div>
+          <div className={insetPanelClass}>
+            <WorkspaceField label="Implementation notes" helper="Capture any scope nuance the consultant wants carried into the final report.">
+              <WorkspaceInput
+                value={draft.implementationNotes}
+                onChange={(event) =>
+                  setDraft((current) => ({
+                    ...current,
+                    implementationNotes: event.target.value,
+                  }))
+                }
+                placeholder="DIY, hybrid, or done-for-you context"
+              />
+            </WorkspaceField>
+          </div>
         </div>
       </WorkspaceSection>
 
@@ -447,12 +460,12 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
             ].map((field) => (
               <div
                 key={field.label}
-                className="rounded-[24px] border border-slate-200/70 bg-slate-50/75 p-4"
+                className={cn(mutedInsetPanelClass, "h-full")}
               >
                 <WorkspaceField label={field.label}>
                   <WorkspaceTextarea
-                    rows={6}
-                    className="min-h-[210px]"
+                    rows={5}
+                    className="min-h-[176px]"
                     value={field.value}
                     onChange={(event) => field.onChange(event.target.value)}
                     placeholder={field.placeholder}
@@ -496,17 +509,17 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                 setDraft((current) => ({ ...current, actionPlanText: value })),
             },
           ].map((field) => (
-            <div
-              key={field.label}
-              className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4"
-            >
-              <WorkspaceField label={field.label}>
-                <WorkspaceTextarea
-                  rows={7}
-                  className="min-h-[190px]"
-                  value={field.value}
-                  onChange={(event) => field.onChange(event.target.value)}
-                  placeholder="One item per line"
+              <div
+                key={field.label}
+                className={cn(insetPanelClass, "h-full")}
+              >
+                <WorkspaceField label={field.label}>
+                  <WorkspaceTextarea
+                    rows={5}
+                    className="min-h-[168px]"
+                    value={field.value}
+                    onChange={(event) => field.onChange(event.target.value)}
+                    placeholder="One item per line"
                 />
               </WorkspaceField>
             </div>
@@ -525,13 +538,13 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
         >
           <TabsList
             variant="line"
-            className="flex w-full flex-wrap justify-start gap-2 rounded-[24px] border border-slate-200/70 bg-white/92 p-2"
+            className="grid w-full gap-2 rounded-[24px] border border-slate-200/70 bg-white/92 p-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5"
           >
             {draft.sections.map((section) => (
               <TabsTrigger
                 key={section.category}
                 value={section.category}
-                className="flex-none rounded-full border border-transparent px-4 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-slate-500 data-active:border-brand-200 data-active:bg-brand-50 data-active:text-brand-700 data-active:after:hidden"
+                className="min-h-[52px] justify-start rounded-[18px] border border-transparent px-4 py-3 text-left text-[11px] font-semibold leading-5 tracking-[0.18em] whitespace-normal uppercase text-slate-500 data-active:border-brand-200 data-active:bg-brand-50 data-active:text-brand-700 data-active:after:hidden"
               >
                 {categoryLabelFromKey(section.category)}
               </TabsTrigger>
@@ -542,11 +555,11 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
             <TabsContent
               key={section.category}
               value={section.category}
-              className="mt-5 space-y-5"
+              className="mt-6 space-y-5"
             >
-              <div className="grid gap-4 xl:grid-cols-[200px_1fr]">
-                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
-                  <WorkspaceField label="Section score">
+              <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)] 2xl:grid-cols-[200px_minmax(0,1fr)]">
+                <div className={insetPanelClass}>
+                  <WorkspaceField label="Section score" helper="Use this to reflect how strong this category is today, not how strong it could become later.">
                     <WorkspaceInput
                       type="number"
                       min={0}
@@ -563,8 +576,8 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                     />
                   </WorkspaceField>
                 </div>
-                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
-                  <WorkspaceField label="Section headline">
+                <div className={insetPanelClass}>
+                  <WorkspaceField label="Section headline" helper="Keep the section heading direct enough that a client immediately understands the takeaway.">
                     <WorkspaceInput
                       value={section.headline}
                       onChange={(event) =>
@@ -577,11 +590,11 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
               </div>
 
               <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
-                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
-                  <WorkspaceField label="Client-facing notes">
+                <div className={cn(insetPanelClass, "h-full")}>
+                  <WorkspaceField label="Client-facing notes" helper="What the client should read in the published report for this category.">
                     <WorkspaceTextarea
-                      rows={6}
-                      className="min-h-[220px]"
+                      rows={5}
+                      className="min-h-[176px]"
                       value={section.clientFacingNotes}
                       onChange={(event) =>
                         setSectionValue(
@@ -594,11 +607,11 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                     />
                   </WorkspaceField>
                 </div>
-                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
-                  <WorkspaceField label="Internal consultant notes">
+                <div className={cn(insetPanelClass, "h-full")}>
+                  <WorkspaceField label="Internal consultant notes" helper="Anything the consultant wants to keep internal while shaping the action plan.">
                     <WorkspaceTextarea
-                      rows={6}
-                      className="min-h-[220px]"
+                      rows={5}
+                      className="min-h-[176px]"
                       value={section.internalNotes}
                       onChange={(event) =>
                         setSectionValue(section.category, "internalNotes", event.target.value)
@@ -609,8 +622,8 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                 </div>
               </div>
 
-              <div className="grid items-start gap-5 xl:grid-cols-[1.02fr_0.98fr]">
-                <div className="rounded-[26px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_24px_48px_-40px_rgba(15,23,42,0.24)]">
+              <div className="grid items-start gap-5 2xl:grid-cols-[1.08fr_0.92fr]">
+                <div className={insetPanelClass}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
@@ -636,9 +649,9 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                       activeChecklistItems.map((item, index) => (
                         <div
                           key={`${section.category}-${index}`}
-                          className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4"
+                          className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4 shadow-[0_18px_36px_-34px_rgba(15,23,42,0.22)]"
                         >
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                             <WorkspaceInput
                               value={item.title}
                               onChange={(event) =>
@@ -662,7 +675,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                             </Button>
                           </div>
 
-                          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                          <div className="mt-4 grid gap-3 xl:grid-cols-[220px_minmax(0,1fr)]">
                             <WorkspaceSelect
                               value={item.status}
                               onChange={(event) =>
@@ -697,8 +710,8 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                           </div>
 
                           <WorkspaceTextarea
-                            rows={4}
-                            className="mt-4 min-h-[148px]"
+                            rows={3}
+                            className="mt-4 min-h-[118px]"
                             value={item.notes}
                             onChange={(event) =>
                               updateChecklistItem(
@@ -716,6 +729,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                       <WorkspaceEmptyState
                         title="No checklist items yet"
                         description="Add the first review item so this section has a concrete consultant workflow."
+                        className="min-h-[220px] flex flex-col justify-center"
                         action={
                           <Button
                             type="button"
@@ -731,7 +745,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                   </div>
                 </div>
 
-                <div className="rounded-[26px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_24px_48px_-40px_rgba(15,23,42,0.24)]">
+                <div className={insetPanelClass}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
@@ -757,9 +771,9 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                       activeEvidence.map((item, index) => (
                         <div
                           key={`${section.category}-evidence-${index}`}
-                          className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4"
+                          className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4 shadow-[0_18px_36px_-34px_rgba(15,23,42,0.2)]"
                         >
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                             <WorkspaceInput
                               value={item.label}
                               onChange={(event) =>
@@ -783,7 +797,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                             </Button>
                           </div>
 
-                          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                          <div className="mt-4 grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
                             <WorkspaceSelect
                               value={item.stage}
                               onChange={(event) =>
@@ -816,8 +830,8 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                           </div>
 
                           <WorkspaceTextarea
-                            rows={4}
-                            className="mt-4 min-h-[148px]"
+                            rows={3}
+                            className="mt-4 min-h-[118px]"
                             value={item.notes}
                             onChange={(event) =>
                               updateEvidenceItem(
@@ -849,10 +863,20 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                         </div>
                       ))
                     ) : (
-                      <WorkspaceEmptyState
-                        title="No evidence references yet"
-                        description="Add a before, after, progress, or reference item so this panel feels intentional."
-                        action={
+                      <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50/82 px-5 py-6 text-center">
+                        <p className="text-sm font-semibold text-slate-950">
+                          No evidence references yet
+                        </p>
+                        <p className="mt-2 text-sm leading-7 text-slate-600">
+                          Add a before, after, progress, or reference item so this section has
+                          proof attached to the written review.
+                        </p>
+                        <div className="mt-4 flex flex-wrap justify-center gap-2">
+                          {Object.values(evidenceStageLabels).map((label) => (
+                            <WorkspaceChip key={label}>{label}</WorkspaceChip>
+                          ))}
+                        </div>
+                        <div className="mt-5 flex justify-center">
                           <Button
                             type="button"
                             variant="outline"
@@ -861,8 +885,8 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                           >
                             Add evidence item
                           </Button>
-                        }
-                      />
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -899,10 +923,13 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
             })}
           </div>
 
-          <WorkspaceField label="Recommendation rationale">
+          <WorkspaceField
+            label="Recommendation rationale"
+            helper="Explain why these plans fit this business so the recommendation feels grounded instead of generic."
+          >
             <WorkspaceTextarea
               rows={4}
-              className="min-h-[164px]"
+              className="min-h-[136px]"
               value={draft.serviceRecommendationRationale}
               onChange={(event) =>
                 setDraft((current) => ({

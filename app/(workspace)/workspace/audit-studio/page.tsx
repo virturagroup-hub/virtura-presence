@@ -210,7 +210,7 @@ export default async function AuditStudioPage({
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.82fr)_minmax(0,1.18fr)]">
         <div className="space-y-6">
           <div className="surface-card p-6">
             <p className="section-kicker">Client context</p>
@@ -238,18 +238,6 @@ export default async function AuditStudioPage({
             businessId={business.id}
             submissionId={submission.id}
             deliverySummary={emailDeliverySummary}
-            latestEvents={submission.notificationEvents.map((event) => ({
-              id: event.id,
-              type: event.type,
-              status: event.status,
-              subject: event.subject,
-              recipient: event.recipient,
-              createdAt: event.createdAt,
-              processedAt: event.processedAt,
-              errorMessage: event.errorMessage,
-              providerMessageId: event.providerMessageId,
-              channel: event.channel,
-            }))}
             hasAudit={Boolean(audit)}
             hasComprehensiveAudit={audit?.scope === AuditScope.COMPREHENSIVE}
           />

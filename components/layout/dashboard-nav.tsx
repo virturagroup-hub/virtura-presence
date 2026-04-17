@@ -8,6 +8,7 @@ import {
   FileText,
   LayoutGrid,
   Settings2,
+  ShieldCheck,
   UserRoundSearch,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ const navigationIcons: Record<NavigationIcon, typeof LayoutGrid> = {
   barChart3: BarChart3,
   clipboardCheck: ClipboardCheck,
   userRoundSearch: UserRoundSearch,
+  shieldCheck: ShieldCheck,
 };
 
 function isActivePath(pathname: string, href: string) {

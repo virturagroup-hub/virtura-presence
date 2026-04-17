@@ -10,7 +10,8 @@ export type NavigationIcon =
   | "settings2"
   | "barChart3"
   | "clipboardCheck"
-  | "userRoundSearch";
+  | "userRoundSearch"
+  | "shieldCheck";
 
 export type NavigationItem = {
   title: string;
@@ -65,6 +66,12 @@ export const workspaceNavigation: NavigationItem[] = [
     href: "/workspace/clients",
     icon: "userRoundSearch",
     description: "Open company records, history, notes, and ongoing care context.",
+  },
+  {
+    title: "Reports",
+    href: "/workspace/reports",
+    icon: "shieldCheck",
+    description: "Free audit volume, conversions, service uptake, and alerts.",
   },
 ];
 
