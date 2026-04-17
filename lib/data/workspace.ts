@@ -9,7 +9,10 @@ import {
   Prisma,
 } from "@prisma/client";
 
-import { dispatchNotificationEvents } from "@/lib/notification-delivery";
+import {
+  dispatchNotificationEvents,
+  processNotificationEventById,
+} from "@/lib/notification-delivery";
 import { recordNotificationEvent } from "@/lib/notifications";
 import { prisma } from "@/lib/prisma";
 import { servicePlans } from "@/lib/plan-catalog";
@@ -634,6 +637,105 @@ async function getSubmissionForNotification(
       },
     },
   });
+}
+
+function notificationPayloadRecord(payload: Prisma.JsonValue | null | undefined) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return {};
+  }
+
+  return payload as Record<string, unknown>;
+}
+
+async function finalizeWorkspaceNotificationDelivery(input: {
+  eventId: string;
+  kind: WorkspaceNotificationActionInput["kind"];
+}) {
+  const event = await prisma.notificationEvent.findUnique({
+    where: {
+      id: input.eventId,
+    },
+    select: {
+      businessId: true,
+      presenceCheckId: true,
+      payload: true,
+    },
+  });
+
+  if (!event?.businessId) {
+    return;
+  }
+
+  const now = new Date();
+  const payload = notificationPayloadRecord(event.payload);
+  const followUpId =
+    typeof payload.followUpId === "string" ? payload.followUpId : null;
+
+  if (input.kind === "follow_up") {
+    if (followUpId) {
+      await prisma.followUp.update({
+        where: {
+          id: followUpId,
+        },
+        data: {
+          status: FollowUpStatus.SENT,
+          sentAt: now,
+        },
+      });
+    } else if (event.presenceCheckId) {
+      const latestFollowUp = await prisma.followUp.findFirst({
+        where: {
+          presenceCheckId: event.presenceCheckId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (latestFollowUp) {
+        await prisma.followUp.update({
+          where: {
+            id: latestFollowUp.id,
+          },
+          data: {
+            status: FollowUpStatus.SENT,
+            sentAt: now,
+          },
+        });
+      }
+    }
+  }
+
+  await prisma.business.update({
+    where: {
+      id: event.businessId,
+    },
+    data: {
+      lifecycleStage:
+        input.kind === "follow_up"
+          ? BusinessLifecycleStage.FOLLOW_UP_SENT
+          : undefined,
+      status:
+        input.kind === "follow_up"
+          ? SubmissionStatus.FOLLOW_UP_SENT
+          : undefined,
+      lastClientContactAt: now,
+      lastActivityAt: now,
+    },
+  });
+}
+
+async function processWorkspaceNotification(input: {
+  eventId: string;
+  kind: WorkspaceNotificationActionInput["kind"];
+}) {
+  const result = await processNotificationEventById(input.eventId);
+
+  if (result.status === "processed") {
+    await finalizeWorkspaceNotificationDelivery(input);
+  }
+
+  return result;
 }
 
 export async function getWorkspaceDashboardData(filters: WorkspaceSearchInput) {
@@ -1359,7 +1461,6 @@ export async function sendWorkspaceNotification(
   actor: { id: string },
 ) {
   const transactionResult = await prisma.$transaction(async (tx) => {
-    const notificationEventIds: string[] = [];
     const business = await tx.business.findUnique({
       where: {
         id: input.businessId,
@@ -1378,7 +1479,6 @@ export async function sendWorkspaceNotification(
 
     const audit = submission.audit;
     const recipient = submission.reportEmail || submission.contactEmail || business.primaryEmail;
-    const now = new Date();
     let eventId: string | null = null;
 
     if (input.kind === "quick_report") {
@@ -1415,9 +1515,9 @@ export async function sendWorkspaceNotification(
     }
 
     if (input.kind === "comprehensive_ready") {
-      if (!audit) {
+      if (!audit || audit.scope !== AuditScope.COMPREHENSIVE) {
         throw new Error(
-          "A comprehensive audit draft needs to exist before this notification can be sent.",
+          "A saved comprehensive audit is required before this notification can be sent.",
         );
       }
 
@@ -1447,16 +1547,18 @@ export async function sendWorkspaceNotification(
                 id: latestFollowUp.id,
               },
               data: {
-                status: FollowUpStatus.SENT,
-                sentAt: now,
+                status:
+                  latestFollowUp.status === FollowUpStatus.SCHEDULED
+                    ? FollowUpStatus.SCHEDULED
+                    : FollowUpStatus.QUEUED,
+                sentAt: null,
               },
             })
           : await tx.followUp.create({
               data: {
                 businessId: business.id,
                 presenceCheckId: submission.id,
-                status: FollowUpStatus.SENT,
-                sentAt: now,
+                status: FollowUpStatus.QUEUED,
                 channel: "email",
                 subject: "A quick follow-up from Virtura Presence",
                 notes:
@@ -1485,30 +1587,61 @@ export async function sendWorkspaceNotification(
       throw new Error("Notification action could not be created.");
     }
 
-    await touchBusinessActivity(tx, {
-      businessId: business.id,
-      lifecycleStage:
-        input.kind === "follow_up"
-          ? BusinessLifecycleStage.FOLLOW_UP_SENT
-          : business.lifecycleStage,
-      status:
-        input.kind === "follow_up"
-          ? SubmissionStatus.FOLLOW_UP_SENT
-          : business.status,
-      lastClientContactAt: now,
-    });
-
-    notificationEventIds.push(eventId);
-
     return {
       eventId,
-      notificationEventIds,
     };
   });
 
-  await dispatchNotificationEvents(transactionResult.notificationEventIds);
+  const result = await processWorkspaceNotification({
+    eventId: transactionResult.eventId,
+    kind: input.kind,
+  });
 
-  return transactionResult.eventId;
+  return {
+    eventId: transactionResult.eventId,
+    delivery: result,
+  };
+}
+
+export async function retryWorkspaceNotificationEvent(input: {
+  eventId: string;
+}) {
+  const event = await prisma.notificationEvent.findUnique({
+    where: {
+      id: input.eventId,
+    },
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      businessId: true,
+      payload: true,
+    },
+  });
+
+  if (!event?.businessId) {
+    throw new Error("Notification event not found.");
+  }
+
+  const payload = notificationPayloadRecord(event.payload);
+  const kind: WorkspaceNotificationActionInput["kind"] =
+    event.type === "SUBMISSION_CREATED"
+      ? "quick_report"
+      : event.type === "FOLLOW_UP_SENT"
+        ? "follow_up"
+        : payload.scope === AuditScope.COMPREHENSIVE
+          ? "comprehensive_ready"
+          : "audit_available";
+
+  const result = await processWorkspaceNotification({
+    eventId: event.id,
+    kind,
+  });
+
+  return {
+    eventId: event.id,
+    delivery: result,
+  };
 }
 
 export async function getFallbackPlanCatalog() {

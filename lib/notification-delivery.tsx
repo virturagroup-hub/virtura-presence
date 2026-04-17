@@ -264,6 +264,17 @@ export async function processNotificationEventById(eventId: string) {
   }
 
   try {
+    await prisma.notificationEvent.update({
+      where: {
+        id: event.id,
+      },
+      data: {
+        status: NotificationStatus.PENDING,
+        errorMessage: null,
+        processedAt: null,
+      },
+    });
+
     const emailPayload = await buildEmailPayload(event);
 
     if (!emailPayload) {

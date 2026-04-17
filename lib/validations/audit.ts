@@ -106,6 +106,14 @@ export type WorkspaceNotificationActionInput = z.infer<
   typeof workspaceNotificationActionSchema
 >;
 
+export const retryWorkspaceNotificationSchema = z.object({
+  eventId: z.string().min(1),
+});
+
+export type RetryWorkspaceNotificationInput = z.infer<
+  typeof retryWorkspaceNotificationSchema
+>;
+
 export const workspaceAuditStateForIntent: Record<
   AuditEditorInput["intent"],
   AuditStatus

@@ -19,6 +19,7 @@ import {
   scoreTierLabel,
 } from "@/lib/display";
 import { canUnpublishAudit } from "@/lib/permissions";
+import { getEmailDeliverySummary } from "@/lib/email/config";
 import { asStringArray } from "@/lib/text";
 import { buildDefaultChecklistItems } from "@/lib/workspace-audit";
 
@@ -37,6 +38,7 @@ export default async function AuditStudioPage({
     getAuditStudioData(parsed),
     getCurrentUser(),
   ]);
+  const emailDeliverySummary = getEmailDeliverySummary();
 
   if (!user?.id) {
     return null;
@@ -235,13 +237,18 @@ export default async function AuditStudioPage({
           <WorkspaceEmailActions
             businessId={business.id}
             submissionId={submission.id}
+            deliverySummary={emailDeliverySummary}
             latestEvents={submission.notificationEvents.map((event) => ({
               id: event.id,
               type: event.type,
               status: event.status,
               subject: event.subject,
+              recipient: event.recipient,
               createdAt: event.createdAt,
               processedAt: event.processedAt,
+              errorMessage: event.errorMessage,
+              providerMessageId: event.providerMessageId,
+              channel: event.channel,
             }))}
             hasAudit={Boolean(audit)}
             hasComprehensiveAudit={audit?.scope === AuditScope.COMPREHENSIVE}

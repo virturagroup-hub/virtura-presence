@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import {
   createSubmissionInternalNote,
+  retryWorkspaceNotificationEvent,
   sendWorkspaceNotification,
   updateBusinessLifecycle,
   updateSubmissionWorkflowStatus,
@@ -16,11 +17,13 @@ import {
   auditEditorSchema,
   businessLifecycleUpdateSchema,
   internalNoteSchema,
+  retryWorkspaceNotificationSchema,
   submissionStatusUpdateSchema,
   workspaceNotificationActionSchema,
   type AuditEditorInput,
   type BusinessLifecycleUpdateInput,
   type InternalNoteInput,
+  type RetryWorkspaceNotificationInput,
   type SubmissionStatusUpdateInput,
   type WorkspaceNotificationActionInput,
 } from "@/lib/validations/audit";
@@ -232,7 +235,7 @@ export async function sendWorkspaceNotificationAction(
 
   try {
     const actor = await requireWorkspaceActor();
-    await sendWorkspaceNotification(parsed.data, actor);
+    const result = await sendWorkspaceNotification(parsed.data, actor);
 
     revalidatePath("/workspace");
     revalidatePath("/workspace/audit-studio");
@@ -241,8 +244,22 @@ export async function sendWorkspaceNotificationAction(
     revalidatePath("/portal");
     revalidatePath("/portal/report");
 
+    if (result.delivery.status === "failed") {
+      return {
+        success: false as const,
+        error:
+          result.delivery.error ??
+          "The notification was created, but email delivery failed during processing.",
+      };
+    }
+
     return {
       success: true as const,
+      deliveryStatus: result.delivery.status,
+      message:
+        result.delivery.status === "processed"
+          ? "Email delivery completed."
+          : "Email delivery was logged without sending.",
     };
   } catch (error) {
     return {
@@ -251,6 +268,55 @@ export async function sendWorkspaceNotificationAction(
         error,
         "The email action could not be sent.",
       ),
+    };
+  }
+}
+
+export async function retryWorkspaceNotificationAction(
+  values: RetryWorkspaceNotificationInput,
+) {
+  const parsed = retryWorkspaceNotificationSchema.safeParse(values);
+
+  if (!parsed.success) {
+    return {
+      success: false as const,
+      error: "Notification retry request is invalid.",
+    };
+  }
+
+  try {
+    await requireWorkspaceActor();
+    const result = await retryWorkspaceNotificationEvent({
+      eventId: parsed.data.eventId,
+    });
+
+    revalidatePath("/workspace");
+    revalidatePath("/workspace/audit-studio");
+    revalidatePath("/workspace/clients");
+    revalidatePath("/portal");
+    revalidatePath("/portal/report");
+
+    if (result.delivery.status === "failed") {
+      return {
+        success: false as const,
+        error:
+          result.delivery.error ??
+          "The notification retry was attempted, but delivery still failed.",
+      };
+    }
+
+    return {
+      success: true as const,
+      deliveryStatus: result.delivery.status,
+      message:
+        result.delivery.status === "processed"
+          ? "Notification sent successfully."
+          : "Notification was logged without sending.",
+    };
+  } catch (error) {
+    return {
+      success: false as const,
+      error: toUserFacingDatabaseError(error, "The notification could not be retried."),
     };
   }
 }

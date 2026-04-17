@@ -36,6 +36,10 @@ const statusStyles: Record<string, string> = {
   pending: "bg-brand-50 text-brand-700 ring-brand-100",
   failed: "bg-rose-50 text-rose-700 ring-rose-100",
   logged: "bg-slate-100 text-slate-700 ring-slate-200",
+  disabled: "bg-amber-50 text-amber-700 ring-amber-100",
+  "available now": "bg-emerald-50 text-emerald-700 ring-emerald-100",
+  "requires saved audit": "bg-slate-100 text-slate-700 ring-slate-200",
+  "requires comprehensive audit": "bg-violet-50 text-violet-700 ring-violet-100",
   "free review": "bg-slate-100 text-slate-700 ring-slate-200",
   comprehensive: "bg-violet-50 text-violet-700 ring-violet-100",
 };

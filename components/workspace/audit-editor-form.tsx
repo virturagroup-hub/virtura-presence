@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition, type ReactNode } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   AuditCategory,
@@ -21,7 +21,19 @@ import {
   implementationRecommendationLabels,
 } from "@/lib/display";
 import { joinLineItems } from "@/lib/text";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  WorkspaceActionFooter,
+  WorkspaceChip,
+  WorkspaceEmptyState,
+  WorkspaceField,
+  WorkspaceInput,
+  WorkspaceSection,
+  WorkspaceSelect,
+  WorkspaceTextarea,
+} from "@/components/workspace/workspace-primitives";
 
 type AuditSectionDraft = {
   category: AuditCategory;
@@ -69,11 +81,7 @@ type AuditEditorFormProps = {
   evidence: EvidenceItemDraft[];
   selectedPlanSlugs: string[];
   serviceRecommendationRationale: string;
-  availablePlans: Array<{
-    slug: string;
-    name: string;
-    tierLabel: string;
-  }>;
+  availablePlans: Array<{ slug: string; name: string; tierLabel: string }>;
   canUnpublish: boolean;
 };
 
@@ -84,30 +92,32 @@ const evidenceStageLabels: Record<AuditEvidenceStage, string> = {
   REFERENCE: "Reference",
 };
 
-export function AuditEditorForm({
-  submissionId,
-  status,
-  scope,
-  progressPercent,
-  implementationRecommendation,
-  implementationNotes,
-  draftAssist = [],
-  title,
-  executiveSummary,
-  clientSummary,
-  internalSummary,
-  strengths,
-  improvementOpportunities,
-  nextSteps,
-  actionPlan,
-  sections,
-  checklistItems,
-  evidence,
-  selectedPlanSlugs,
-  serviceRecommendationRationale,
-  availablePlans,
-  canUnpublish,
-}: AuditEditorFormProps) {
+export function AuditEditorForm(props: AuditEditorFormProps) {
+  const {
+    submissionId,
+    status,
+    scope,
+    progressPercent,
+    implementationRecommendation,
+    implementationNotes,
+    draftAssist = [],
+    title,
+    executiveSummary,
+    clientSummary,
+    internalSummary,
+    strengths,
+    improvementOpportunities,
+    nextSteps,
+    actionPlan,
+    sections,
+    checklistItems,
+    evidence,
+    selectedPlanSlugs,
+    serviceRecommendationRationale,
+    availablePlans,
+    canUnpublish,
+  } = props;
+
   const router = useRouter();
   const [draft, setDraft] = useState({
     scope,
@@ -142,43 +152,43 @@ export function AuditEditorForm({
     [activeCategory, draft.evidence],
   );
 
-  function setSectionValue(
+  const setSectionValue = (
     category: AuditCategory,
     field: keyof AuditSectionDraft,
     value: string | number,
-  ) {
+  ) =>
     setDraft((current) => ({
       ...current,
       sections: current.sections.map((section) =>
         section.category === category ? { ...section, [field]: value } : section,
       ),
     }));
-  }
 
-  function togglePlan(slug: string) {
+  const togglePlan = (slug: string) =>
     setDraft((current) => ({
       ...current,
       selectedPlanSlugs: current.selectedPlanSlugs.includes(slug)
         ? current.selectedPlanSlugs.filter((item) => item !== slug)
         : [...current.selectedPlanSlugs, slug],
     }));
-  }
 
-  function addChecklistItem(category: AuditCategory) {
+  const addChecklistItem = (category: AuditCategory) =>
     setDraft((current) => ({
       ...current,
       checklistItems: [
         ...current.checklistItems,
-        {
-          category,
-          title: "",
-          status: AuditChecklistStatus.NOT_STARTED,
-          notes: "",
-          recommendation: "",
-        },
+        { category, title: "", status: AuditChecklistStatus.NOT_STARTED, notes: "", recommendation: "" },
       ],
     }));
-  }
+
+  const addEvidence = (category: AuditCategory) =>
+    setDraft((current) => ({
+      ...current,
+      evidence: [
+        ...current.evidence,
+        { category, label: "", assetUrl: "", notes: "", stage: AuditEvidenceStage.REFERENCE, clientVisible: false },
+      ],
+    }));
 
   function updateChecklistItem(
     category: AuditCategory,
@@ -212,23 +222,6 @@ export function AuditEditorForm({
         seen += 1;
         return seen !== index;
       }),
-    }));
-  }
-
-  function addEvidence(category: AuditCategory) {
-    setDraft((current) => ({
-      ...current,
-      evidence: [
-        ...current.evidence,
-        {
-          category,
-          label: "",
-          assetUrl: "",
-          notes: "",
-          stage: AuditEvidenceStage.REFERENCE,
-          clientVisible: false,
-        },
-      ],
     }));
   }
 
@@ -311,214 +304,234 @@ export function AuditEditorForm({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <p className="section-kicker">Audit studio</p>
-          <h2 className="mt-4 font-heading text-3xl font-semibold text-slate-950">
+          <h2 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-slate-950">
             Draft, refine, and publish the consultant review
           </h2>
         </div>
         <div className="flex flex-wrap gap-3">
-          <div className="rounded-full border border-brand-100 bg-brand-50 px-4 py-2 text-xs font-semibold tracking-[0.22em] text-brand-700 uppercase">
-            {status.replaceAll("_", " ")}
-          </div>
-          <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold tracking-[0.22em] text-slate-700 uppercase">
-            {auditScopeLabels[draft.scope]}
-          </div>
+          <WorkspaceChip active>{status.replaceAll("_", " ")}</WorkspaceChip>
+          <WorkspaceChip>{auditScopeLabels[draft.scope]}</WorkspaceChip>
         </div>
       </div>
 
       {draftAssist.length ? (
-        <div className="rounded-[28px] border border-brand-100 bg-brand-50/75 p-5">
-          <div className="flex items-center gap-3">
-            <Sparkles className="size-5 text-brand-600" />
-            <div>
-              <p className="text-xs font-semibold tracking-[0.22em] text-brand-700 uppercase">
-                AI-assisted drafting cues
-              </p>
-              <p className="mt-1 text-sm text-brand-800">
-                Grounding prompts pulled from the latest submission and client request context.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 grid gap-3">
+        <WorkspaceSection
+          kicker="AI-assisted drafting cues"
+          description="Grounding prompts pulled from the latest submission and request context."
+          tone="brand"
+        >
+          <div className="grid gap-3">
             {draftAssist.map((item) => (
               <div
                 key={item}
                 className="rounded-[22px] border border-white/80 bg-white/92 px-4 py-4 text-sm leading-7 text-slate-700"
               >
-                {item}
+                <div className="flex items-start gap-3">
+                  <Sparkles className="mt-1 size-4 shrink-0 text-brand-600" />
+                  <span>{item}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </WorkspaceSection>
+      ) : null}
+
+      <WorkspaceSection
+        kicker="Audit setup"
+        title="Align scope, progress, and implementation direction"
+        tone="muted"
+      >
+        <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-[0.95fr_0.8fr_1fr_1.25fr]">
+          <WorkspaceField label="Audit scope">
+            <WorkspaceSelect
+              value={draft.scope}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  scope: event.target.value as AuditScope,
+                }))
+              }
+            >
+              {Object.entries(auditScopeLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </WorkspaceSelect>
+          </WorkspaceField>
+          <WorkspaceField label="Progress percent">
+            <WorkspaceInput
+              type="number"
+              min={0}
+              max={100}
+              value={draft.progressPercent}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  progressPercent: Number(event.target.value || 0),
+                }))
+              }
+            />
+          </WorkspaceField>
+          <WorkspaceField label="Implementation path">
+            <WorkspaceSelect
+              value={draft.implementationRecommendation}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  implementationRecommendation:
+                    event.target.value as ImplementationRecommendation,
+                }))
+              }
+            >
+              {Object.entries(implementationRecommendationLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </WorkspaceSelect>
+          </WorkspaceField>
+          <WorkspaceField label="Implementation notes">
+            <WorkspaceInput
+              value={draft.implementationNotes}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  implementationNotes: event.target.value,
+                }))
+              }
+              placeholder="DIY, hybrid, or done-for-you context"
+            />
+          </WorkspaceField>
+        </div>
+      </WorkspaceSection>
+
+      <WorkspaceSection kicker="Report foundation" title="Shape the title and summary stack">
+        <div className="space-y-5">
+          <WorkspaceField label="Audit title">
+            <WorkspaceInput
+              value={draft.title}
+              onChange={(event) =>
+                setDraft((current) => ({ ...current, title: event.target.value }))
+              }
+              placeholder="Audit title"
+            />
+          </WorkspaceField>
+
+          <div className="grid gap-4 xl:grid-cols-3 xl:items-start">
+            {[
+              {
+                label: "Executive summary",
+                value: draft.executiveSummary,
+                onChange: (value: string) =>
+                  setDraft((current) => ({ ...current, executiveSummary: value })),
+                placeholder: "Executive summary",
+              },
+              {
+                label: "Client-facing summary",
+                value: draft.clientSummary,
+                onChange: (value: string) =>
+                  setDraft((current) => ({ ...current, clientSummary: value })),
+                placeholder: "Client-facing summary",
+              },
+              {
+                label: "Internal consultant summary",
+                value: draft.internalSummary,
+                onChange: (value: string) =>
+                  setDraft((current) => ({ ...current, internalSummary: value })),
+                placeholder: "Internal-only consultant summary",
+              },
+            ].map((field) => (
+              <div
+                key={field.label}
+                className="rounded-[24px] border border-slate-200/70 bg-slate-50/75 p-4"
+              >
+                <WorkspaceField label={field.label}>
+                  <WorkspaceTextarea
+                    rows={6}
+                    className="min-h-[210px]"
+                    value={field.value}
+                    onChange={(event) => field.onChange(event.target.value)}
+                    placeholder={field.placeholder}
+                  />
+                </WorkspaceField>
               </div>
             ))}
           </div>
         </div>
-      ) : null}
+      </WorkspaceSection>
 
-      <div className="grid gap-4 lg:grid-cols-4">
-        <Field label="Audit scope">
-          <select
-            value={draft.scope}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                scope: event.target.value as AuditScope,
-              }))
-            }
-            className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-          >
-            {Object.entries(auditScopeLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="Progress percent">
-          <input
-            type="number"
-            min={0}
-            max={100}
-            value={draft.progressPercent}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                progressPercent: Number(event.target.value || 0),
-              }))
-            }
-            className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-          />
-        </Field>
-
-        <Field label="Implementation path">
-          <select
-            value={draft.implementationRecommendation}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                implementationRecommendation:
-                  event.target.value as ImplementationRecommendation,
-              }))
-            }
-            className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-          >
-            {Object.entries(implementationRecommendationLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="Implementation notes">
-          <input
-            value={draft.implementationNotes}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                implementationNotes: event.target.value,
-              }))
-            }
-            className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-            placeholder="DIY, hybrid, or done-for-you context"
-          />
-        </Field>
-      </div>
-
-      <div className="grid gap-4">
-        <input
-          value={draft.title}
-          onChange={(event) =>
-            setDraft((current) => ({ ...current, title: event.target.value }))
-          }
-          className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-          placeholder="Audit title"
-        />
-        <div className="grid gap-4 lg:grid-cols-3">
-          <textarea
-            value={draft.executiveSummary}
-            onChange={(event) =>
-              setDraft((current) => ({
-                ...current,
-                executiveSummary: event.target.value,
-              }))
-            }
-            rows={5}
-            className="rounded-3xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-            placeholder="Executive summary"
-          />
-          <textarea
-            value={draft.clientSummary}
-            onChange={(event) =>
-              setDraft((current) => ({ ...current, clientSummary: event.target.value }))
-            }
-            rows={5}
-            className="rounded-3xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-            placeholder="Client-facing summary"
-          />
-          <textarea
-            value={draft.internalSummary}
-            onChange={(event) =>
-              setDraft((current) => ({ ...current, internalSummary: event.target.value }))
-            }
-            rows={5}
-            className="rounded-3xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-            placeholder="Internal-only consultant summary"
-          />
+      <WorkspaceSection
+        kicker="Action framing"
+        title="Capture strengths, gaps, next steps, and the action plan"
+        tone="muted"
+      >
+        <div className="grid gap-4 xl:grid-cols-2">
+          {[
+            {
+              label: "Strengths",
+              value: draft.strengthsText,
+              onChange: (value: string) =>
+                setDraft((current) => ({ ...current, strengthsText: value })),
+            },
+            {
+              label: "Improvement opportunities",
+              value: draft.improvementText,
+              onChange: (value: string) =>
+                setDraft((current) => ({ ...current, improvementText: value })),
+            },
+            {
+              label: "Recommended next steps",
+              value: draft.nextStepsText,
+              onChange: (value: string) =>
+                setDraft((current) => ({ ...current, nextStepsText: value })),
+            },
+            {
+              label: "Action plan",
+              value: draft.actionPlanText,
+              onChange: (value: string) =>
+                setDraft((current) => ({ ...current, actionPlanText: value })),
+            },
+          ].map((field) => (
+            <div
+              key={field.label}
+              className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4"
+            >
+              <WorkspaceField label={field.label}>
+                <WorkspaceTextarea
+                  rows={7}
+                  className="min-h-[190px]"
+                  value={field.value}
+                  onChange={(event) => field.onChange(event.target.value)}
+                  placeholder="One item per line"
+                />
+              </WorkspaceField>
+            </div>
+          ))}
         </div>
-      </div>
+      </WorkspaceSection>
 
-      <div className="grid gap-4 lg:grid-cols-4">
-        {[
-          {
-            label: "Strengths",
-            value: draft.strengthsText,
-            onChange: (value: string) =>
-              setDraft((current) => ({ ...current, strengthsText: value })),
-          },
-          {
-            label: "Improvement opportunities",
-            value: draft.improvementText,
-            onChange: (value: string) =>
-              setDraft((current) => ({ ...current, improvementText: value })),
-          },
-          {
-            label: "Recommended next steps",
-            value: draft.nextStepsText,
-            onChange: (value: string) =>
-              setDraft((current) => ({ ...current, nextStepsText: value })),
-          },
-          {
-            label: "Action plan",
-            value: draft.actionPlanText,
-            onChange: (value: string) =>
-              setDraft((current) => ({ ...current, actionPlanText: value })),
-          },
-        ].map((field) => (
-          <div key={field.label} className="rounded-[28px] border border-slate-200/70 bg-white/88 p-4">
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
-              {field.label}
-            </p>
-            <textarea
-              rows={7}
-              value={field.value}
-              onChange={(event) => field.onChange(event.target.value)}
-              className="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-              placeholder="One item per line"
-            />
-          </div>
-        ))}
-      </div>
-
-      <div className="rounded-[30px] border border-slate-200/70 bg-slate-50/80 p-5 sm:p-6">
-        <p className="section-kicker">Category review</p>
-        <Tabs value={activeCategory} onValueChange={(value) => setActiveCategory(value as AuditCategory)} className="mt-5">
-          <TabsList variant="line" className="flex w-full flex-wrap rounded-[22px] bg-white/88 p-2">
+      <WorkspaceSection
+        kicker="Category review"
+        title="Review each category with notes, checklist context, and evidence"
+        tone="muted"
+      >
+        <Tabs
+          value={activeCategory}
+          onValueChange={(value) => setActiveCategory(value as AuditCategory)}
+        >
+          <TabsList
+            variant="line"
+            className="flex w-full flex-wrap justify-start gap-2 rounded-[24px] border border-slate-200/70 bg-white/92 p-2"
+          >
             {draft.sections.map((section) => (
               <TabsTrigger
                 key={section.category}
                 value={section.category}
-                className="rounded-full px-4 py-2 data-active:bg-brand-50 data-active:text-brand-700"
+                className="flex-none rounded-full border border-transparent px-4 py-2 text-xs font-semibold tracking-[0.18em] uppercase text-slate-500 data-active:border-brand-200 data-active:bg-brand-50 data-active:text-brand-700 data-active:after:hidden"
               >
                 {categoryLabelFromKey(section.category)}
               </TabsTrigger>
@@ -526,379 +539,429 @@ export function AuditEditorForm({
           </TabsList>
 
           {draft.sections.map((section) => (
-            <TabsContent key={section.category} value={section.category} className="mt-5">
-              <div className="grid gap-4 lg:grid-cols-[0.24fr_0.76fr]">
+            <TabsContent
+              key={section.category}
+              value={section.category}
+              className="mt-5 space-y-5"
+            >
+              <div className="grid gap-4 xl:grid-cols-[200px_1fr]">
                 <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
-                    Section score
-                  </p>
-                  <input
-                    type="number"
-                    min={0}
-                    max={20}
-                    value={section.score}
-                    onChange={(event) =>
-                      setSectionValue(
-                        section.category,
-                        "score",
-                        Number(event.target.value || 0),
-                      )
-                    }
-                    className="mt-3 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-lg font-semibold text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                  />
+                  <WorkspaceField label="Section score">
+                    <WorkspaceInput
+                      type="number"
+                      min={0}
+                      max={20}
+                      className="text-lg font-semibold"
+                      value={section.score}
+                      onChange={(event) =>
+                        setSectionValue(
+                          section.category,
+                          "score",
+                          Number(event.target.value || 0),
+                        )
+                      }
+                    />
+                  </WorkspaceField>
                 </div>
-
                 <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
-                  <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
-                    Section headline
-                  </p>
-                  <input
-                    value={section.headline}
-                    onChange={(event) =>
-                      setSectionValue(section.category, "headline", event.target.value)
-                    }
-                    className="mt-3 h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                    placeholder="Headline"
-                  />
+                  <WorkspaceField label="Section headline">
+                    <WorkspaceInput
+                      value={section.headline}
+                      onChange={(event) =>
+                        setSectionValue(section.category, "headline", event.target.value)
+                      }
+                      placeholder="Headline"
+                    />
+                  </WorkspaceField>
                 </div>
               </div>
 
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <textarea
-                  rows={6}
-                  value={section.clientFacingNotes}
-                  onChange={(event) =>
-                    setSectionValue(
-                      section.category,
-                      "clientFacingNotes",
-                      event.target.value,
-                    )
-                  }
-                  className="rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                  placeholder="Client-facing notes"
-                />
-                <textarea
-                  rows={6}
-                  value={section.internalNotes}
-                  onChange={(event) =>
-                    setSectionValue(section.category, "internalNotes", event.target.value)
-                  }
-                  className="rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                  placeholder="Internal-only consultant notes"
-                />
+              <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
+                  <WorkspaceField label="Client-facing notes">
+                    <WorkspaceTextarea
+                      rows={6}
+                      className="min-h-[220px]"
+                      value={section.clientFacingNotes}
+                      onChange={(event) =>
+                        setSectionValue(
+                          section.category,
+                          "clientFacingNotes",
+                          event.target.value,
+                        )
+                      }
+                      placeholder="Client-facing notes"
+                    />
+                  </WorkspaceField>
+                </div>
+                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
+                  <WorkspaceField label="Internal consultant notes">
+                    <WorkspaceTextarea
+                      rows={6}
+                      className="min-h-[220px]"
+                      value={section.internalNotes}
+                      onChange={(event) =>
+                        setSectionValue(section.category, "internalNotes", event.target.value)
+                      }
+                      placeholder="Internal-only consultant notes"
+                    />
+                  </WorkspaceField>
+                </div>
               </div>
 
-              <div className="mt-5 grid gap-5 xl:grid-cols-2">
-                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
+              <div className="grid items-start gap-5 xl:grid-cols-[1.02fr_0.98fr]">
+                <div className="rounded-[26px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_24px_48px_-40px_rgba(15,23,42,0.24)]">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
                         Checklist workflow
                       </p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        Track what was checked, what still needs attention, and what to recommend.
+                      <p className="mt-2 text-sm text-slate-600">
+                        Track what was checked and what needs attention.
                       </p>
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      size="icon-sm"
+                      variant="outline"
+                      className="rounded-full"
                       onClick={() => addChecklistItem(section.category)}
-                      className="inline-flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-brand-200 hover:text-brand-700"
                     >
                       <Plus className="size-4" />
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="mt-4 grid gap-3">
-                    {activeChecklistItems.map((item, index) => (
-                      <div
-                        key={`${section.category}-${index}`}
-                        className="rounded-[20px] border border-slate-200/70 bg-slate-50/80 p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <input
-                            value={item.title}
+                    {activeChecklistItems.length ? (
+                      activeChecklistItems.map((item, index) => (
+                        <div
+                          key={`${section.category}-${index}`}
+                          className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4"
+                        >
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                            <WorkspaceInput
+                              value={item.title}
+                              onChange={(event) =>
+                                updateChecklistItem(
+                                  section.category,
+                                  index,
+                                  "title",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Checklist item"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon-lg"
+                              className="shrink-0 rounded-full"
+                              onClick={() => removeChecklistItem(section.category, index)}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </div>
+
+                          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                            <WorkspaceSelect
+                              value={item.status}
+                              onChange={(event) =>
+                                updateChecklistItem(
+                                  section.category,
+                                  index,
+                                  "status",
+                                  event.target.value,
+                                )
+                              }
+                            >
+                              {Object.entries(auditChecklistStatusLabels).map(
+                                ([value, label]) => (
+                                  <option key={value} value={value}>
+                                    {label}
+                                  </option>
+                                ),
+                              )}
+                            </WorkspaceSelect>
+                            <WorkspaceInput
+                              value={item.recommendation}
+                              onChange={(event) =>
+                                updateChecklistItem(
+                                  section.category,
+                                  index,
+                                  "recommendation",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Recommendation"
+                            />
+                          </div>
+
+                          <WorkspaceTextarea
+                            rows={4}
+                            className="mt-4 min-h-[148px]"
+                            value={item.notes}
                             onChange={(event) =>
                               updateChecklistItem(
                                 section.category,
                                 index,
-                                "title",
+                                "notes",
                                 event.target.value,
                               )
                             }
-                            className="h-11 flex-1 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                            placeholder="Checklist item"
+                            placeholder="Consultant notes"
                           />
-                          <button
+                        </div>
+                      ))
+                    ) : (
+                      <WorkspaceEmptyState
+                        title="No checklist items yet"
+                        description="Add the first review item so this section has a concrete consultant workflow."
+                        action={
+                          <Button
                             type="button"
-                            onClick={() => removeChecklistItem(section.category, index)}
-                            className="inline-flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-rose-200 hover:text-rose-700"
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={() => addChecklistItem(section.category)}
                           >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                          <select
-                            value={item.status}
-                            onChange={(event) =>
-                              updateChecklistItem(
-                                section.category,
-                                index,
-                                "status",
-                                event.target.value,
-                              )
-                            }
-                            className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                          >
-                            {Object.entries(auditChecklistStatusLabels).map(([value, label]) => (
-                              <option key={value} value={value}>
-                                {label}
-                              </option>
-                            ))}
-                          </select>
-                          <input
-                            value={item.recommendation}
-                            onChange={(event) =>
-                              updateChecklistItem(
-                                section.category,
-                                index,
-                                "recommendation",
-                                event.target.value,
-                              )
-                            }
-                            className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                            placeholder="Recommendation"
-                          />
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={item.notes}
-                          onChange={(event) =>
-                            updateChecklistItem(
-                              section.category,
-                              index,
-                              "notes",
-                              event.target.value,
-                            )
-                          }
-                          className="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                          placeholder="Section notes"
-                        />
-                      </div>
-                    ))}
+                            Add checklist item
+                          </Button>
+                        }
+                      />
+                    )}
                   </div>
                 </div>
 
-                <div className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4">
+                <div className="rounded-[26px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_24px_48px_-40px_rgba(15,23,42,0.24)]">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
                         Evidence and screenshots
                       </p>
-                      <p className="mt-1 text-sm text-slate-600">
-                        Store before, after, and progress references now so uploads can deepen later without changing the audit model.
+                      <p className="mt-2 text-sm text-slate-600">
+                        Keep proof and references attached to the right section.
                       </p>
                     </div>
-                    <button
+                    <Button
                       type="button"
+                      size="icon-sm"
+                      variant="outline"
+                      className="rounded-full"
                       onClick={() => addEvidence(section.category)}
-                      className="inline-flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:border-brand-200 hover:text-brand-700"
                     >
                       <Plus className="size-4" />
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="mt-4 grid gap-3">
-                    {activeEvidence.map((item, index) => (
-                      <div
-                        key={`${section.category}-evidence-${index}`}
-                        className="rounded-[20px] border border-slate-200/70 bg-slate-50/80 p-4"
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <input
-                            value={item.label}
+                    {activeEvidence.length ? (
+                      activeEvidence.map((item, index) => (
+                        <div
+                          key={`${section.category}-evidence-${index}`}
+                          className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4"
+                        >
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                            <WorkspaceInput
+                              value={item.label}
+                              onChange={(event) =>
+                                updateEvidenceItem(
+                                  section.category,
+                                  index,
+                                  "label",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Evidence label"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon-lg"
+                              className="shrink-0 rounded-full"
+                              onClick={() => removeEvidenceItem(section.category, index)}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </div>
+
+                          <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                            <WorkspaceSelect
+                              value={item.stage}
+                              onChange={(event) =>
+                                updateEvidenceItem(
+                                  section.category,
+                                  index,
+                                  "stage",
+                                  event.target.value,
+                                )
+                              }
+                            >
+                              {Object.entries(evidenceStageLabels).map(([value, label]) => (
+                                <option key={value} value={value}>
+                                  {label}
+                                </option>
+                              ))}
+                            </WorkspaceSelect>
+                            <WorkspaceInput
+                              value={item.assetUrl}
+                              onChange={(event) =>
+                                updateEvidenceItem(
+                                  section.category,
+                                  index,
+                                  "assetUrl",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="Screenshot URL or reference path"
+                            />
+                          </div>
+
+                          <WorkspaceTextarea
+                            rows={4}
+                            className="mt-4 min-h-[148px]"
+                            value={item.notes}
                             onChange={(event) =>
                               updateEvidenceItem(
                                 section.category,
                                 index,
-                                "label",
+                                "notes",
                                 event.target.value,
                               )
                             }
-                            className="h-11 flex-1 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                            placeholder="Evidence label"
+                            placeholder="Why this reference matters"
                           />
-                          <button
+
+                          <label className="mt-4 flex items-center gap-3 rounded-[18px] border border-slate-200/70 bg-white/90 px-4 py-3 text-sm text-slate-700">
+                            <input
+                              type="checkbox"
+                              checked={item.clientVisible}
+                              onChange={(event) =>
+                                updateEvidenceItem(
+                                  section.category,
+                                  index,
+                                  "clientVisible",
+                                  event.target.checked,
+                                )
+                              }
+                              className="size-4 rounded border-slate-300 text-brand-500 focus:ring-brand-300"
+                            />
+                            Client can see this reference
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <WorkspaceEmptyState
+                        title="No evidence references yet"
+                        description="Add a before, after, progress, or reference item so this panel feels intentional."
+                        action={
+                          <Button
                             type="button"
-                            onClick={() => removeEvidenceItem(section.category, index)}
-                            className="inline-flex size-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-rose-200 hover:text-rose-700"
+                            variant="outline"
+                            className="rounded-full"
+                            onClick={() => addEvidence(section.category)}
                           >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                          <select
-                            value={item.stage}
-                            onChange={(event) =>
-                              updateEvidenceItem(
-                                section.category,
-                                index,
-                                "stage",
-                                event.target.value,
-                              )
-                            }
-                            className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                          >
-                            {Object.entries(evidenceStageLabels).map(([value, label]) => (
-                              <option key={value} value={value}>
-                                {label}
-                              </option>
-                            ))}
-                          </select>
-                          <input
-                            value={item.assetUrl}
-                            onChange={(event) =>
-                              updateEvidenceItem(
-                                section.category,
-                                index,
-                                "assetUrl",
-                                event.target.value,
-                              )
-                            }
-                            className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                            placeholder="Screenshot URL or reference path"
-                          />
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={item.notes}
-                          onChange={(event) =>
-                            updateEvidenceItem(
-                              section.category,
-                              index,
-                              "notes",
-                              event.target.value,
-                            )
-                          }
-                          className="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-                          placeholder="Why this reference matters"
-                        />
-                        <label className="mt-3 flex items-center gap-3 text-sm text-slate-700">
-                          <input
-                            type="checkbox"
-                            checked={item.clientVisible}
-                            onChange={(event) =>
-                              updateEvidenceItem(
-                                section.category,
-                                index,
-                                "clientVisible",
-                                event.target.checked,
-                              )
-                            }
-                            className="size-4 rounded border-slate-300 text-brand-500 focus:ring-brand-300"
-                          />
-                          Client can see this reference
-                        </label>
-                      </div>
-                    ))}
+                            Add evidence item
+                          </Button>
+                        }
+                      />
+                    )}
                   </div>
                 </div>
               </div>
             </TabsContent>
           ))}
         </Tabs>
-      </div>
+      </WorkspaceSection>
 
-      <div className="rounded-[28px] border border-slate-200/70 bg-slate-50/80 p-5">
-        <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
-          Recommended service plans
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          {availablePlans.map((plan) => {
-            const selected = draft.selectedPlanSlugs.includes(plan.slug);
+      <WorkspaceSection
+        kicker="Recommended service plans"
+        title="Align recommendations with the visible gaps"
+      >
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-3">
+            {availablePlans.map((plan) => {
+              const selected = draft.selectedPlanSlugs.includes(plan.slug);
 
-            return (
-              <button
-                key={plan.slug}
-                type="button"
-                onClick={() => togglePlan(plan.slug)}
-                className={`rounded-full border px-4 py-2 text-sm transition ${
-                  selected
-                    ? "border-brand-300 bg-brand-50 text-brand-700"
-                    : "border-slate-200 bg-white text-slate-700 hover:border-brand-200"
-                }`}
-              >
-                {plan.name}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={plan.slug}
+                  type="button"
+                  onClick={() => togglePlan(plan.slug)}
+                  className={cn(
+                    "rounded-full border px-4 py-2 text-sm font-semibold transition",
+                    selected
+                      ? "border-brand-200 bg-brand-50 text-brand-700 shadow-[0_16px_36px_-26px_rgba(47,111,228,0.45)]"
+                      : "border-slate-200/80 bg-white/95 text-slate-700 hover:border-brand-200 hover:text-brand-700",
+                  )}
+                >
+                  {plan.name}
+                </button>
+              );
+            })}
+          </div>
+
+          <WorkspaceField label="Recommendation rationale">
+            <WorkspaceTextarea
+              rows={4}
+              className="min-h-[164px]"
+              value={draft.serviceRecommendationRationale}
+              onChange={(event) =>
+                setDraft((current) => ({
+                  ...current,
+                  serviceRecommendationRationale: event.target.value,
+                }))
+              }
+              placeholder="Why do these recommendations fit this business?"
+            />
+          </WorkspaceField>
         </div>
-        <textarea
-          rows={4}
-          value={draft.serviceRecommendationRationale}
-          onChange={(event) =>
-            setDraft((current) => ({
-              ...current,
-              serviceRecommendationRationale: event.target.value,
-            }))
-          }
-          className="mt-4 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
-          placeholder="Why do these recommendations fit this business?"
-        />
-      </div>
+      </WorkspaceSection>
 
-      <div className="flex flex-wrap gap-3">
-        <button
+      <WorkspaceActionFooter
+        title="Finalization controls"
+        description="Save the working draft, mark it ready, or publish the client-safe report when the review is complete."
+      >
+        <Button
           type="button"
+          variant="outline"
+          size="lg"
           onClick={() => submit("save")}
           disabled={isPending}
-          className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 transition hover:border-brand-200 disabled:cursor-not-allowed disabled:opacity-70"
+          className="rounded-full px-5"
         >
-          Save draft
-        </button>
-        <button
+          {isPending ? "Working..." : "Save draft"}
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
+          size="lg"
           onClick={() => submit("ready")}
           disabled={isPending}
-          className="inline-flex h-11 items-center justify-center rounded-full border border-brand-200 bg-brand-50 px-5 text-sm font-semibold text-brand-700 transition hover:bg-brand-100 disabled:cursor-not-allowed disabled:opacity-70"
+          className="rounded-full border border-brand-200 bg-brand-50 px-5 text-brand-700 hover:bg-brand-100"
         >
           Mark ready
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          size="lg"
           onClick={() => submit("publish")}
           disabled={isPending}
-          className="inline-flex h-11 items-center justify-center rounded-full bg-brand-500 px-5 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
+          className="rounded-full px-5"
         >
           Publish audit
-        </button>
+        </Button>
         {canUnpublish ? (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={() => submit("unpublish")}
             disabled={isPending}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-amber-200 bg-amber-50 px-5 text-sm font-semibold text-amber-700 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-full border-amber-200 bg-amber-50 px-5 text-amber-700 hover:bg-amber-100"
           >
             Return to internal review
-          </button>
+          </Button>
         ) : null}
-      </div>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
-        {label}
-      </p>
-      {children}
+      </WorkspaceActionFooter>
     </div>
   );
 }

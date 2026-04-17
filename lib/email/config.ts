@@ -42,3 +42,38 @@ export function getEmailRuntimeConfig() {
     replyTo: parsed.RESEND_REPLY_TO,
   };
 }
+
+export function getEmailDeliverySummary() {
+  const config = getEmailRuntimeConfig();
+
+  if (config.mode === "resend") {
+    return {
+      mode: "resend" as const,
+      label: "Live email delivery",
+      description:
+        "Messages are being rendered and sent through Resend with the configured sender identity.",
+      canSend: true,
+      from: config.from,
+    };
+  }
+
+  if (config.mode === "log") {
+    return {
+      mode: "log" as const,
+      label: "Local dev log mode",
+      description:
+        "Email actions stay usable, but messages are written to the server log instead of being delivered to a real inbox.",
+      canSend: true,
+      from: config.from,
+    };
+  }
+
+  return {
+    mode: "disabled" as const,
+    label: "Email delivery unavailable",
+    description:
+      "Transactional email is disabled because Resend is not fully configured for this environment yet.",
+    canSend: false,
+    from: config.from,
+  };
+}

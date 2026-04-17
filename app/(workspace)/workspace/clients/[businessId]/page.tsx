@@ -19,6 +19,7 @@ import {
 } from "@/lib/display";
 import { asStringArray } from "@/lib/text";
 import { resolveServicePlanDefinition } from "@/lib/plan-catalog";
+import { getEmailDeliverySummary } from "@/lib/email/config";
 
 type WorkspaceClientDetailPageProps = {
   params: Promise<{
@@ -39,6 +40,7 @@ export default async function WorkspaceClientDetailPage({
   const { business, latestSubmission, latestAudit, latestPublishedAudit, scoreTrend } = detail;
   const latestSubmissionId = latestSubmission?.id ?? null;
   const notificationHistory = business.notificationEvents.slice(0, 6);
+  const emailDeliverySummary = getEmailDeliverySummary();
   const visibleRecommendations =
     latestAudit?.planRecommendations.length
       ? latestAudit.planRecommendations
@@ -185,13 +187,18 @@ export default async function WorkspaceClientDetailPage({
           <WorkspaceEmailActions
             businessId={business.id}
             submissionId={latestSubmissionId}
+            deliverySummary={emailDeliverySummary}
             latestEvents={notificationHistory.map((event) => ({
               id: event.id,
               type: event.type,
               status: event.status,
               subject: event.subject,
+              recipient: event.recipient,
               createdAt: event.createdAt,
               processedAt: event.processedAt,
+              errorMessage: event.errorMessage,
+              providerMessageId: event.providerMessageId,
+              channel: event.channel,
             }))}
             hasAudit={Boolean(latestAudit)}
             hasComprehensiveAudit={latestAudit?.scope === "COMPREHENSIVE"}

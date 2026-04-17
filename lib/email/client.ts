@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { render, toPlainText } from "@react-email/render";
 import { Resend } from "resend";
 
 import { getEmailRuntimeConfig } from "@/lib/email/config";
@@ -60,12 +61,15 @@ export async function sendTransactionalEmail(
   }
 
   try {
+    const html = await render(input.react);
+    const text = toPlainText(html);
     const resend = getResendClient(config.resendApiKey);
     const response = await resend.emails.send({
       from: config.from,
       to: input.to,
       subject: input.subject,
-      react: input.react,
+      html,
+      text,
       replyTo: input.replyTo ?? config.replyTo,
     });
 
