@@ -4,7 +4,7 @@ import { VirturaLogo } from "@/components/brand/virtura-logo";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-slate-200/70 bg-white/76 backdrop-blur-xl">
+    <footer className="border-t border-slate-200/70 bg-white/82 backdrop-blur-xl">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-12 lg:grid-cols-[1.15fr_0.85fr_0.8fr] lg:px-8">
         <div className="space-y-5">
           <VirturaLogo />
@@ -53,7 +53,7 @@ export function SiteFooter() {
             <Link href="/terms" className="hover:text-slate-950">
               Terms
             </Link>
-            <p className="rounded-[24px] border border-slate-200/70 bg-white/85 px-4 py-4 text-sm leading-7 text-slate-600">
+            <p className="rounded-[24px] border border-slate-200/70 bg-slate-50/72 px-4 py-4 text-sm leading-7 text-slate-600">
               Service plans are recommendation-driven and may require consultation
               for custom scope.
             </p>

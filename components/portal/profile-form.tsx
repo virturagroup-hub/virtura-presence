@@ -7,9 +7,13 @@ import { toast } from "sonner";
 
 import { updatePortalProfileAction } from "@/lib/actions/portal";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  WorkspaceField,
+  WorkspaceInput,
+  WorkspaceSection,
+  WorkspaceSelect,
+  WorkspaceTextarea,
+} from "@/components/workspace/workspace-primitives";
 
 type PortalProfileFormProps = {
   businessId: string;
@@ -95,107 +99,94 @@ export function PortalProfileForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="surface-card p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="section-kicker">Company profile</p>
-          <h2 className="mt-4 font-heading text-3xl font-semibold text-slate-950">
-            Keep your business details current
-          </h2>
-        </div>
-        <Button type="submit" className="rounded-full px-5" disabled={isPending}>
-          {isPending ? "Saving..." : "Save profile"}
-        </Button>
-      </div>
-
-      <div className="mt-6 grid gap-5 lg:grid-cols-2">
-        <div className="space-y-5">
-          <div className="grid gap-5 sm:grid-cols-2">
+    <form onSubmit={handleSubmit}>
+      <WorkspaceSection
+        kicker="Company profile"
+        title="Keep your business details current"
+        description="Update the business profile consultants and future reports rely on so the portal stays accurate over time."
+        actions={
+          <Button type="submit" className="rounded-full px-5" disabled={isPending}>
+            {isPending ? "Saving..." : "Save profile"}
+          </Button>
+        }
+      >
+        <div className="grid gap-5 xl:grid-cols-2">
+          <div className="space-y-5">
+            <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Your name">
-              <Input
+              <WorkspaceInput
                 value={values.accountName}
                 onChange={(event) => updateValue("accountName", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Business name">
-              <Input
+              <WorkspaceInput
                 value={values.businessName}
                 onChange={(event) => updateValue("businessName", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Owner / contact name">
-              <Input
+              <WorkspaceInput
                 value={values.ownerName}
                 onChange={(event) => updateValue("ownerName", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Business category">
-              <Input
+              <WorkspaceInput
                 value={values.businessCategory}
                 onChange={(event) => updateValue("businessCategory", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="City">
-              <Input
+              <WorkspaceInput
                 value={values.city}
                 onChange={(event) => updateValue("city", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="State">
-              <Input
+              <WorkspaceInput
                 value={values.state}
                 onChange={(event) => updateValue("state", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
           </div>
 
           <Field label="Primary service area">
-            <Input
+            <WorkspaceInput
               value={values.serviceArea}
               onChange={(event) => updateValue("serviceArea", event.target.value)}
-              className="h-12 rounded-2xl"
             />
           </Field>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Contact email">
-              <Input
+              <WorkspaceInput
                 type="email"
                 value={values.contactEmail}
                 onChange={(event) => updateValue("contactEmail", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Phone">
-              <Input
+              <WorkspaceInput
                 value={values.phone}
                 onChange={(event) => updateValue("phone", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
           </div>
 
           <div className="grid gap-5">
             <Field label="Website">
-              <Input
+              <WorkspaceInput
                 value={values.websiteUrl}
                 onChange={(event) => updateValue("websiteUrl", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Google Business Profile">
-              <Input
+              <WorkspaceInput
                 value={values.googleBusinessProfileUrl}
                 onChange={(event) =>
                   updateValue("googleBusinessProfileUrl", event.target.value)
                 }
-                className="h-12 rounded-2xl"
               />
             </Field>
           </div>
@@ -204,66 +195,59 @@ export function PortalProfileForm({
         <div className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Facebook">
-              <Input
+              <WorkspaceInput
                 value={values.facebookUrl}
                 onChange={(event) => updateValue("facebookUrl", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Instagram">
-              <Input
+              <WorkspaceInput
                 value={values.instagramUrl}
                 onChange={(event) => updateValue("instagramUrl", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="LinkedIn">
-              <Input
+              <WorkspaceInput
                 value={values.linkedinUrl}
                 onChange={(event) => updateValue("linkedinUrl", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="YouTube">
-              <Input
+              <WorkspaceInput
                 value={values.youtubeUrl}
                 onChange={(event) => updateValue("youtubeUrl", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
           </div>
 
           <Field label="Nextdoor">
-            <Input
+            <WorkspaceInput
               value={values.nextdoorUrl}
               onChange={(event) => updateValue("nextdoorUrl", event.target.value)}
-              className="h-12 rounded-2xl"
             />
           </Field>
 
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Current review count">
-              <Input
+              <WorkspaceInput
                 type="number"
                 min={0}
                 value={values.reviewCount}
                 onChange={(event) => updateValue("reviewCount", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Average rating">
-              <Input
+              <WorkspaceInput
                 type="number"
                 step="0.1"
                 min={0}
                 max={5}
                 value={values.averageRating}
                 onChange={(event) => updateValue("averageRating", event.target.value)}
-                className="h-12 rounded-2xl"
               />
             </Field>
             <Field label="Review request process">
-              <select
+              <WorkspaceSelect
                 value={values.reviewRequestCadence}
                 onChange={(event) =>
                   updateValue(
@@ -271,16 +255,15 @@ export function PortalProfileForm({
                     event.target.value as ReviewRequestCadence,
                   )
                 }
-                className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
               >
                 <option value="NEVER">Never ask</option>
                 <option value="RARELY">Rarely ask</option>
                 <option value="SOMETIMES">Sometimes ask</option>
                 <option value="REGULARLY">Regularly ask</option>
-              </select>
+              </WorkspaceSelect>
             </Field>
             <Field label="Advertising">
-              <select
+              <WorkspaceSelect
                 value={values.runsAdvertising}
                 onChange={(event) =>
                   updateValue(
@@ -288,35 +271,33 @@ export function PortalProfileForm({
                     event.target.value as AdvertisingCadence,
                   )
                 }
-                className="h-12 rounded-2xl border border-slate-200 bg-white/90 px-4 text-sm text-slate-900 outline-none ring-brand-200 transition focus:border-brand-300 focus:ring-2"
               >
                 <option value="NO">No</option>
                 <option value="OCCASIONALLY">Occasionally</option>
                 <option value="YES">Yes</option>
-              </select>
+              </WorkspaceSelect>
             </Field>
           </div>
 
           <Field label="Business description or notes">
-            <Textarea
+            <WorkspaceTextarea
               rows={5}
               value={values.businessDescription}
               onChange={(event) => updateValue("businessDescription", event.target.value)}
-              className="rounded-3xl"
             />
           </Field>
 
           <Field label="Major goals">
-            <Textarea
+            <WorkspaceTextarea
               rows={4}
               value={values.goalsText}
               onChange={(event) => updateValue("goalsText", event.target.value)}
-              className="rounded-3xl"
               placeholder="One goal per line"
             />
           </Field>
         </div>
-      </div>
+        </div>
+      </WorkspaceSection>
     </form>
   );
 }
@@ -328,10 +309,5 @@ function Field({
   label: string;
   children: ReactNode;
 }) {
-  return (
-    <div className="space-y-3">
-      <Label>{label}</Label>
-      {children}
-    </div>
-  );
+  return <WorkspaceField label={label}>{children}</WorkspaceField>;
 }

@@ -252,7 +252,7 @@ export function PresenceCheckFlow() {
             ].map((item) => (
               <div
                 key={item}
-                className="rounded-3xl border border-slate-200/70 bg-white/85 px-4 py-3 text-sm text-slate-700"
+                className="rounded-3xl border border-slate-200/70 bg-slate-50/72 px-4 py-3 text-sm leading-7 text-slate-700"
               >
                 {item}
               </div>
@@ -264,7 +264,7 @@ export function PresenceCheckFlow() {
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
             What happens next
           </p>
-          <div className="mt-4 rounded-3xl border border-brand-100 bg-brand-50/70 p-4 text-sm leading-7 text-brand-800">
+          <div className="mt-4 rounded-3xl border border-cyan-100 bg-cyan-50/62 p-4 text-sm leading-7 text-cyan-900">
             <Sparkles className="size-4" />
             <p className="mt-3">
               Your quick score is generated immediately after submission, then you
@@ -304,7 +304,7 @@ export function PresenceCheckFlow() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.2 }}
-            className="mt-8 space-y-6"
+            className="mt-8 space-y-6 rounded-[28px] border border-slate-200/70 bg-slate-50/55 p-4 sm:p-5"
           >
             {stepIndex === 0 ? (
               <div className="grid gap-5 sm:grid-cols-2">

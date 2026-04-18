@@ -1,0 +1,114 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "Virtura Group mark Virtura Group Virtura Presence" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "Virtura Group mark" [ref=e7]
+          - generic [ref=e8]:
+            - generic [ref=e9]: Virtura Group
+            - generic [ref=e10]: Virtura Presence
+        - navigation [ref=e11]:
+          - link "How it Works" [ref=e12] [cursor=pointer]:
+            - /url: /#how-it-works
+          - link "Plans" [ref=e13] [cursor=pointer]:
+            - /url: /#service-plans
+          - link "FAQ" [ref=e14] [cursor=pointer]:
+            - /url: /#faq
+          - link "Client Portal" [ref=e15] [cursor=pointer]:
+            - /url: /portal
+        - generic [ref=e16]:
+          - link "Workspace" [ref=e17] [cursor=pointer]:
+            - /url: /workspace
+          - link "Start Free Presence Check" [ref=e18] [cursor=pointer]:
+            - /url: /presence-check
+    - main [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: Free presence check
+          - heading "A guided first-pass review for how your business shows up online." [level=2] [ref=e23]
+          - paragraph [ref=e24]: Answer a focused set of questions, then receive an honest preview of what looks strong and what likely deserves attention next.
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]:
+              - generic [ref=e29]: Guided onboarding
+              - heading "Honest inputs make the score more believable." [level=2] [ref=e30]
+              - paragraph [ref=e31]: This check works best when the answers reflect the real state of the business today. Missing fundamentals should read like missing fundamentals, not polite middle-of-the-road placeholders.
+              - generic [ref=e32]:
+                - generic [ref=e33]: Specific answer states instead of fuzzy yes or no inputs
+                - generic [ref=e34]: Constructive scoring that does not flatter weak foundations
+                - generic [ref=e35]: A cleaner handoff into the deeper consultant review when you request it
+            - generic [ref=e36]:
+              - paragraph [ref=e37]: What happens next
+              - generic [ref=e38]:
+                - img [ref=e39]
+                - paragraph [ref=e42]: Your quick score is generated immediately after submission, then you can choose where to send the free report and whether you want portal access or a deeper consultant-led review.
+          - generic [ref=e43]:
+            - generic [ref=e44]:
+              - generic [ref=e45]:
+                - generic [ref=e46]: Step 1 of 5
+                - generic [ref=e47]: 20%
+              - progressbar [ref=e48]
+              - generic [ref=e50]:
+                - heading "Business basics" [level=2] [ref=e51]
+                - paragraph [ref=e52]: Start with who you are and where the free report should go once you choose to send it.
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - generic [ref=e56]: Business name
+                - textbox "Business name" [ref=e57]
+              - generic [ref=e58]:
+                - generic [ref=e59]: Owner / contact name
+                - textbox "Owner / contact name" [ref=e60]
+              - generic [ref=e61]:
+                - generic [ref=e62]: Email
+                - textbox "Email" [ref=e63]
+              - generic [ref=e64]:
+                - generic [ref=e65]: Phone
+                - textbox "Phone" [ref=e66]
+            - generic [ref=e67]:
+              - button "Back" [disabled]:
+                - img
+                - text: Back
+              - button "Continue" [ref=e68]:
+                - text: Continue
+                - img
+    - contentinfo [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - link "Virtura Group mark Virtura Group Virtura Presence" [ref=e72] [cursor=pointer]:
+            - /url: /
+            - img "Virtura Group mark" [ref=e74]
+            - generic [ref=e75]:
+              - generic [ref=e76]: Virtura Group
+              - generic [ref=e77]: Virtura Presence
+          - paragraph [ref=e78]: Virtura Presence is part of Virtura Group and is built for honest, practical online presence reviews without scare tactics or pressure-heavy sales language.
+          - generic [ref=e79]:
+            - paragraph [ref=e80]:
+              - text: "Contact:"
+              - link "hello@virtura.us" [ref=e81] [cursor=pointer]:
+                - /url: mailto:hello@virtura.us
+            - paragraph [ref=e82]: Copyright 2026 Virtura Group. All rights reserved.
+        - generic [ref=e83]:
+          - paragraph [ref=e84]: Navigation
+          - generic [ref=e85]:
+            - link "Home" [ref=e86] [cursor=pointer]:
+              - /url: /
+            - link "Free Presence Check" [ref=e87] [cursor=pointer]:
+              - /url: /presence-check
+            - link "Client Portal" [ref=e88] [cursor=pointer]:
+              - /url: /portal
+            - link "Consultant Workspace" [ref=e89] [cursor=pointer]:
+              - /url: /workspace
+            - link "Sign in" [ref=e90] [cursor=pointer]:
+              - /url: /sign-in
+        - generic [ref=e91]:
+          - paragraph [ref=e92]: Legal
+          - generic [ref=e93]:
+            - link "Privacy" [ref=e94] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms" [ref=e95] [cursor=pointer]:
+              - /url: /terms
+            - paragraph [ref=e96]: Service plans are recommendation-driven and may require consultation for custom scope.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e102] [cursor=pointer]:
+    - img [ref=e103]

@@ -23,7 +23,6 @@ import {
 import { joinLineItems } from "@/lib/text";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   WorkspaceActionFooter,
   WorkspaceChip,
@@ -349,7 +348,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
         title="Align scope, progress, and implementation direction"
         tone="muted"
       >
-        <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2">
           <div className={insetPanelClass}>
             <WorkspaceField label="Audit scope" helper="Choose whether this is a free review or a deeper comprehensive audit.">
               <WorkspaceSelect
@@ -434,7 +433,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
             />
           </WorkspaceField>
 
-          <div className="grid gap-4 xl:grid-cols-3 xl:items-start">
+          <div className="grid gap-4 2xl:grid-cols-3 2xl:items-start">
             {[
               {
                 label: "Executive summary",
@@ -482,7 +481,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
         title="Capture strengths, gaps, next steps, and the action plan"
         tone="muted"
       >
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 2xl:grid-cols-2">
           {[
             {
               label: "Strengths",
@@ -532,29 +531,40 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
         title="Review each category with notes, checklist context, and evidence"
         tone="muted"
       >
-        <Tabs
-          value={activeCategory}
-          onValueChange={(value) => setActiveCategory(value as AuditCategory)}
+        <div
+          role="tablist"
+          aria-label="Audit categories"
+          className="grid gap-2 rounded-[24px] border border-slate-200/70 bg-white/92 p-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5"
         >
-          <TabsList
-            variant="line"
-            className="grid w-full gap-2 rounded-[24px] border border-slate-200/70 bg-white/92 p-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5"
-          >
-            {draft.sections.map((section) => (
-              <TabsTrigger
+          {draft.sections.map((section) => {
+            const isActive = section.category === activeCategory;
+
+            return (
+              <button
                 key={section.category}
-                value={section.category}
-                className="min-h-[52px] justify-start rounded-[18px] border border-transparent px-4 py-3 text-left text-[11px] font-semibold leading-5 tracking-[0.18em] whitespace-normal uppercase text-slate-500 data-active:border-brand-200 data-active:bg-brand-50 data-active:text-brand-700 data-active:after:hidden"
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveCategory(section.category)}
+                className={cn(
+                  "min-h-[52px] rounded-[18px] border px-4 py-3 text-left text-[10px] font-semibold leading-5 tracking-[0.12em] uppercase transition",
+                  isActive
+                    ? "border-brand-200 bg-brand-50 text-brand-700 shadow-[0_18px_38px_-28px_rgba(47,111,228,0.35)]"
+                    : "border-transparent bg-white/90 text-slate-500 hover:border-brand-100 hover:text-slate-700",
+                )}
               >
                 {categoryLabelFromKey(section.category)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+              </button>
+            );
+          })}
+        </div>
 
-          {draft.sections.map((section) => (
-            <TabsContent
+        {draft.sections
+          .filter((section) => section.category === activeCategory)
+          .map((section) => (
+            <div
               key={section.category}
-              value={section.category}
+              role="tabpanel"
               className="mt-6 space-y-5"
             >
               <div className="grid gap-4 lg:grid-cols-[180px_minmax(0,1fr)] 2xl:grid-cols-[200px_minmax(0,1fr)]">
@@ -589,7 +599,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                 </div>
               </div>
 
-              <div className="grid gap-4 xl:grid-cols-2 xl:items-start">
+              <div className="grid gap-4 2xl:grid-cols-2 2xl:items-start">
                 <div className={cn(insetPanelClass, "h-full")}>
                   <WorkspaceField label="Client-facing notes" helper="What the client should read in the published report for this category.">
                     <WorkspaceTextarea
@@ -622,7 +632,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                 </div>
               </div>
 
-              <div className="grid items-start gap-5 2xl:grid-cols-[1.08fr_0.92fr]">
+              <div className="grid items-start gap-5 min-[1700px]:grid-cols-[1.08fr_0.92fr]">
                 <div className={insetPanelClass}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
@@ -891,9 +901,8 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                   </div>
                 </div>
               </div>
-            </TabsContent>
+            </div>
           ))}
-        </Tabs>
       </WorkspaceSection>
 
       <WorkspaceSection

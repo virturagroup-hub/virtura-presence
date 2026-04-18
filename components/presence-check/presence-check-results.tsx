@@ -163,7 +163,7 @@ export function PresenceCheckResults() {
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
-        <div className="surface-card space-y-5 p-6">
+        <div className="surface-card space-y-5 p-6 sm:p-7">
           <span className="section-kicker">Free report delivery</span>
           <h2 className="font-heading text-3xl font-semibold text-slate-950">
             Choose where the free report should go, then decide whether you want portal access.
@@ -173,7 +173,7 @@ export function PresenceCheckResults() {
             to the right inbox and sets up the correct next step for portal access.
           </p>
 
-          <div className="rounded-[28px] border border-brand-100 bg-brand-50/70 p-5">
+          <div className="rounded-[28px] border border-brand-100/80 bg-brand-50/62 p-5">
             <p className="text-xs font-semibold tracking-[0.22em] text-brand-700 uppercase">
               Report destination
             </p>
@@ -213,7 +213,7 @@ export function PresenceCheckResults() {
                 <Link href={primaryAction.href}>{primaryAction.label}</Link>
               </Button>
             ) : (
-              <div className="rounded-3xl border border-slate-200/70 bg-slate-50/85 px-4 py-3 text-sm text-slate-600">
+              <div className="rounded-3xl border border-slate-200/70 bg-slate-50/72 px-4 py-3 text-sm leading-7 text-slate-600">
                 Send the free report first, then the correct portal action will appear here.
               </div>
             )}
@@ -235,7 +235,7 @@ export function PresenceCheckResults() {
         </div>
 
         <div className="space-y-6">
-          <div className="surface-card p-6">
+          <div className="surface-card p-6 sm:p-7">
             <span className="section-kicker">Suggested next steps</span>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               These recommendations are suggestions, not automatic requests. If you
@@ -255,7 +255,7 @@ export function PresenceCheckResults() {
             </div>
           </div>
 
-          <div className="surface-card p-6">
+          <div className="surface-card p-6 sm:p-7">
             <span className="section-kicker">Pricing at a glance</span>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               Virtura Presence still starts with a free check, but pricing should not
@@ -266,7 +266,7 @@ export function PresenceCheckResults() {
               {recommendedPlans.map((plan) => (
                 <div
                   key={`${plan.slug}-price`}
-                  className="rounded-[24px] border border-slate-200/70 bg-white/88 px-4 py-4"
+                  className="rounded-[24px] border border-slate-200/70 bg-slate-50/72 px-4 py-4"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>

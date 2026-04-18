@@ -43,7 +43,7 @@ export function ServicePlanDetailDialog({
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[30px] border border-white/70 bg-white/95 p-0 backdrop-blur-2xl sm:max-w-4xl">
+      <DialogContent className="max-h-[calc(100vh-1.5rem)] overflow-hidden rounded-[30px] border border-slate-200/70 bg-white/97 p-0 backdrop-blur-2xl sm:max-w-4xl">
         <div className="relative h-full overflow-y-auto">
           <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${plan.accentColor}`} />
 
@@ -65,7 +65,7 @@ export function ServicePlanDetailDialog({
                   <DialogDescription className="text-sm leading-7 text-slate-600 sm:text-base">
                     {plan.summary}
                   </DialogDescription>
-                  <div className="rounded-[28px] border border-brand-100 bg-brand-50/80 p-5">
+                  <div className="rounded-[28px] border border-brand-100/80 bg-brand-50/65 p-5">
                     <p className="text-xs font-semibold tracking-[0.22em] text-brand-700 uppercase">
                       Public pricing
                     </p>
@@ -83,7 +83,7 @@ export function ServicePlanDetailDialog({
                   </div>
                 </div>
 
-                <div className="rounded-[28px] border border-slate-200/70 bg-slate-50/80 p-5">
+                <div className="rounded-[28px] border border-slate-200/70 bg-slate-50/72 p-5">
                   <p className="text-xs font-semibold tracking-[0.22em] text-slate-500 uppercase">
                     Ideal for
                   </p>
@@ -96,7 +96,7 @@ export function ServicePlanDetailDialog({
                       {plan.outcomes.map((outcome) => (
                         <span
                           key={outcome}
-                          className="rounded-full border border-white/80 bg-white/92 px-3 py-2 text-xs font-medium text-slate-700 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.45)]"
+                          className="rounded-full border border-slate-200/80 bg-white/94 px-3 py-2 text-xs font-medium text-slate-700 shadow-[0_10px_24px_-20px_rgba(15,23,42,0.28)]"
                         >
                           {outcome}
                         </span>
@@ -124,7 +124,7 @@ export function ServicePlanDetailDialog({
                   {plan.pricingDetails.map((detail) => (
                     <div
                       key={detail}
-                      className="rounded-[24px] border border-slate-200/70 bg-white/92 px-4 py-4 text-sm leading-7 text-slate-700"
+                      className="rounded-[24px] border border-slate-200/70 bg-white/94 px-4 py-4 text-sm leading-7 text-slate-700"
                     >
                       {detail}
                     </div>
@@ -148,7 +148,7 @@ export function ServicePlanDetailDialog({
                   {plan.deliverables.map((deliverable) => (
                     <div
                       key={deliverable}
-                      className="rounded-[24px] border border-slate-200/70 bg-white/92 px-4 py-4 text-sm leading-7 text-slate-700"
+                      className="rounded-[24px] border border-slate-200/70 bg-white/94 px-4 py-4 text-sm leading-7 text-slate-700"
                     >
                       {deliverable}
                     </div>
@@ -173,7 +173,7 @@ export function ServicePlanDetailDialog({
                 {plan.scopeNotes.map((note) => (
                   <div
                     key={note}
-                    className="rounded-[24px] border border-slate-200/70 bg-white/92 px-4 py-4 text-sm leading-7 text-slate-700"
+                    className="rounded-[24px] border border-slate-200/70 bg-white/94 px-4 py-4 text-sm leading-7 text-slate-700"
                   >
                     {note}
                   </div>
@@ -182,7 +182,7 @@ export function ServicePlanDetailDialog({
             </section>
           </div>
 
-          <div className="border-t border-slate-200/70 bg-slate-50/85 px-6 py-4 sm:px-8">
+          <div className="border-t border-slate-200/70 bg-slate-50/72 px-6 py-4 sm:px-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               {mode === "marketing" ? (
                 <Button asChild className="rounded-full px-5">

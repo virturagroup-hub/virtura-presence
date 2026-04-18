@@ -1,0 +1,303 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7]:
+      - img [ref=e8]
+    - generic [ref=e11]:
+      - button "Open issues overlay" [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: "0"
+          - generic [ref=e15]: "1"
+        - generic [ref=e16]: Issue
+      - button "Collapse issues badge" [ref=e17]:
+        - img [ref=e18]
+  - generic [ref=e20]:
+    - banner [ref=e21]:
+      - generic [ref=e22]:
+        - link "Virtura Group mark Virtura Group Virtura Presence" [ref=e23] [cursor=pointer]:
+          - /url: /
+          - img "Virtura Group mark" [ref=e25]
+          - generic [ref=e26]:
+            - generic [ref=e27]: Virtura Group
+            - generic [ref=e28]: Virtura Presence
+        - navigation [ref=e29]:
+          - link "How it Works" [ref=e30] [cursor=pointer]:
+            - /url: /#how-it-works
+          - link "Plans" [ref=e31] [cursor=pointer]:
+            - /url: /#service-plans
+          - link "FAQ" [ref=e32] [cursor=pointer]:
+            - /url: /#faq
+          - link "Client Portal" [ref=e33] [cursor=pointer]:
+            - /url: /portal
+        - generic [ref=e34]:
+          - link "Workspace" [ref=e35] [cursor=pointer]:
+            - /url: /workspace
+          - link "Start Free Presence Check" [ref=e36] [cursor=pointer]:
+            - /url: /presence-check
+    - main [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - generic [ref=e42]: Honest online presence reviews
+            - generic [ref=e43]:
+              - heading "See what is working, what is missing, and what deserves attention without the hype." [level=1] [ref=e44]
+              - paragraph [ref=e45]: Virtura Presence helps small businesses understand how they are found, trusted, and contacted online through a polished first-pass check and a consultant-ready review workflow.
+            - generic [ref=e46]:
+              - link "Start Free Presence Check" [ref=e47] [cursor=pointer]:
+                - /url: /presence-check
+                - text: Start Free Presence Check
+                - img
+              - link "View Service Plans" [ref=e48] [cursor=pointer]:
+                - /url: "#service-plans"
+            - generic [ref=e49]:
+              - generic [ref=e50]: Helpful first-pass review
+              - generic [ref=e51]: Manual audit when deeper work is needed
+              - generic [ref=e52]: Built for honest consultant delivery
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - generic [ref=e58]:
+                  - generic [ref=e59]: "68"
+                  - generic [ref=e60]: Score
+                - generic [ref=e61]:
+                  - generic [ref=e62]: Quick read
+                  - heading "Solid foundation with improvement opportunities" [level=3] [ref=e63]
+                  - paragraph [ref=e64]: Harbor & Pine HVAC looks credible online, but trust and consistency signals still leave room for improvement.
+                  - paragraph [ref=e65]: There is already enough traction here to build on. The next wins are about tightening consistency, not rebuilding everything.
+              - generic [ref=e66]:
+                - generic [ref=e68]:
+                  - generic [ref=e69]: Website Presence
+                  - generic [ref=e70]: 15/20
+                - generic [ref=e74]:
+                  - generic [ref=e75]: Google / Local Presence
+                  - generic [ref=e76]: 15/20
+                - generic [ref=e80]:
+                  - generic [ref=e81]: Reviews & Trust
+                  - generic [ref=e82]: 13/20
+                - generic [ref=e86]:
+                  - generic [ref=e87]: Social Presence / Brand Activity
+                  - generic [ref=e88]: 11/20
+                - generic [ref=e92]:
+                  - generic [ref=e93]: Customer Action Readiness
+                  - generic [ref=e94]: 14/20
+              - generic [ref=e97]:
+                - generic [ref=e98]:
+                  - paragraph [ref=e99]: Helping you already
+                  - generic [ref=e100]:
+                    - paragraph [ref=e101]: A live website gives customers a credible place to evaluate the business.
+                    - paragraph [ref=e102]: Google / local presence is established enough to support nearby discovery.
+                - generic [ref=e103]:
+                  - paragraph [ref=e104]: Likely needs attention
+                  - generic [ref=e105]:
+                    - paragraph [ref=e106]: Review cadence and proof visibility still need to become more consistent.
+                    - paragraph [ref=e107]: Social activity exists but does not yet reinforce trust strongly enough.
+            - generic [ref=e108]:
+              - generic [ref=e109]:
+                - img [ref=e110]
+                - paragraph [ref=e113]: Constructive scoring
+              - generic [ref=e114]:
+                - img [ref=e115]
+                - paragraph [ref=e118]: AI-assisted drafting
+              - generic [ref=e119]:
+                - img [ref=e120]
+                - paragraph [ref=e124]: Local presence aware
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e127]: Core philosophy
+            - heading "A presence review should build confidence, not manufacture fear." [level=2] [ref=e128]
+            - paragraph [ref=e129]: Virtura Presence is designed around clarity, honesty, and calm practical advice. When a business is doing well, the product should say so. When something is weak, it should be direct without becoming pushy.
+          - generic [ref=e130]:
+            - article [ref=e131]:
+              - img [ref=e133]
+              - heading "Constructive by design" [level=3] [ref=e136]
+              - paragraph [ref=e137]: Virtura Presence is built to tell businesses what is working, not just what is missing.
+            - article [ref=e138]:
+              - img [ref=e140]
+              - heading "Grounded in reality" [level=3] [ref=e143]
+              - paragraph [ref=e144]: Recommendations stay practical, scoped to visible gaps, and tied to real customer trust signals.
+            - article [ref=e145]:
+              - img [ref=e147]
+              - heading "Consultant-guided delivery" [level=3] [ref=e150]
+              - paragraph [ref=e151]: AI helps accelerate drafting, but final audits remain human-reviewed and fully editable.
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - generic [ref=e154]: How it works
+            - heading "A polished, guided experience on the front end. A refined consultant workspace behind it." [level=2] [ref=e155]
+            - paragraph [ref=e156]: The public flow stays conversational and focused, while the internal side supports review, drafting, publishing, and follow-up without pretending to be a bloated CRM.
+          - generic [ref=e157]:
+            - article [ref=e158]:
+              - generic [ref=e159]: Step 1
+              - heading "Answer a short guided check-in" [level=3] [ref=e160]
+              - paragraph [ref=e161]: Share your business basics, key channels, and what you want more of so the review has useful context.
+            - article [ref=e162]:
+              - generic [ref=e163]: Step 2
+              - heading "Get an encouraging first-pass score" [level=3] [ref=e164]
+              - paragraph [ref=e165]: See a grounded summary of what is helping your presence and what likely deserves attention next.
+            - article [ref=e166]:
+              - generic [ref=e167]: Step 3
+              - heading "Receive a consultant-ready next step" [level=3] [ref=e168]
+              - paragraph [ref=e169]: If deeper help makes sense, Virtura can deliver a manual audit and practical plan recommendations.
+        - generic [ref=e170]:
+          - generic [ref=e171]:
+            - generic [ref=e172]: Common gaps
+            - heading "Weak presence rarely looks dramatic. It usually looks quietly inconsistent." [level=2] [ref=e173]
+            - paragraph [ref=e174]: Businesses often do a lot right offline and still lose confidence online because key proof points are incomplete, stale, or uneven across channels.
+          - generic [ref=e175]:
+            - article [ref=e176]:
+              - paragraph [ref=e177]: A business looks capable in person, but the website and Google profile do not reflect that confidence yet.
+            - article [ref=e178]:
+              - paragraph [ref=e179]: Customers can find the company, but reviews and proof points are too thin to build trust quickly.
+            - article [ref=e180]:
+              - paragraph [ref=e181]: Social channels exist, but they do not consistently reinforce that the business is active and credible.
+            - article [ref=e182]:
+              - paragraph [ref=e183]: The business gets referrals, yet the online presence still does not turn new traffic into calls cleanly.
+        - generic [ref=e184]:
+          - generic [ref=e185]:
+            - generic [ref=e186]: Service plans
+            - heading "Recommendations are available when they are actually justified." [level=2] [ref=e187]
+            - paragraph [ref=e188]: Virtura Presence supports plan recommendations such as profile cleanup, website launch support, ongoing visibility care, and deeper manual audits. Entry pricing is visible on each card, and the full detail view shows the fuller breakdown, included scope, and honest notes.
+          - generic [ref=e189]:
+            - article [ref=e190]:
+              - generic [ref=e192]:
+                - generic [ref=e194]:
+                  - paragraph [ref=e195]: Local visibility
+                  - heading "Google Business Profile Boost" [level=3] [ref=e196]
+                - paragraph [ref=e197]: Build or rebuild a stronger local front door where nearby customers decide who to trust.
+                - paragraph [ref=e198]: A focused local package for businesses that need a cleaner, more credible Google Business Profile without turning it into a bloated SEO project.
+                - generic [ref=e199]:
+                  - paragraph [ref=e200]: Public pricing
+                  - paragraph [ref=e201]: $249
+                  - paragraph [ref=e202]: One-time setup and optimization package
+              - generic [ref=e203]:
+                - link "Start with the free check" [ref=e204] [cursor=pointer]:
+                  - /url: /presence-check
+                  - text: Start with the free check
+                  - img
+                - button "View full details" [ref=e205]
+            - article [ref=e206]:
+              - generic [ref=e208]:
+                - generic [ref=e210]:
+                  - paragraph [ref=e211]: Website readiness
+                  - heading "Quick Website Launch" [level=3] [ref=e212]
+                - paragraph [ref=e213]: Launch a simple, credible site when the business needs clarity more than complexity.
+                - paragraph [ref=e214]: A focused launch offer for businesses that need a clean, clear web presence customers can trust and contact without delay.
+                - generic [ref=e215]:
+                  - paragraph [ref=e216]: Public pricing
+                  - paragraph [ref=e217]: Starting at $349
+                  - paragraph [ref=e218]: Focused launch pricing by page count
+              - generic [ref=e219]:
+                - link "Start with the free check" [ref=e220] [cursor=pointer]:
+                  - /url: /presence-check
+                  - text: Start with the free check
+                  - img
+                - button "View full details" [ref=e221]
+            - article [ref=e222]:
+              - generic [ref=e224]:
+                - generic [ref=e225]:
+                  - generic [ref=e226]:
+                    - paragraph [ref=e227]: Ongoing support
+                    - heading "Visibility Care Plan" [level=3] [ref=e228]
+                  - generic [ref=e229]: Featured
+                - paragraph [ref=e230]: Maintain momentum with grounded, recurring visibility support.
+                - paragraph [ref=e231]: An ongoing support plan for businesses that already have the core pieces in place and need steady upkeep instead of stop-and-start fixes.
+                - generic [ref=e232]:
+                  - paragraph [ref=e233]: Public pricing
+                  - paragraph [ref=e234]: $99/mo
+                  - paragraph [ref=e235]: Ongoing month-to-month support
+              - generic [ref=e236]:
+                - link "Start with the free check" [ref=e237] [cursor=pointer]:
+                  - /url: /presence-check
+                  - text: Start with the free check
+                  - img
+                - button "View full details" [ref=e238]
+            - article [ref=e239]:
+              - generic [ref=e241]:
+                - generic [ref=e243]:
+                  - paragraph [ref=e244]: Deep review
+                  - heading "Manual Comprehensive Audit" [level=3] [ref=e245]
+                - paragraph [ref=e246]: Get a deeper consultant-reviewed read on what is helping, what is missing, and what to do next.
+                - paragraph [ref=e247]: A consultant-reviewed manual audit for businesses that want a practical action plan instead of an automated SEO crawl dressed up as strategy.
+                - generic [ref=e248]:
+                  - paragraph [ref=e249]: Public pricing
+                  - paragraph [ref=e250]: $79
+                  - paragraph [ref=e251]: Consultant-reviewed manual audit
+              - generic [ref=e252]:
+                - link "Start with the free check" [ref=e253] [cursor=pointer]:
+                  - /url: /presence-check
+                  - text: Start with the free check
+                  - img
+                - button "View full details" [ref=e254]
+        - generic [ref=e255]:
+          - generic [ref=e256]:
+            - generic [ref=e257]: Testimonials
+            - heading "Designed for trust-forward delivery." [level=2] [ref=e258]
+            - paragraph [ref=e259]: This section is ready for real client proof once Virtura Presence starts publishing production reviews and plan recommendations.
+          - generic [ref=e260]:
+            - article [ref=e261]:
+              - img [ref=e262]
+              - paragraph [ref=e266]: Placeholder for a future client quote about getting a calm, useful review instead of pressure tactics.
+            - article [ref=e267]:
+              - img [ref=e268]
+              - paragraph [ref=e272]: Placeholder for a future client quote about understanding exactly what to fix and what not to overpay for.
+        - generic [ref=e273]:
+          - generic [ref=e274]:
+            - generic [ref=e275]: FAQ
+            - heading "Clear expectations from the start." [level=2] [ref=e276]
+            - paragraph [ref=e277]: The product is designed to help businesses make better decisions, not to trap them in marketing theater.
+          - generic [ref=e278]:
+            - article [ref=e279]:
+              - heading "Is this an SEO grader or a scare tactic score?" [level=3] [ref=e280]
+              - paragraph [ref=e281]: No. The quick score is a helpful first-pass review meant to show visible strengths and likely gaps without pressure language or fake urgency.
+            - article [ref=e282]:
+              - heading "Does Virtura Presence replace a full consultant review?" [level=3] [ref=e283]
+              - paragraph [ref=e284]: No. The deeper audit is manual and consultant-reviewed. AI can help draft findings internally, but the final report stays consultant-controlled.
+            - article [ref=e285]:
+              - heading "Do I need to buy a service plan after using the free check?" [level=3] [ref=e286]
+              - paragraph [ref=e287]: No. The platform is designed to be honest about when a business is already doing well or when only a focused improvement is needed.
+        - generic [ref=e290]:
+          - generic [ref=e291]:
+            - generic [ref=e292]: Ready to start?
+            - heading "Start the free presence check and get a grounded first-pass review." [level=2] [ref=e293]
+            - paragraph [ref=e294]: See how your business currently shows up, where confidence is already strong, and where a manual consultant review would actually help.
+          - link "Start Free Presence Check" [ref=e295] [cursor=pointer]:
+            - /url: /presence-check
+            - text: Start Free Presence Check
+            - img
+    - contentinfo [ref=e296]:
+      - generic [ref=e297]:
+        - generic [ref=e298]:
+          - link "Virtura Group mark Virtura Group Virtura Presence" [ref=e299] [cursor=pointer]:
+            - /url: /
+            - img "Virtura Group mark" [ref=e301]
+            - generic [ref=e302]:
+              - generic [ref=e303]: Virtura Group
+              - generic [ref=e304]: Virtura Presence
+          - paragraph [ref=e305]: Virtura Presence is part of Virtura Group and is built for honest, practical online presence reviews without scare tactics or pressure-heavy sales language.
+          - generic [ref=e306]:
+            - paragraph [ref=e307]:
+              - text: "Contact:"
+              - link "hello@virtura.us" [ref=e308] [cursor=pointer]:
+                - /url: mailto:hello@virtura.us
+            - paragraph [ref=e309]: Copyright 2026 Virtura Group. All rights reserved.
+        - generic [ref=e310]:
+          - paragraph [ref=e311]: Navigation
+          - generic [ref=e312]:
+            - link "Home" [ref=e313] [cursor=pointer]:
+              - /url: /
+            - link "Free Presence Check" [ref=e314] [cursor=pointer]:
+              - /url: /presence-check
+            - link "Client Portal" [ref=e315] [cursor=pointer]:
+              - /url: /portal
+            - link "Consultant Workspace" [ref=e316] [cursor=pointer]:
+              - /url: /workspace
+            - link "Sign in" [ref=e317] [cursor=pointer]:
+              - /url: /sign-in
+        - generic [ref=e318]:
+          - paragraph [ref=e319]: Legal
+          - generic [ref=e320]:
+            - link "Privacy" [ref=e321] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms" [ref=e322] [cursor=pointer]:
+              - /url: /terms
+            - paragraph [ref=e323]: Service plans are recommendation-driven and may require consultation for custom scope.
+  - region "Notifications alt+T"
+  - alert [ref=e324]

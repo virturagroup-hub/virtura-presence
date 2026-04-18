@@ -1,0 +1,34 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: Why sign in
+      - heading "Access the client portal or consultant workspace." [level=2] [ref=e6]
+      - paragraph [ref=e7]: The client portal is for viewing assessment summaries, published manual audits, and honest next-step recommendations. The internal workspace is for consultants reviewing leads, drafting reports, and publishing findings.
+      - generic [ref=e8]:
+        - paragraph [ref=e9]: Demo access
+        - generic [ref=e10]:
+          - 'button "Consultant demo consultant@virturagroup.com Password: DemoConsult-2026!" [ref=e11]':
+            - paragraph [ref=e12]: Consultant demo
+            - paragraph [ref=e13]: consultant@virturagroup.com
+            - paragraph [ref=e14]: "Password: DemoConsult-2026!"
+          - 'button "Client demo client@virturapresence.com Password: DemoClient-2026!" [ref=e15]':
+            - paragraph [ref=e16]: Client demo
+            - paragraph [ref=e17]: client@virturapresence.com
+            - paragraph [ref=e18]: "Password: DemoClient-2026!"
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: Secure sign-in
+        - heading "Continue into Virtura Presence" [level=2] [ref=e22]
+      - generic [ref=e23]:
+        - generic [ref=e24]: Email
+        - textbox "Email" [ref=e25]:
+          - /placeholder: name@business.com
+          - text: consultant@virturagroup.com
+      - generic [ref=e26]:
+        - generic [ref=e27]: Password
+        - textbox "Password" [ref=e28]:
+          - /placeholder: Enter your password
+          - text: DemoConsult-2026!
+      - button "Sign in" [ref=e29]
+  - region "Notifications alt+T"
+  - alert [ref=e30]

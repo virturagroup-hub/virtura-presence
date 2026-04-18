@@ -55,7 +55,7 @@ export function StatusBadge({ value, className }: StatusBadgeProps) {
   return (
     <Badge
       className={cn(
-        "rounded-full border-0 px-3 py-1 text-[11px] font-semibold tracking-[0.2em] uppercase ring-1",
+        "rounded-full border-0 px-3.5 py-1 text-[11px] font-semibold tracking-[0.16em] uppercase ring-1",
         statusStyles[normalized] ?? "bg-slate-100 text-slate-700 ring-slate-200",
         className,
       )}

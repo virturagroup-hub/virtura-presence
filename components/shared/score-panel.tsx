@@ -51,7 +51,7 @@ export function ScorePanel({
           <h3 className="font-heading text-2xl font-semibold text-slate-950">{tier}</h3>
           <p className="max-w-xl text-sm leading-7 text-slate-600 sm:text-base">{summary}</p>
           {encouragement ? (
-            <p className="rounded-2xl border border-brand-100 bg-brand-50/80 px-4 py-3 text-sm text-brand-700">
+            <p className="rounded-[24px] border border-cyan-100 bg-cyan-50/80 px-4 py-3 text-sm leading-7 text-cyan-900">
               {encouragement}
             </p>
           ) : null}
@@ -63,7 +63,7 @@ export function ScorePanel({
           {categories.map((category) => (
             <div
               key={category.label}
-              className="rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-3"
+              className="rounded-[24px] border border-slate-200/70 bg-slate-50/72 px-4 py-3"
             >
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-medium text-slate-700">{category.label}</span>
@@ -83,8 +83,8 @@ export function ScorePanel({
       {(strengths.length || improvements.length) && (
         <div className={cn("grid gap-4", strengths.length && improvements.length ? "lg:grid-cols-2" : "")}>
           {strengths.length ? (
-            <div className="rounded-3xl border border-emerald-100 bg-emerald-50/80 p-5">
-              <p className="text-xs font-semibold tracking-[0.26em] text-emerald-700 uppercase">
+            <div className="rounded-3xl border border-emerald-100 bg-emerald-50/72 p-5">
+              <p className="text-xs font-semibold tracking-[0.18em] text-emerald-700 uppercase">
                 Helping you already
               </p>
               <div className="mt-3 space-y-3 text-sm leading-6 text-emerald-900">
@@ -95,8 +95,8 @@ export function ScorePanel({
             </div>
           ) : null}
           {improvements.length ? (
-            <div className="rounded-3xl border border-amber-100 bg-amber-50/80 p-5">
-              <p className="text-xs font-semibold tracking-[0.26em] text-amber-700 uppercase">
+            <div className="rounded-3xl border border-amber-100 bg-amber-50/72 p-5">
+              <p className="text-xs font-semibold tracking-[0.18em] text-amber-700 uppercase">
                 Likely needs attention
               </p>
               <div className="mt-3 space-y-3 text-sm leading-6 text-amber-900">

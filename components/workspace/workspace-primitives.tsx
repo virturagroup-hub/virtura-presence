@@ -17,8 +17,8 @@ type WorkspaceSectionProps = {
 
 const sectionToneStyles = {
   default: "border-slate-200/70 bg-white/90",
-  muted: "border-slate-200/70 bg-slate-50/82",
-  brand: "border-brand-100 bg-brand-50/75",
+  muted: "border-slate-200/70 bg-slate-50/78",
+  brand: "border-brand-100/80 bg-brand-50/65",
 } satisfies Record<NonNullable<WorkspaceSectionProps["tone"]>, string>;
 
 export function WorkspaceSection({
@@ -77,12 +77,12 @@ export function WorkspaceField({
   className?: string;
 }) {
   return (
-    <div className={cn("space-y-3", className)}>
+    <div className={cn("min-w-0 space-y-3", className)}>
       <div>
-        <p className="text-[11px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
+        <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
           {label}
         </p>
-        {helper ? <p className="mt-2 text-xs leading-6 text-slate-500">{helper}</p> : null}
+        {helper ? <p className="mt-2 text-xs leading-6 text-slate-600">{helper}</p> : null}
       </div>
       {children}
     </div>
@@ -130,7 +130,7 @@ export function WorkspaceSelect({
   return (
     <select
       className={cn(
-        "h-12 w-full rounded-[22px] border border-slate-200/80 bg-white/96 px-4 text-sm text-slate-900 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.2)] outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100/80 disabled:cursor-not-allowed disabled:opacity-60",
+        "h-12 w-full rounded-[22px] border border-slate-200/80 bg-white/96 px-4 pr-10 text-sm text-slate-900 shadow-[0_12px_28px_-24px_rgba(15,23,42,0.2)] outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100/80 disabled:cursor-not-allowed disabled:opacity-60",
         className,
       )}
       {...props}
@@ -152,7 +152,7 @@ export function WorkspaceChip({
   return (
     <span
       className={cn(
-        "inline-flex min-h-9 items-center rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.18em] uppercase transition",
+        "inline-flex min-h-9 items-center rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition",
         active
           ? "border-brand-200 bg-brand-50 text-brand-700 shadow-[0_16px_36px_-24px_rgba(47,111,228,0.4)]"
           : "border-slate-200/80 bg-white/92 text-slate-600",
@@ -178,7 +178,7 @@ export function WorkspaceEmptyState({
   return (
     <div
       className={cn(
-        "rounded-[24px] border border-dashed border-slate-300 bg-white/75 px-5 py-6 text-center",
+        "rounded-[24px] border border-dashed border-slate-300 bg-white/82 px-5 py-6 text-center",
         className,
       )}
     >
@@ -209,7 +209,7 @@ export function WorkspaceActionFooter({
     >
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <p className="text-[11px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
             {title}
           </p>
           <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>

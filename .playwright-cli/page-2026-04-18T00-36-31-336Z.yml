@@ -1,0 +1,147 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - link "Virtura Group mark Virtura Group Virtura Presence" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Virtura Group mark" [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]: Virtura Group
+          - generic [ref=e11]: Virtura Presence
+      - generic [ref=e12]:
+        - paragraph [ref=e13]: Consultant Workspace
+        - paragraph [ref=e14]: consultant@virturagroup.com
+    - main [ref=e15]:
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: Workspace surface
+        - generic [ref=e19]:
+          - heading "Consultant Workspace" [level=1] [ref=e20]
+          - paragraph [ref=e21]: Group submissions by company, move audits through a real studio workflow, send client-ready notifications intentionally, and keep the client lifecycle visible from first check to ongoing care.
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - paragraph [ref=e26]: Active companies
+            - generic [ref=e27]: "1"
+            - paragraph [ref=e28]: Grouped pipeline records
+          - generic [ref=e29]:
+            - paragraph [ref=e30]: In review
+            - generic [ref=e31]: "0"
+            - paragraph [ref=e32]: Free and comprehensive work in motion
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: Published audits
+            - generic [ref=e35]: "0"
+            - paragraph [ref=e36]: Client-visible reports
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Follow-up due
+            - generic [ref=e39]: "0"
+            - paragraph [ref=e40]: Queued client touchpoints
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: Comprehensive requests
+            - generic [ref=e43]: "0"
+            - paragraph [ref=e44]: Client-raised opportunities
+        - generic [ref=e46]:
+          - textbox "Search business, email, area, or category" [ref=e47]
+          - combobox [ref=e48]:
+            - option "All statuses" [selected]
+            - option "Submitted"
+            - option "Awaiting review"
+            - option "In review"
+            - option "Published"
+            - option "Follow-up sent"
+            - option "Converted"
+            - option "Closed"
+          - combobox [ref=e49]:
+            - option "All score bands" [selected]
+            - option "Limited online foundation"
+            - option "Early-stage presence"
+            - option "Basic foundation with clear gaps"
+            - option "Solid foundation with improvement opportunities"
+            - option "Strong online presence"
+          - textbox "Business type" [ref=e50]
+          - textbox "State" [ref=e51]
+          - combobox [ref=e52]:
+            - option "Newest first" [selected]
+            - option "Oldest first"
+            - option "Highest score"
+            - option "Lowest score"
+          - generic [ref=e53]:
+            - link "Clear" [ref=e54] [cursor=pointer]:
+              - /url: /workspace
+            - button "Apply" [ref=e55]
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: Grouped pipeline
+              - heading "Company records first, submission history underneath" [level=2] [ref=e60]
+              - paragraph [ref=e61]: Each business now acts as the primary workspace record, with nested presence checks, lifecycle visibility, and direct paths into the Audit Studio.
+            - paragraph [ref=e62]: 1 companies
+          - article [ref=e64]:
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - generic [ref=e67]:
+                  - heading "Virtura Group" [level=3] [ref=e68]
+                  - generic [ref=e69]: Free audit requested
+                  - generic [ref=e70]: Follow-up sent
+                - generic [ref=e71]:
+                  - paragraph [ref=e72]: brian.wheeler03@yahoo.com
+                  - paragraph [ref=e73]: "3377891644"
+                  - paragraph [ref=e74]: Lafayette, LA · Metro
+                  - paragraph [ref=e75]: IT Consulting
+                - paragraph [ref=e76]: There are workable building blocks here, but a few core visibility and trust signals need attention before the presence can feel consistently strong.
+              - generic [ref=e77]:
+                - generic [ref=e78]:
+                  - generic [ref=e79]:
+                    - paragraph [ref=e80]: Latest score
+                    - generic [ref=e81]:
+                      - generic [ref=e82]:
+                        - paragraph [ref=e83]: "30"
+                        - paragraph [ref=e84]: Basic foundation with clear gaps
+                      - generic [ref=e85]:
+                        - img [ref=e86]
+                        - text: "-5"
+                  - generic [ref=e89]:
+                    - paragraph [ref=e90]: Activity
+                    - paragraph [ref=e91]: 2 checks
+                    - paragraph [ref=e92]: Latest activity Apr 17, 2026
+                - generic [ref=e93]:
+                  - link "Open company" [ref=e94] [cursor=pointer]:
+                    - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                    - text: Open company
+                    - img
+                  - link "Open studio" [ref=e95] [cursor=pointer]:
+                    - /url: /workspace/audit-studio?businessId=cmo0qng3h0001l9042e2jjwuo&submissionId=cmo0qxbew0001l704bkeucvgj
+                    - text: Open studio
+                    - img
+            - generic [ref=e96]:
+              - generic [ref=e97]:
+                - generic [ref=e98]:
+                  - paragraph [ref=e99]: Submission history
+                  - paragraph [ref=e100]: Each check stays visible under the company record instead of splitting the account into separate rows.
+                - paragraph [ref=e101]: Latest check Apr 15, 2026
+              - generic [ref=e102]:
+                - generic [ref=e104]:
+                  - generic [ref=e105]:
+                    - generic [ref=e106]:
+                      - paragraph [ref=e107]: Apr 15, 2026
+                      - generic [ref=e108]: Follow-up sent
+                    - paragraph [ref=e109]: 30 score · Basic foundation with clear gaps
+                  - link "Open this check" [ref=e110] [cursor=pointer]:
+                    - /url: /workspace/audit-studio?businessId=cmo0qng3h0001l9042e2jjwuo&submissionId=cmo0qxbew0001l704bkeucvgj
+                    - text: Open this check
+                    - img
+                - generic [ref=e112]:
+                  - generic [ref=e113]:
+                    - generic [ref=e114]:
+                      - paragraph [ref=e115]: Apr 15, 2026
+                      - generic [ref=e116]: Submitted
+                    - paragraph [ref=e117]: 35 score · Basic foundation with clear gaps
+                  - link "Open this check" [ref=e118] [cursor=pointer]:
+                    - /url: /workspace/audit-studio?businessId=cmo0qng3h0001l9042e2jjwuo&submissionId=cmo0qng4b0003l904lwbo5grl
+                    - text: Open this check
+                    - img
+              - generic [ref=e120]:
+                - img [ref=e121]
+                - text: "Contact owner: Brian Wheeler"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e129] [cursor=pointer]:
+    - img [ref=e130]
+  - alert [ref=e133]

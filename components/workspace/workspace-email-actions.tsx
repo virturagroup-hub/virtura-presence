@@ -113,12 +113,12 @@ export function WorkspaceEmailActions({
       <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <p className="section-kicker">Client email actions</p>
-          <h2 className="mt-4 font-heading text-2xl font-semibold text-slate-950">
-            Make delivery intentional without turning the workspace into a log screen
+          <h2 className="mt-4 font-heading text-xl font-semibold text-slate-950 sm:text-2xl">
+            Send client emails
           </h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            Send the next message from here, then use reports and alerts to monitor failures,
-            sender issues, and delivery reliability across the workspace.
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+            Use this panel for report delivery and follow-up. Delivery issues and sender alerts now
+            live in Reports.
           </p>
         </div>
 
@@ -136,12 +136,7 @@ export function WorkspaceEmailActions({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-slate-500">
-        <span>{deliverySummary.description}</span>
-        {deliverySummary.from ? <span>Sender {deliverySummary.from}</span> : null}
-      </div>
-
-      <div className="mt-5 grid gap-4 xl:grid-cols-2">
+      <div className="mt-5 grid gap-4">
         {actions.map((action) => {
           const blockedByAudit = action.requiresAudit && !hasAudit;
           const blockedByComprehensive =
@@ -166,12 +161,12 @@ export function WorkspaceEmailActions({
           return (
             <div
               key={action.kind}
-              className="flex h-full flex-col rounded-[26px] border border-slate-200/70 bg-white/92 p-5 shadow-[0_24px_48px_-38px_rgba(15,23,42,0.28)]"
+              className="flex h-full flex-col rounded-[26px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_24px_48px_-38px_rgba(15,23,42,0.28)] sm:p-5"
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2">
+                <div className="min-w-0 space-y-2">
                   <p className="text-sm font-semibold text-slate-950">{action.label}</p>
-                  <p className="text-sm leading-7 text-slate-600">{action.description}</p>
+                  <p className="text-sm leading-6 text-slate-600">{action.description}</p>
                 </div>
                 <div className="rounded-full border border-brand-100 bg-brand-50/80 p-2 text-brand-600">
                   <MailCheck className="size-4" />
@@ -190,10 +185,9 @@ export function WorkspaceEmailActions({
                       "bg-violet-50 text-violet-700 ring-violet-100",
                   )}
                 />
-                <span className="text-xs text-slate-500">{action.requirementLabel}</span>
               </div>
 
-              <p className="mt-3 text-sm leading-7 text-slate-500">{helperText}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-500">{helperText}</p>
 
               <Button
                 type="button"
@@ -201,7 +195,7 @@ export function WorkspaceEmailActions({
                 variant={disabled ? "outline" : "default"}
                 onClick={() => send(action.kind)}
                 disabled={disabled}
-                className="mt-auto h-11 rounded-full px-5"
+                className="mt-5 h-11 self-start rounded-full px-5"
               >
                 {pendingAction === action.kind ? "Working..." : action.label}
                 <Send className="size-4" />

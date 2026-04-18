@@ -1,0 +1,331 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e6] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e7]:
+      - img [ref=e8]
+    - generic [ref=e11]:
+      - button "Open issues overlay" [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: "0"
+          - generic [ref=e15]: "1"
+        - generic [ref=e16]: Issue
+      - button "Collapse issues badge" [ref=e17]:
+        - img [ref=e18]
+  - generic [ref=e21]:
+    - complementary [ref=e22]:
+      - generic [ref=e23]:
+        - link "Virtura Group mark Virtura Group" [ref=e24] [cursor=pointer]:
+          - /url: /
+          - img "Virtura Group mark" [ref=e26]
+          - generic [ref=e28]: Virtura Group
+        - paragraph [ref=e29]: Group submissions by company, move audits through a real studio workflow, send client-ready notifications intentionally, and keep the client lifecycle visible from first check to ongoing care.
+      - navigation [ref=e31]:
+        - link "Pipeline Company pipeline, grouped submissions, lifecycle, and next actions." [ref=e32] [cursor=pointer]:
+          - /url: /workspace
+          - img [ref=e33]
+          - generic [ref=e35]:
+            - paragraph [ref=e36]: Pipeline
+            - paragraph [ref=e37]: Company pipeline, grouped submissions, lifecycle, and next actions.
+        - link "Audit Studio Draft, refine, publish, and resend consultant-reviewed audits." [ref=e38] [cursor=pointer]:
+          - /url: /workspace/audit-studio
+          - img [ref=e39]
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: Audit Studio
+            - paragraph [ref=e45]: Draft, refine, publish, and resend consultant-reviewed audits.
+        - link "Clients Open company records, history, notes, and ongoing care context." [ref=e46] [cursor=pointer]:
+          - /url: /workspace/clients
+          - img [ref=e47]
+          - generic [ref=e52]:
+            - paragraph [ref=e53]: Clients
+            - paragraph [ref=e54]: Open company records, history, notes, and ongoing care context.
+        - link "Reports Free audit volume, conversions, service uptake, and alerts." [ref=e55] [cursor=pointer]:
+          - /url: /workspace/reports
+          - img [ref=e56]
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: Reports
+            - paragraph [ref=e61]: Free audit volume, conversions, service uptake, and alerts.
+      - generic [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - generic [ref=e66]: VC
+            - generic [ref=e67]:
+              - paragraph [ref=e68]: Virtura Consultant
+              - paragraph [ref=e69]: consultant@virturagroup.com
+          - paragraph [ref=e70]: CONSULTANT
+        - generic [ref=e71]:
+          - button "Log out" [ref=e72]:
+            - img
+            - text: Log out
+          - link "Back to public site" [ref=e73] [cursor=pointer]:
+            - /url: /
+    - main [ref=e74]:
+      - generic [ref=e75]:
+        - paragraph [ref=e76]: Workspace surface
+        - generic [ref=e78]:
+          - heading "Consultant Workspace" [level=1] [ref=e79]
+          - paragraph [ref=e80]: Group submissions by company, move audits through a real studio workflow, send client-ready notifications intentionally, and keep the client lifecycle visible from first check to ongoing care.
+      - generic [ref=e82]:
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - paragraph [ref=e86]: Reports and alerts
+              - heading "Track audit volume, customer growth, service uptake, and operational alerts" [level=2] [ref=e87]
+              - paragraph [ref=e88]: "This view keeps consultant reporting practical: free audit volume, customer conversion signals, accepted services, comprehensive audit demand, and the delivery or security issues that actually need attention."
+            - generic [ref=e89]:
+              - link "Back to pipeline" [ref=e90] [cursor=pointer]:
+                - /url: /workspace
+                - text: Back to pipeline
+                - img
+              - link "Open Audit Studio" [ref=e91] [cursor=pointer]:
+                - /url: /workspace/audit-studio
+          - generic [ref=e92]:
+            - generic [ref=e93]: Live email delivery
+            - generic [ref=e94]: April 2026 snapshot
+            - generic [ref=e95]: Sender Virtura Presence <hello@notify.virtura.us>
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - paragraph [ref=e98]: Free audits
+            - generic [ref=e99]: "2"
+            - paragraph [ref=e100]: 2 total presence checks recorded
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: New customers
+            - generic [ref=e103]: "0"
+            - paragraph [ref=e104]: 0 companies with accepted services
+          - generic [ref=e105]:
+            - paragraph [ref=e106]: Services purchased
+            - generic [ref=e107]: "0"
+            - paragraph [ref=e108]: 0 accepted recommendations total
+          - generic [ref=e109]:
+            - paragraph [ref=e110]: Comprehensive audits
+            - generic [ref=e111]: "0"
+            - paragraph [ref=e112]: 0 total · 0 active requests
+          - generic [ref=e113]:
+            - paragraph [ref=e114]: Failed email alerts
+            - generic [ref=e115]: "7"
+            - paragraph [ref=e116]: 7 total delivery failures tracked
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - generic [ref=e120]:
+              - paragraph [ref=e121]: Service activity
+              - heading "Accepted work and next-step momentum" [level=3] [ref=e122]
+              - paragraph [ref=e123]: Accepted recommendations are treated as purchased work until billing and invoicing are added later.
+            - generic [ref=e125]:
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - paragraph [ref=e129]: Google Business Profile Boost
+                  - paragraph [ref=e130]: Accepted services show confirmed work. Presented and proposed counts show what is still in play.
+                - generic [ref=e131]:
+                  - generic [ref=e132]:
+                    - paragraph [ref=e133]: Accepted
+                    - paragraph [ref=e134]: "0"
+                    - paragraph [ref=e135]: Accepted count
+                  - generic [ref=e136]:
+                    - paragraph [ref=e137]: Presented
+                    - paragraph [ref=e138]: "0"
+                    - paragraph [ref=e139]: Presented count
+                  - generic [ref=e140]:
+                    - paragraph [ref=e141]: Proposed
+                    - paragraph [ref=e142]: "0"
+                    - paragraph [ref=e143]: Proposed count
+              - generic [ref=e145]:
+                - generic [ref=e146]:
+                  - paragraph [ref=e147]: Manual Comprehensive Audit
+                  - paragraph [ref=e148]: Accepted services show confirmed work. Presented and proposed counts show what is still in play.
+                - generic [ref=e149]:
+                  - generic [ref=e150]:
+                    - paragraph [ref=e151]: Accepted
+                    - paragraph [ref=e152]: "0"
+                    - paragraph [ref=e153]: Accepted count
+                  - generic [ref=e154]:
+                    - paragraph [ref=e155]: Presented
+                    - paragraph [ref=e156]: "0"
+                    - paragraph [ref=e157]: Presented count
+                  - generic [ref=e158]:
+                    - paragraph [ref=e159]: Proposed
+                    - paragraph [ref=e160]: "0"
+                    - paragraph [ref=e161]: Proposed count
+              - generic [ref=e163]:
+                - generic [ref=e164]:
+                  - paragraph [ref=e165]: Quick Website Launch
+                  - paragraph [ref=e166]: Accepted services show confirmed work. Presented and proposed counts show what is still in play.
+                - generic [ref=e167]:
+                  - generic [ref=e168]:
+                    - paragraph [ref=e169]: Accepted
+                    - paragraph [ref=e170]: "0"
+                    - paragraph [ref=e171]: Accepted count
+                  - generic [ref=e172]:
+                    - paragraph [ref=e173]: Presented
+                    - paragraph [ref=e174]: "0"
+                    - paragraph [ref=e175]: Presented count
+                  - generic [ref=e176]:
+                    - paragraph [ref=e177]: Proposed
+                    - paragraph [ref=e178]: "0"
+                    - paragraph [ref=e179]: Proposed count
+              - generic [ref=e181]:
+                - generic [ref=e182]:
+                  - paragraph [ref=e183]: Visibility Care Plan
+                  - paragraph [ref=e184]: Accepted services show confirmed work. Presented and proposed counts show what is still in play.
+                - generic [ref=e185]:
+                  - generic [ref=e186]:
+                    - paragraph [ref=e187]: Accepted
+                    - paragraph [ref=e188]: "0"
+                    - paragraph [ref=e189]: Accepted count
+                  - generic [ref=e190]:
+                    - paragraph [ref=e191]: Presented
+                    - paragraph [ref=e192]: "0"
+                    - paragraph [ref=e193]: Presented count
+                  - generic [ref=e194]:
+                    - paragraph [ref=e195]: Proposed
+                    - paragraph [ref=e196]: "0"
+                    - paragraph [ref=e197]: Proposed count
+          - generic [ref=e198]:
+            - generic [ref=e200]:
+              - paragraph [ref=e201]: Client lifecycle
+              - heading "Where companies are sitting right now" [level=3] [ref=e202]
+              - paragraph [ref=e203]: This keeps the CRM side honest by showing how many companies are still leads, in audit motion, converted, or in ongoing care.
+            - generic [ref=e207]:
+              - generic [ref=e208]:
+                - paragraph [ref=e209]: Free audit requested
+                - paragraph [ref=e210]: Companies currently sitting in this stage
+              - generic [ref=e211]: "1"
+        - generic [ref=e212]:
+          - generic [ref=e214]:
+            - paragraph [ref=e215]: Security and delivery alerts
+            - heading "Operational alerts that need human attention" [level=3] [ref=e216]
+            - paragraph [ref=e217]: "This panel currently covers delivery failures and insecure stored links. It is intentionally honest: Virtura Presence does not claim to be running live external cyber threat monitoring yet."
+          - generic [ref=e218]:
+            - generic [ref=e219]:
+              - generic [ref=e221]:
+                - img [ref=e222]
+                - generic [ref=e224]:
+                  - paragraph [ref=e225]: Failed email sends
+                  - paragraph [ref=e226]: "7"
+              - generic [ref=e228]:
+                - img [ref=e229]
+                - generic [ref=e231]:
+                  - paragraph [ref=e232]: Sender auth issues
+                  - paragraph [ref=e233]: "3"
+              - generic [ref=e235]:
+                - img [ref=e236]
+                - generic [ref=e238]:
+                  - paragraph [ref=e239]: Insecure links
+                  - paragraph [ref=e240]: "0"
+              - generic [ref=e242]:
+                - img [ref=e243]
+                - generic [ref=e246]:
+                  - paragraph [ref=e247]: Active requests
+                  - paragraph [ref=e248]: "0"
+            - generic [ref=e249]:
+              - generic [ref=e250]:
+                - generic [ref=e251]:
+                  - generic [ref=e252]:
+                    - paragraph [ref=e253]: Delivery alerts
+                    - paragraph [ref=e254]: Failed sends are tracked here so the Audit Studio and client views can stay focused on action instead of raw error logging.
+                  - paragraph [ref=e255]: 7 recent
+                - generic [ref=e256]:
+                  - generic [ref=e258]:
+                    - generic [ref=e259]:
+                      - generic [ref=e260]:
+                        - paragraph [ref=e261]: Your quick review for Virtura Group is ready
+                        - generic [ref=e262]: critical
+                      - paragraph [ref=e263]: This API key is not authorized to send emails from mail.virtura.us
+                      - paragraph [ref=e264]:
+                        - link "Virtura Group" [ref=e265] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e266]: Created Apr 17, 2026, 6:23 PM · Last attempt Apr 17, 2026, 6:23 PM
+                    - button "Retry send" [ref=e267]:
+                      - text: Retry send
+                      - img
+                  - generic [ref=e269]:
+                    - generic [ref=e270]:
+                      - generic [ref=e271]:
+                        - paragraph [ref=e272]: Your quick review for Virtura Group is ready
+                        - generic [ref=e273]: critical
+                      - paragraph [ref=e274]: This API key is not authorized to send emails from mail.virtura.us
+                      - paragraph [ref=e275]:
+                        - link "Virtura Group" [ref=e276] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e277]: Created Apr 17, 2026, 6:21 PM · Last attempt Apr 17, 2026, 6:21 PM
+                    - button "Retry send" [ref=e278]:
+                      - text: Retry send
+                      - img
+                  - generic [ref=e280]:
+                    - generic [ref=e281]:
+                      - generic [ref=e282]:
+                        - paragraph [ref=e283]: Your quick review for Virtura Group is ready
+                        - generic [ref=e284]: critical
+                      - paragraph [ref=e285]: This API key is not authorized to send emails from mail.virtura.us
+                      - paragraph [ref=e286]:
+                        - link "Virtura Group" [ref=e287] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e288]: Created Apr 16, 2026, 7:59 PM · Last attempt Apr 17, 2026, 6:18 PM
+                    - button "Retry send" [ref=e289]:
+                      - text: Retry send
+                      - img
+                  - generic [ref=e291]:
+                    - generic [ref=e292]:
+                      - generic [ref=e293]:
+                        - paragraph [ref=e294]: A quick follow-up from Virtura Presence
+                        - generic [ref=e295]: warning
+                      - paragraph [ref=e296]: "Failed to render React component. Make sure to install `@react-email/render` or `@react-email/components`."
+                      - paragraph [ref=e297]:
+                        - link "Virtura Group" [ref=e298] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e299]: Created Apr 16, 2026, 7:07 PM · Last attempt Apr 16, 2026, 7:07 PM
+                    - button "Retry send" [ref=e300]:
+                      - text: Retry send
+                      - img
+                  - generic [ref=e302]:
+                    - generic [ref=e303]:
+                      - generic [ref=e304]:
+                        - paragraph [ref=e305]: Your quick review for Virtura Group is ready
+                        - generic [ref=e306]: warning
+                      - paragraph [ref=e307]: "Failed to render React component. Make sure to install `@react-email/render` or `@react-email/components`."
+                      - paragraph [ref=e308]:
+                        - link "Virtura Group" [ref=e309] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e310]: Created Apr 15, 2026, 7:33 PM · Last attempt Apr 15, 2026, 7:33 PM
+                    - button "Retry send" [ref=e311]:
+                      - text: Retry send
+                      - img
+                  - generic [ref=e313]:
+                    - generic [ref=e314]:
+                      - generic [ref=e315]:
+                        - paragraph [ref=e316]: Verify your Virtura Presence email
+                        - generic [ref=e317]: warning
+                      - paragraph [ref=e318]: "Failed to render React component. Make sure to install `@react-email/render` or `@react-email/components`."
+                      - paragraph [ref=e319]:
+                        - link "Virtura Group" [ref=e320] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e321]: Created Apr 15, 2026, 7:27 PM · Last attempt Apr 15, 2026, 7:27 PM
+                    - button "Retry send" [ref=e322]:
+                      - text: Retry send
+                      - img
+                  - generic [ref=e324]:
+                    - generic [ref=e325]:
+                      - generic [ref=e326]:
+                        - paragraph [ref=e327]: Create portal access for Virtura Group
+                        - generic [ref=e328]: warning
+                      - paragraph [ref=e329]: "Failed to render React component. Make sure to install `@react-email/render` or `@react-email/components`."
+                      - paragraph [ref=e330]:
+                        - link "Virtura Group" [ref=e331] [cursor=pointer]:
+                          - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                        - text: · brian.wheeler03@yahoo.com
+                      - paragraph [ref=e332]: Created Apr 15, 2026, 7:25 PM · Last attempt Apr 15, 2026, 7:25 PM
+                    - button "Retry send" [ref=e333]:
+                      - text: Retry send
+                      - img
+              - generic [ref=e334]:
+                - generic [ref=e336]:
+                  - paragraph [ref=e337]: Security posture signals
+                  - paragraph [ref=e338]: These are practical hygiene signals from the data already in Virtura Presence, not a replacement for managed threat monitoring.
+                - generic [ref=e339]:
+                  - paragraph [ref=e340]: No insecure stored links found
+                  - paragraph [ref=e341]: The current workspace data is not showing businesses with obvious HTTP links that should be upgraded to HTTPS.
+  - region "Notifications alt+T"
+  - alert [ref=e342]

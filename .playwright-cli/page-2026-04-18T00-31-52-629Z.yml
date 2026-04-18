@@ -1,0 +1,60 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - link "Virtura Group mark Virtura Group" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Virtura Group mark" [ref=e8]
+          - generic [ref=e10]: Virtura Group
+        - paragraph [ref=e11]: Review your quick assessment, published audit findings, and practical next steps without pressure-heavy sales language.
+      - navigation [ref=e13]:
+        - link "Overview Quick assessment, status, and next steps." [ref=e14] [cursor=pointer]:
+          - /url: /portal
+          - img [ref=e15]
+          - generic [ref=e20]:
+            - paragraph [ref=e21]: Overview
+            - paragraph [ref=e22]: Quick assessment, status, and next steps.
+        - link "Published Report Client-facing audit summary and category findings." [ref=e23] [cursor=pointer]:
+          - /url: /portal/report
+          - img [ref=e24]
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: Published Report
+            - paragraph [ref=e29]: Client-facing audit summary and category findings.
+        - link "Profile & Security Business details, contact data, and password settings." [ref=e30] [cursor=pointer]:
+          - /url: /portal/profile
+          - img [ref=e31]
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Profile & Security
+            - paragraph [ref=e36]: Business details, contact data, and password settings.
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - generic [ref=e41]: VC
+            - generic [ref=e42]:
+              - paragraph [ref=e43]: Virtura Consultant
+              - paragraph [ref=e44]: consultant@virturagroup.com
+          - paragraph [ref=e45]: CONSULTANT
+        - generic [ref=e46]:
+          - button "Log out" [ref=e47]:
+            - img
+            - text: Log out
+          - link "Back to public site" [ref=e48] [cursor=pointer]:
+            - /url: /
+    - main [ref=e49]:
+      - generic [ref=e50]:
+        - paragraph [ref=e51]: Workspace surface
+        - generic [ref=e53]:
+          - heading "Client Portal" [level=1] [ref=e54]
+          - paragraph [ref=e55]: Review your quick assessment, published audit findings, and practical next steps without pressure-heavy sales language.
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: Client portal
+        - heading "Your portal will populate as soon as a real presence check is submitted." [level=2] [ref=e59]
+        - paragraph [ref=e60]: Right now there are no submissions linked to this account. Start a free presence check or create portal access with the same email you used when the business was submitted.
+        - link "Start free presence check" [ref=e61] [cursor=pointer]:
+          - /url: /presence-check
+          - text: Start free presence check
+          - img
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e67] [cursor=pointer]:
+    - img [ref=e68]
+  - alert [ref=e71]

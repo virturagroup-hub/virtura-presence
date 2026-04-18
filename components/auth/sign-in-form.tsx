@@ -103,14 +103,8 @@ export function SignInForm({
         </p>
 
         {!showDemoCredentials ? (
-          <div className="mt-8 rounded-3xl border border-amber-200/70 bg-amber-50/80 p-4 text-sm leading-7 text-amber-900">
-            Demo client and consultant access are currently off in this environment.
-            Those optional demo users only work when <code>ENABLE_DEMO_AUTH=true</code>,
-            or after database setup if you intentionally seed demo data with{" "}
-            <code>$env:SEED_DEMO_DATA=&quot;true&quot;; npm run db:seed</code>. The
-            real admin account is seeded separately through{" "}
-            <code>ADMIN_EMAIL</code> / <code>ADMIN_PASSWORD</code> when you run{" "}
-            <code>npm run db:seed</code>.
+          <div className="mt-8 rounded-3xl border border-amber-200/70 bg-amber-50/72 p-5 text-sm leading-7 text-amber-900">
+            Demo sign-in is off in this environment. Use the seeded admin or real account credentials for access here, and only enable demo users when you intentionally want a sample client or consultant flow.
           </div>
         ) : null}
 
@@ -178,7 +172,7 @@ export function SignInForm({
         </div>
 
         {error ? (
-          <div className="rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="rounded-[24px] border border-rose-100 bg-rose-50/82 px-4 py-3 text-sm leading-7 text-rose-700">
             {error}
           </div>
         ) : null}

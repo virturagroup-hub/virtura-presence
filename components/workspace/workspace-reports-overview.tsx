@@ -155,16 +155,15 @@ export function WorkspaceReportsOverview({
                   key={plan.slug}
                   className="rounded-[24px] border border-slate-200/70 bg-white/92 p-4 shadow-[0_22px_45px_-38px_rgba(15,23,42,0.22)]"
                 >
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
                     <div>
                       <p className="text-base font-semibold text-slate-950">{plan.name}</p>
-                      <p className="mt-2 text-sm leading-7 text-slate-600">
-                        Accepted services show confirmed work. Presented and proposed counts show
-                        what is still in play.
+                      <p className="mt-2 text-sm leading-6 text-slate-600">
+                        Confirmed work versus recommendations still in play.
                       </p>
                     </div>
 
-                    <div className="grid min-w-[260px] gap-3 sm:grid-cols-3">
+                    <div className="flex flex-wrap gap-3 xl:min-w-[320px] xl:justify-end">
                       {[
                         {
                           label: "Accepted",
@@ -184,17 +183,14 @@ export function WorkspaceReportsOverview({
                       ].map((item) => (
                         <div
                           key={item.label}
-                          className="rounded-[20px] border border-slate-200/70 bg-slate-50/75 px-4 py-3"
+                          className="min-w-[110px] flex-1 rounded-[20px] border border-slate-200/70 bg-slate-50/75 px-4 py-3 sm:flex-none"
                         >
                           <p className="text-[11px] font-semibold tracking-[0.22em] text-slate-500 uppercase">
                             {item.label}
                           </p>
-                          <div className="mt-2 flex items-center gap-2">
-                            <p className="text-2xl font-semibold text-slate-950">
-                              {item.value}
-                            </p>
-                            <StatusBadge value={item.label} className={item.tone} />
-                          </div>
+                          <p className="mt-2 text-2xl font-semibold text-slate-950">
+                            {item.value}
+                          </p>
                         </div>
                       ))}
                     </div>

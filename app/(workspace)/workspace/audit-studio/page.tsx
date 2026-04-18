@@ -102,7 +102,7 @@ export default async function AuditStudioPage({
 
   return (
     <div className="space-y-7">
-      <div className="grid gap-6 xl:grid-cols-[0.38fr_0.62fr]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(300px,0.36fr)_minmax(0,0.64fr)] xl:items-start">
         <div className="surface-card p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -210,7 +210,7 @@ export default async function AuditStudioPage({
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.82fr)_minmax(0,1.18fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(360px,0.92fr)_minmax(0,1.08fr)] xl:items-start">
         <div className="space-y-6">
           <div className="surface-card p-6">
             <p className="section-kicker">Client context</p>

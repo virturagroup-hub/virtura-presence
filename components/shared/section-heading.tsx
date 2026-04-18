@@ -18,7 +18,7 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "max-w-3xl space-y-4",
+        "max-w-3xl space-y-3",
         align === "center" ? "mx-auto text-center" : "",
         className,
       )}
@@ -27,7 +27,7 @@ export function SectionHeading({
       <h2 className="font-heading text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
         {title}
       </h2>
-      <p className="text-base leading-7 text-slate-600 sm:text-lg">{description}</p>
+      <p className="text-base leading-8 text-slate-600 sm:text-lg">{description}</p>
     </div>
   );
 }
