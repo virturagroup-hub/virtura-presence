@@ -685,7 +685,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                             </Button>
                           </div>
 
-                          <div className="mt-4 grid min-w-0 gap-3 2xl:grid-cols-[220px_minmax(0,1fr)]">
+                          <div className="mt-4 grid min-w-0 gap-3">
                             <WorkspaceSelect
                               value={item.status}
                               onChange={(event) =>
@@ -715,7 +715,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                                   event.target.value,
                                 )
                               }
-                              placeholder="Recommendation"
+                              placeholder="Action recommendation"
                             />
                           </div>
 
