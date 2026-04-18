@@ -661,7 +661,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                           key={`${section.category}-${index}`}
                           className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4 shadow-[0_18px_36px_-34px_rgba(15,23,42,0.22)]"
                         >
-                          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
                             <WorkspaceInput
                               value={item.title}
                               onChange={(event) =>
@@ -685,7 +685,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                             </Button>
                           </div>
 
-                          <div className="mt-4 grid gap-3 xl:grid-cols-[220px_minmax(0,1fr)]">
+                          <div className="mt-4 grid min-w-0 gap-3 2xl:grid-cols-[220px_minmax(0,1fr)]">
                             <WorkspaceSelect
                               value={item.status}
                               onChange={(event) =>
@@ -783,7 +783,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                           key={`${section.category}-evidence-${index}`}
                           className="rounded-[22px] border border-slate-200/70 bg-slate-50/85 p-4 shadow-[0_18px_36px_-34px_rgba(15,23,42,0.2)]"
                         >
-                          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
                             <WorkspaceInput
                               value={item.label}
                               onChange={(event) =>
@@ -807,7 +807,7 @@ export function AuditEditorForm(props: AuditEditorFormProps) {
                             </Button>
                           </div>
 
-                          <div className="mt-4 grid gap-3 xl:grid-cols-[180px_minmax(0,1fr)]">
+                          <div className="mt-4 grid min-w-0 gap-3 2xl:grid-cols-[180px_minmax(0,1fr)]">
                             <WorkspaceSelect
                               value={item.stage}
                               onChange={(event) =>

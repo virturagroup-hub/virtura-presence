@@ -1,0 +1,419 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - link "Virtura Group mark Virtura Group" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - img "Virtura Group mark" [ref=e8]
+          - generic [ref=e10]: Virtura Group
+        - paragraph [ref=e11]: Group submissions by company, move audits through a real studio workflow, send client-ready notifications intentionally, and keep the client lifecycle visible from first check to ongoing care.
+      - navigation [ref=e13]:
+        - link "Pipeline Company pipeline, grouped submissions, lifecycle, and next actions." [ref=e14] [cursor=pointer]:
+          - /url: /workspace
+          - img [ref=e15]
+          - generic [ref=e17]:
+            - paragraph [ref=e18]: Pipeline
+            - paragraph [ref=e19]: Company pipeline, grouped submissions, lifecycle, and next actions.
+        - link "Audit Studio Draft, refine, publish, and resend consultant-reviewed audits." [ref=e20] [cursor=pointer]:
+          - /url: /workspace/audit-studio
+          - img [ref=e21]
+          - generic [ref=e25]:
+            - paragraph [ref=e26]: Audit Studio
+            - paragraph [ref=e27]: Draft, refine, publish, and resend consultant-reviewed audits.
+        - link "Clients Open company records, history, notes, and ongoing care context." [ref=e28] [cursor=pointer]:
+          - /url: /workspace/clients
+          - img [ref=e29]
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Clients
+            - paragraph [ref=e36]: Open company records, history, notes, and ongoing care context.
+        - link "Reports Free audit volume, conversions, service uptake, and alerts." [ref=e37] [cursor=pointer]:
+          - /url: /workspace/reports
+          - img [ref=e38]
+          - generic [ref=e41]:
+            - paragraph [ref=e42]: Reports
+            - paragraph [ref=e43]: Free audit volume, conversions, service uptake, and alerts.
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e48]: VC
+            - generic [ref=e49]:
+              - paragraph [ref=e50]: Virtura Consultant
+              - paragraph [ref=e51]: consultant@virturagroup.com
+          - paragraph [ref=e52]: CONSULTANT
+        - generic [ref=e53]:
+          - button "Log out" [ref=e54]:
+            - img
+            - text: Log out
+          - link "Back to public site" [ref=e55] [cursor=pointer]:
+            - /url: /
+    - main [ref=e56]:
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: Workspace surface
+        - generic [ref=e60]:
+          - heading "Consultant Workspace" [level=1] [ref=e61]
+          - paragraph [ref=e62]: Group submissions by company, move audits through a real studio workflow, send client-ready notifications intentionally, and keep the client lifecycle visible from first check to ongoing care.
+      - generic [ref=e64]:
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - paragraph [ref=e69]: Audit Studio queue
+                - heading "Choose a company to review" [level=2] [ref=e70]
+              - paragraph [ref=e71]: 1 in studio
+            - link "Virtura Group Free audit requested Score 30 · Basic foundation with clear gaps brian.wheeler03@yahoo.com · Lafayette, LA Latest activity Apr 17, 2026" [ref=e73] [cursor=pointer]:
+              - /url: /workspace/audit-studio?businessId=cmo0qng3h0001l9042e2jjwuo&submissionId=cmo0qxbew0001l704bkeucvgj
+              - generic [ref=e74]:
+                - paragraph [ref=e75]: Virtura Group
+                - generic [ref=e76]: Free audit requested
+              - paragraph [ref=e77]: Score 30 · Basic foundation with clear gaps
+              - paragraph [ref=e78]: brian.wheeler03@yahoo.com · Lafayette, LA
+              - paragraph [ref=e79]: Latest activity Apr 17, 2026
+          - generic [ref=e80]:
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - paragraph [ref=e84]: Selected company
+                - heading "Virtura Group" [level=2] [ref=e85]
+                - generic [ref=e87]: Free audit requested
+                - paragraph
+              - generic [ref=e88]:
+                - link "Open company record" [ref=e89] [cursor=pointer]:
+                  - /url: /workspace/clients/cmo0qng3h0001l9042e2jjwuo
+                - link "Back to pipeline" [ref=e90] [cursor=pointer]:
+                  - /url: /workspace
+            - generic [ref=e91]:
+              - generic [ref=e92]:
+                - generic [ref=e95]:
+                  - generic [ref=e96]: "30"
+                  - generic [ref=e97]: Score
+                - generic [ref=e98]:
+                  - generic [ref=e99]: Quick read
+                  - heading "Basic foundation with clear gaps" [level=3] [ref=e100]
+                  - paragraph [ref=e101]: There are workable building blocks here, but a few core visibility and trust signals need attention before the presence can feel consistently strong.
+                  - paragraph [ref=e102]: The good news is that the gaps look fixable with focused, grounded next steps rather than hype or guesswork.
+              - generic [ref=e103]:
+                - generic [ref=e105]:
+                  - generic [ref=e106]: Website Presence
+                  - generic [ref=e107]: 3/20
+                - generic [ref=e111]:
+                  - generic [ref=e112]: Google / Local Presence
+                  - generic [ref=e113]: 4/20
+                - generic [ref=e117]:
+                  - generic [ref=e118]: Reviews & Trust
+                  - generic [ref=e119]: 5/20
+                - generic [ref=e123]:
+                  - generic [ref=e124]: Social Presence / Brand Activity
+                  - generic [ref=e125]: 4/20
+                - generic [ref=e129]:
+                  - generic [ref=e130]: Customer Action Readiness
+                  - generic [ref=e131]: 14/20
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - paragraph [ref=e136]: Helping you already
+                  - paragraph [ref=e138]: Customers may still need a more direct path from trust to action.
+                - generic [ref=e139]:
+                  - paragraph [ref=e140]: Likely needs attention
+                  - generic [ref=e141]:
+                    - paragraph [ref=e142]: The website foundation needs more work to carry trust and conversion weight confidently.
+                    - paragraph [ref=e143]: Local presence looks lighter than it should be, so nearby discovery is probably inconsistent.
+                    - paragraph [ref=e144]: Brand activity feels lighter than the business quality likely deserves, so visibility is less reinforced.
+        - generic [ref=e145]:
+          - generic [ref=e146]:
+            - generic [ref=e147]:
+              - paragraph [ref=e148]: Client context
+              - generic [ref=e149]:
+                - generic [ref=e150]:
+                  - paragraph [ref=e151]: Primary contact
+                  - paragraph [ref=e152]: Brian Wheeler
+                - generic [ref=e153]:
+                  - paragraph [ref=e154]: Email
+                  - paragraph [ref=e155]: brian.wheeler03@yahoo.com
+                - generic [ref=e156]:
+                  - paragraph [ref=e157]: Phone
+                  - paragraph [ref=e158]: "3377891644"
+                - generic [ref=e159]:
+                  - paragraph [ref=e160]: Category
+                  - paragraph [ref=e161]: IT Consulting
+                - generic [ref=e162]:
+                  - paragraph [ref=e163]: Service area
+                  - paragraph [ref=e164]: Metro
+                - generic [ref=e165]:
+                  - paragraph [ref=e166]: Last check
+                  - paragraph [ref=e167]: Apr 15, 2026
+            - generic [ref=e168]:
+              - generic [ref=e169]:
+                - generic [ref=e170]:
+                  - paragraph [ref=e171]: Client email actions
+                  - heading "Send client emails" [level=2] [ref=e172]
+                  - paragraph [ref=e173]: Use this panel for report delivery and follow-up. Delivery issues and sender alerts now live in Reports.
+                - generic [ref=e174]:
+                  - generic [ref=e175]: Live email delivery
+                  - link "View reports & alerts" [ref=e176] [cursor=pointer]:
+                    - /url: /workspace/reports
+                    - text: View reports & alerts
+                    - img
+              - generic [ref=e177]:
+                - generic [ref=e178]:
+                  - generic [ref=e179]:
+                    - generic [ref=e180]:
+                      - paragraph [ref=e181]: Send free report
+                      - paragraph [ref=e182]: Resend the quick review summary and portal entry point.
+                    - img [ref=e184]
+                  - generic [ref=e189]: available now
+                  - paragraph [ref=e190]: Ready to send with the current quick review.
+                  - button "Send free report" [ref=e191]:
+                    - text: Send free report
+                    - img
+                - generic [ref=e192]:
+                  - generic [ref=e193]:
+                    - generic [ref=e194]:
+                      - paragraph [ref=e195]: Send audit available
+                      - paragraph [ref=e196]: Let the client know a consultant-reviewed audit is ready to open.
+                    - img [ref=e198]
+                  - generic [ref=e203]: requires saved audit
+                  - paragraph [ref=e204]: Save an audit in Audit Studio first.
+                  - button "Send audit available" [disabled]:
+                    - text: Send audit available
+                    - img
+                - generic [ref=e205]:
+                  - generic [ref=e206]:
+                    - generic [ref=e207]:
+                      - paragraph [ref=e208]: Send follow-up
+                      - paragraph [ref=e209]: Send a grounded follow-up without turning it into a pressure sequence.
+                    - img [ref=e211]
+                  - generic [ref=e216]: available now
+                  - paragraph [ref=e217]: Use this for a practical check-in after review work.
+                  - button "Send follow-up" [ref=e218]:
+                    - text: Send follow-up
+                    - img
+                - generic [ref=e219]:
+                  - generic [ref=e220]:
+                    - generic [ref=e221]:
+                      - paragraph [ref=e222]: Send comprehensive ready
+                      - paragraph [ref=e223]: Notify the client when the deeper comprehensive review is ready.
+                    - img [ref=e225]
+                  - generic [ref=e230]: requires comprehensive audit
+                  - paragraph [ref=e231]: Save a comprehensive audit before sending this.
+                  - button "Send comprehensive ready" [disabled]:
+                    - text: Send comprehensive ready
+                    - img
+          - generic [ref=e232]:
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - paragraph [ref=e235]: Audit studio
+                - heading "Draft, refine, and publish the consultant review" [level=2] [ref=e236]
+              - generic [ref=e237]:
+                - generic [ref=e238]: DRAFT
+                - generic [ref=e239]: Free review
+            - generic [ref=e240]:
+              - generic [ref=e242]:
+                - paragraph [ref=e243]: AI-assisted drafting cues
+                - paragraph [ref=e244]: Grounding prompts pulled from the latest submission and request context.
+              - generic [ref=e246]:
+                - generic [ref=e248]:
+                  - img [ref=e249]
+                  - generic [ref=e252]: Virtura Group has no live website, so the audit should treat website clarity and contact readiness as a primary gap rather than a secondary polish item.
+                - generic [ref=e254]:
+                  - img [ref=e255]
+                  - generic [ref=e258]: Google / local presence is either missing or uncertain, so the report should treat local discoverability as a foundational gap.
+                - generic [ref=e260]:
+                  - img [ref=e261]
+                  - generic [ref=e264]: Reviews and trust are thin right now. Recommendations should focus on building a repeatable, realistic review engine instead of overpromising quick reputation wins.
+                - generic [ref=e266]:
+                  - img [ref=e267]
+                  - generic [ref=e270]: This business is not running ads, so the plan should prioritize trust, clarity, and visibility fundamentals before suggesting paid traffic.
+                - generic [ref=e272]:
+                  - img [ref=e273]
+                  - generic [ref=e276]: Website Presence is one of the weakest visible areas right now. Make sure the action plan includes a focused fix, not just a description of the problem.
+                - generic [ref=e278]:
+                  - img [ref=e279]
+                  - generic [ref=e282]: Google / Local Presence is one of the weakest visible areas right now. Make sure the action plan includes a focused fix, not just a description of the problem.
+            - generic [ref=e283]:
+              - generic [ref=e285]:
+                - paragraph [ref=e286]: Audit setup
+                - heading "Align scope, progress, and implementation direction" [level=3] [ref=e287]
+              - generic [ref=e289]:
+                - generic [ref=e291]:
+                  - generic [ref=e292]:
+                    - paragraph [ref=e293]: Audit scope
+                    - paragraph [ref=e294]: Choose whether this is a free review or a deeper comprehensive audit.
+                  - combobox [ref=e295]:
+                    - option "Free review" [selected]
+                    - option "Comprehensive"
+                - generic [ref=e297]:
+                  - generic [ref=e298]:
+                    - paragraph [ref=e299]: Progress percent
+                    - paragraph [ref=e300]: Keep the studio honest about how complete the review is right now.
+                  - spinbutton [ref=e301]: "10"
+                - generic [ref=e303]:
+                  - generic [ref=e304]:
+                    - paragraph [ref=e305]: Implementation path
+                    - paragraph [ref=e306]: Clarify whether Virtura recommends DIY, hybrid support, or done-for-you delivery.
+                  - combobox [ref=e307]:
+                    - option "DIY-friendly"
+                    - option "Done for you"
+                    - option "Hybrid support"
+                    - option "Consultation first" [selected]
+                - generic [ref=e309]:
+                  - generic [ref=e310]:
+                    - paragraph [ref=e311]: Implementation notes
+                    - paragraph [ref=e312]: Capture any scope nuance the consultant wants carried into the final report.
+                  - textbox "DIY, hybrid, or done-for-you context" [ref=e313]
+            - generic [ref=e314]:
+              - generic [ref=e316]:
+                - paragraph [ref=e317]: Report foundation
+                - heading "Shape the title and summary stack" [level=3] [ref=e318]
+              - generic [ref=e320]:
+                - generic [ref=e321]:
+                  - paragraph [ref=e323]: Audit title
+                  - textbox "Audit title" [ref=e324]: Virtura Group Presence Audit
+                - generic [ref=e325]:
+                  - generic [ref=e327]:
+                    - paragraph [ref=e329]: Executive summary
+                    - textbox "Executive summary" [ref=e330]
+                  - generic [ref=e332]:
+                    - paragraph [ref=e334]: Client-facing summary
+                    - textbox "Client-facing summary" [ref=e335]
+                  - generic [ref=e337]:
+                    - paragraph [ref=e339]: Internal consultant summary
+                    - textbox "Internal-only consultant summary" [ref=e340]
+            - generic [ref=e341]:
+              - generic [ref=e343]:
+                - paragraph [ref=e344]: Action framing
+                - heading "Capture strengths, gaps, next steps, and the action plan" [level=3] [ref=e345]
+              - generic [ref=e347]:
+                - generic [ref=e349]:
+                  - paragraph [ref=e351]: Strengths
+                  - textbox "One item per line" [ref=e352]: Customers may still need a more direct path from trust to action.
+                - generic [ref=e354]:
+                  - paragraph [ref=e356]: Improvement opportunities
+                  - textbox "One item per line" [ref=e357]: The website foundation needs more work to carry trust and conversion weight confidently. Local presence looks lighter than it should be, so nearby discovery is probably inconsistent. Brand activity feels lighter than the business quality likely deserves, so visibility is less reinforced.
+                - generic [ref=e359]:
+                  - paragraph [ref=e361]: Recommended next steps
+                  - textbox "One item per line" [ref=e362]
+                - generic [ref=e364]:
+                  - paragraph [ref=e366]: Action plan
+                  - textbox "One item per line" [ref=e367]
+            - generic [ref=e368]:
+              - generic [ref=e370]:
+                - paragraph [ref=e371]: Category review
+                - heading "Review each category with notes, checklist context, and evidence" [level=3] [ref=e372]
+              - generic [ref=e373]:
+                - tablist "Audit categories" [ref=e374]:
+                  - tab "Website Presence" [selected] [ref=e375]
+                  - tab "Google / Local Presence" [ref=e376]
+                  - tab "Reviews & Trust" [ref=e377]
+                  - tab "Social Presence / Brand Activity" [ref=e378]
+                  - tab "Customer Action Readiness" [ref=e379]
+                - tabpanel [ref=e380]:
+                  - generic [ref=e381]:
+                    - generic [ref=e383]:
+                      - generic [ref=e384]:
+                        - paragraph [ref=e385]: Section score
+                        - paragraph [ref=e386]: Use this to reflect how strong this category is today, not how strong it could become later.
+                      - spinbutton [ref=e387]: "3"
+                    - generic [ref=e389]:
+                      - generic [ref=e390]:
+                        - paragraph [ref=e391]: Section headline
+                        - paragraph [ref=e392]: Keep the section heading direct enough that a client immediately understands the takeaway.
+                      - textbox "Headline" [ref=e393]: Website Presence
+                  - generic [ref=e394]:
+                    - generic [ref=e396]:
+                      - generic [ref=e397]:
+                        - paragraph [ref=e398]: Client-facing notes
+                        - paragraph [ref=e399]: What the client should read in the published report for this category.
+                      - textbox "Client-facing notes" [ref=e400]: The website foundation needs more work to carry trust and conversion weight confidently.
+                    - generic [ref=e402]:
+                      - generic [ref=e403]:
+                        - paragraph [ref=e404]: Internal consultant notes
+                        - paragraph [ref=e405]: Anything the consultant wants to keep internal while shaping the action plan.
+                      - textbox "Internal-only consultant notes" [ref=e406]
+                  - generic [ref=e407]:
+                    - generic [ref=e408]:
+                      - generic [ref=e409]:
+                        - generic [ref=e410]:
+                          - paragraph [ref=e411]: Checklist workflow
+                          - paragraph [ref=e412]: Track what was checked and what needs attention.
+                        - button [ref=e413]:
+                          - img
+                      - generic [ref=e414]:
+                        - generic [ref=e415]:
+                          - generic [ref=e416]:
+                            - textbox "Checklist item" [ref=e417]: Homepage clearly explains who the business serves and what it does
+                            - button [ref=e418]:
+                              - img
+                          - generic [ref=e419]:
+                            - combobox [ref=e420]:
+                              - option "Not started" [selected]
+                              - option "In progress"
+                              - option "Complete"
+                              - option "Needs attention"
+                            - textbox "Recommendation" [ref=e421]: Clarify the main service promise in the first screenful.
+                          - textbox "Consultant notes" [ref=e422]
+                        - generic [ref=e423]:
+                          - generic [ref=e424]:
+                            - textbox "Checklist item" [ref=e425]: Primary calls to action are easy to find on desktop and mobile
+                            - button [ref=e426]:
+                              - img
+                          - generic [ref=e427]:
+                            - combobox [ref=e428]:
+                              - option "Not started" [selected]
+                              - option "In progress"
+                              - option "Complete"
+                              - option "Needs attention"
+                            - textbox "Recommendation" [ref=e429]: Move core contact actions closer to trust-building proof.
+                          - textbox "Consultant notes" [ref=e430]
+                        - generic [ref=e431]:
+                          - generic [ref=e432]:
+                            - textbox "Checklist item" [ref=e433]: Trust signals appear near service and contact decisions
+                            - button [ref=e434]:
+                              - img
+                          - generic [ref=e435]:
+                            - combobox [ref=e436]:
+                              - option "Not started" [selected]
+                              - option "In progress"
+                              - option "Complete"
+                              - option "Needs attention"
+                            - textbox "Recommendation" [ref=e437]: Place reviews, guarantees, or credentials near decision points.
+                          - textbox "Consultant notes" [ref=e438]
+                    - generic [ref=e439]:
+                      - generic [ref=e440]:
+                        - generic [ref=e441]:
+                          - paragraph [ref=e442]: Evidence and screenshots
+                          - paragraph [ref=e443]: Keep proof and references attached to the right section.
+                        - button [ref=e444]:
+                          - img
+                      - generic [ref=e446]:
+                        - paragraph [ref=e447]: No evidence references yet
+                        - paragraph [ref=e448]: Add a before, after, progress, or reference item so this section has proof attached to the written review.
+                        - generic [ref=e449]:
+                          - generic [ref=e450]: Before
+                          - generic [ref=e451]: After
+                          - generic [ref=e452]: Progress
+                          - generic [ref=e453]: Reference
+                        - button "Add evidence item" [ref=e455]
+            - generic [ref=e456]:
+              - generic [ref=e458]:
+                - paragraph [ref=e459]: Recommended service plans
+                - heading "Align recommendations with the visible gaps" [level=3] [ref=e460]
+              - generic [ref=e462]:
+                - generic [ref=e463]:
+                  - button "Google Business Profile Boost" [ref=e464]
+                  - button "Manual Comprehensive Audit" [ref=e465]
+                  - button "Quick Website Launch" [ref=e466]
+                  - button "Visibility Care Plan" [ref=e467]
+                - generic [ref=e468]:
+                  - generic [ref=e469]:
+                    - paragraph [ref=e470]: Recommendation rationale
+                    - paragraph [ref=e471]: Explain why these plans fit this business so the recommendation feels grounded instead of generic.
+                  - textbox "Why do these recommendations fit this business?" [ref=e472]
+            - generic [ref=e474]:
+              - generic [ref=e475]:
+                - paragraph [ref=e476]: Finalization controls
+                - paragraph [ref=e477]: Save the working draft, mark it ready, or publish the client-safe report when the review is complete.
+              - generic [ref=e478]:
+                - button "Save draft" [ref=e479]
+                - button "Mark ready" [ref=e480]
+                - button "Publish audit" [ref=e481]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e487] [cursor=pointer]:
+    - img [ref=e488]
